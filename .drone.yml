@@ -3,7 +3,7 @@ pipeline:
     image: dodoreg.azurecr.io/drone-plugins/nuget:1.0.1
     pull: true
     secrets: [ nuget_source, nuget_user, nuget_password, nuget_sourcename ]
-   
+
   build:
     image: docker
     commands:
