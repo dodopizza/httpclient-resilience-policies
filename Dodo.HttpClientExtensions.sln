@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dodo.HttpClientExtensions", "Dodo.HttpClientExtensions\Dodo.HttpClientExtensions.csproj", "{558A02C8-BC81-4ED0-8C10-E9F5C2DF9351}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{876566FC-C860-4142-B19D-8EEE4F3AEF81}"
+ProjectSection(SolutionItems) = preProject
+	.drone.yml = .drone.yml
+	Dockerfile = Dockerfile
+EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{09D70CE7-7727-484C-B27F-65DAE3911A4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09D70CE7-7727-484C-B27F-65DAE3911A4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09D70CE7-7727-484C-B27F-65DAE3911A4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09D70CE7-7727-484C-B27F-65DAE3911A4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{558A02C8-BC81-4ED0-8C10-E9F5C2DF9351}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{558A02C8-BC81-4ED0-8C10-E9F5C2DF9351}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{558A02C8-BC81-4ED0-8C10-E9F5C2DF9351}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{558A02C8-BC81-4ED0-8C10-E9F5C2DF9351}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
