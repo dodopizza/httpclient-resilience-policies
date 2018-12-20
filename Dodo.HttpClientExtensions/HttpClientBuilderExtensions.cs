@@ -14,17 +14,21 @@ namespace Dodo.HttpClientExtensions
 		public static IHttpClientBuilder AddJsonClient<TClientInterface, TClientImplementation>(
 			this IServiceCollection sc,
 			Uri baseAddress,
-			string clientName,
-			ClientSettings settings) where TClientInterface : class where TClientImplementation : class, TClientInterface
+			ClientSettings settings,
+			string clientName = null) where TClientInterface : class where TClientImplementation : class, TClientInterface
 		{
-			return sc.AddHttpClient<TClientInterface, TClientImplementation>(client =>
+			var httpClientBuilder = sc.AddHttpClient<TClientInterface, TClientImplementation>(client =>
 				{
 					client.BaseAddress = baseAddress;
 					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 					client.Timeout = settings.TimeOutPerRequest;
 				})
-				.AddTracingHandler(clientName)
 				.AddDefaultPolicies(settings);
+			if (!string.IsNullOrEmpty(clientName))
+			{
+				httpClientBuilder.AddTracingHandler(clientName);
+			}
+			return httpClientBuilder;
 		}
 
 		public static IHttpClientBuilder AddDefaultPolicies(this IHttpClientBuilder clientBuilder, ClientSettings settings)
