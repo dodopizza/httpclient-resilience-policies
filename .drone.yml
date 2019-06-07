@@ -1,24 +1,49 @@
-pipeline:
-  nuget:
-    image: dodoreg.azurecr.io/drone-plugins/nuget:1.0.1
-    pull: true
-    secrets: [ nuget_source, nuget_user, nuget_password, nuget_sourcename ]
+---
+kind: pipeline
+name: default
 
-  build:
-    image: docker
-    commands:
-    - docker build . -t httpclientextensions -f Dockerfile
-    volumes:
-    - /var/run/docker.sock:/var/run/docker.sock
-    when:
-      event: [ push, pull_request ]
-  
-  push:
-    image: docker
-    commands:
-    - docker run httpclientextensions --api-key $NUGET_PASSWORD 
-    secrets: [ nuget_password ]
-    volumes:
-    - /var/run/docker.sock:/var/run/docker.sock
-    when:
-      status: [ success ]
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: nuget
+  image: dodoreg.azurecr.io/drone-plugins/nuget:2.0.0
+  environment:
+    NUGET_CONFIG:
+      from_secret: global_nuget_config
+
+- name: build
+  pull: default
+  image: docker
+  commands:
+  - docker build . -t httpclientextensions -f Dockerfile
+  volumes:
+  - name: 2f7661722f72756e2f646f636b65722e736f636b
+    path: /var/run/docker.sock
+  when:
+    event:
+    - push
+    - pull_request
+
+- name: push
+  pull: default
+  image: docker
+  commands:
+  - docker run httpclientextensions --api-key $NUGET_PASSWORD
+  environment:
+    NUGET_PASSWORD:
+      from_secret: nuget_password
+  volumes:
+  - name: 2f7661722f72756e2f646f636b65722e736f636b
+    path: /var/run/docker.sock
+  when:
+    status:
+    - success
+
+volumes:
+- name: 2f7661722f72756e2f646f636b65722e736f636b
+  host:
+    path: /var/run/docker.sock
+
+...
