@@ -33,7 +33,7 @@ steps:
   - docker run httpclientextensions --api-key $NUGET_PASSWORD
   environment:
     NUGET_PASSWORD:
-      from_secret: nuget_password
+      from_secret: global_nuget_password
   volumes:
   - name: 2f7661722f72756e2f646f636b65722e736f636b
     path: /var/run/docker.sock
