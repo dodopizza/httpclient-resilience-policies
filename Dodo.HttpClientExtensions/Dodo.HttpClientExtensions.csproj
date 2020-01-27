@@ -1,10 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <Version>1.0.1</Version>
+        <Version>1.1.0</Version>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="zipkin4net" Version="1.2.3" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="2.1.1" />
         <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="2.1.1" />

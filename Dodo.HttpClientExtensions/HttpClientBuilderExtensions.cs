@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.Extensions.Http;
 using Polly.Timeout;
-using zipkin4net.Transport.Http;
 
 namespace Dodo.HttpClientExtensions
 {
@@ -24,10 +23,7 @@ namespace Dodo.HttpClientExtensions
 					client.Timeout = settings.TimeOutPerRequest;
 				})
 				.AddDefaultPolicies(settings);
-			if (!string.IsNullOrEmpty(clientName))
-			{
-				httpClientBuilder.AddTracingHandler(clientName);
-			}
+			
 			return httpClientBuilder;
 		}
 
@@ -37,12 +33,6 @@ namespace Dodo.HttpClientExtensions
 				.AddTimeoutPolicy(settings.TotalTimeOut)
 				.AddRetryPolicy(settings.RetryCount, settings.SleepDurationProvider)
 				.AddCircuitBreakerPolicy(settings.FailureThreshold, settings.MinimumThroughput, settings.DurationOfBreak, settings.SamplingDuration);
-		}
-
-		public static IHttpClientBuilder AddTracingHandler(this IHttpClientBuilder clientBuilder, string clientName)
-		{
-			return clientBuilder
-				.AddHttpMessageHandler(() => TracingHandler.WithoutInnerHandler(clientName));
 		}
 
 		private static IHttpClientBuilder AddRetryPolicy(this IHttpClientBuilder clientBuilder, int retryCount, Func<int, TimeSpan> sleepDurationProvider)
