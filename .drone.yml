@@ -32,7 +32,6 @@ steps:
   when:
     event:
     - push
-    - pull_request
 
 - name: push
   pull: default
@@ -48,8 +47,8 @@ steps:
   - name: 2f7661722f72756e2f646f636b65722e736f636b
     path: /var/run/docker.sock
   when:
-    status:
-    - success
+    event:
+    - push
 
 volumes:
 - name: 2f7661722f72756e2f646f636b65722e736f636b
