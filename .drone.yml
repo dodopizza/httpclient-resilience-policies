@@ -17,8 +17,7 @@ steps:
     - clone
   when:
     event:
-      - push
-      - pull_request
+    - push
 
 - name: build
   pull: default
