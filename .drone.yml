@@ -8,23 +8,30 @@ platform:
 
 steps:
 - name: nuget
+  pull: always
   image: dodoreg.azurecr.io/drone-plugins/nuget:2.0.0
   environment:
     NUGET_CONFIG:
       from_secret: global_nuget_config
+  depends_on:
+    - clone
+  when:
+    event:
+    - push
 
 - name: build
   pull: default
   image: docker
   commands:
   - docker build . -t httpclientextensions -f Dockerfile
+  depends_on:
+    - nuget
   volumes:
   - name: 2f7661722f72756e2f646f636b65722e736f636b
     path: /var/run/docker.sock
   when:
     event:
     - push
-    - pull_request
 
 - name: push
   pull: default
@@ -34,12 +41,14 @@ steps:
   environment:
     NUGET_PASSWORD:
       from_secret: global_nuget_password
+  depends_on:
+    - build
   volumes:
   - name: 2f7661722f72756e2f646f636b65722e736f636b
     path: /var/run/docker.sock
   when:
-    status:
-    - success
+    event:
+    - push
 
 volumes:
 - name: 2f7661722f72756e2f646f636b65722e736f636b
