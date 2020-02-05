@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
@@ -54,6 +55,7 @@ namespace Dodo.HttpClientExtensions
 			return clientBuilder.AddPolicyHandler( 
 				HttpPolicyExtensions
 					.HandleTransientHttpError()
+					.OrResult(r => r.StatusCode == (HttpStatusCode) 429) // Too Many Requests
 					.AdvancedCircuitBreakerAsync(
 						failureThreshold: failureThreshold,
 						samplingDuration: samplingDuration, 
