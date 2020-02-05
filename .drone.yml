@@ -6,12 +6,13 @@ platform:
   os: linux
   arch: amd64
 
-steps:
 - name: nuget
+  pull: always
   image: dodoreg.azurecr.io/drone-plugins/nuget:2.0.0
   environment:
     NUGET_CONFIG:
       from_secret: global_nuget_config
+  depends_on: [ clone ]
 
 - name: build
   pull: default
