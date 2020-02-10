@@ -41,7 +41,7 @@ namespace Dodo.HttpClientExtensions
 
         private static IHttpClientBuilder AddRetryPolicy(
             this IHttpClientBuilder clientBuilder,
-            RetrySettings settings)
+            IRetrySettings settings)
         {
             return clientBuilder
                 .AddPolicyHandler(HttpPolicyExtensions // (serviceProvider, _)  =>
@@ -55,7 +55,7 @@ namespace Dodo.HttpClientExtensions
 
         private static IHttpClientBuilder AddCircuitBreakerPolicy(
             this IHttpClientBuilder clientBuilder,
-            CircuitBreakerSettings settings)
+            ICircuitBreakerSettings settings)
         {
             return clientBuilder.AddPolicyHandler(
                 HttpPolicyExtensions

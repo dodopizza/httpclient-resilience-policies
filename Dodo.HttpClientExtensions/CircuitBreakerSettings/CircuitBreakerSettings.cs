@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using Polly;
 
 namespace Dodo.HttpClientExtensions
 {
-    public class CircuitBreakerSettings
+    public class CircuitBreakerSettings : ICircuitBreakerSettings
     {
         public double FailureThreshold { get; }
         public int MinimumThroughput { get; }
@@ -32,7 +32,7 @@ namespace Dodo.HttpClientExtensions
             OnHalfOpen = onHalfOpen;
         }
 
-        public static CircuitBreakerSettings Default() =>
+        public static ICircuitBreakerSettings Default() =>
             new CircuitBreakerSettings(
                 DefaultFailureThreshold,
                 DefaultMinimumThroughput,
