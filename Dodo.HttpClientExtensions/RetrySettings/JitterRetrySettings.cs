@@ -44,12 +44,13 @@ namespace Dodo.HttpClientExtensions
 				_defaultOnRetry
 			);
 
-		private const int DefaultRetryCount = 5;
-		private static readonly TimeSpan _defaultMedianFirstRetryDelay = TimeSpan.FromSeconds(3);
+		private const int DefaultRetryCount = 3;
+		private static readonly TimeSpan _defaultMedianFirstRetryDelay = TimeSpan.FromSeconds(2);
 
+		// i - retry attempt
 		private static readonly Func<int, TimeSpan, Func<int, TimeSpan>> _defaultSleepDurationProvider =
 			(retryCount, medianFirstRetryDelay) => i =>
-				Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay, retryCount).ToArray()[i];
+				Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay, retryCount).ToArray()[i - 1];
 
 		private static readonly Action<DelegateResult<HttpResponseMessage>, TimeSpan> _defaultOnRetry = (_, __) => { };
 	}

@@ -18,6 +18,15 @@ namespace Dodo.HttpClientExtensions
 			double failureThreshold,
 			int minimumThroughput,
 			TimeSpan durationOfBreak,
+			TimeSpan samplingDuration) : this(failureThreshold, minimumThroughput, durationOfBreak, samplingDuration,
+			_defaultOnBreak, _defaultOnReset, _defaultOnHalfOpen)
+		{
+		}
+
+		public CircuitBreakerSettings(
+			double failureThreshold,
+			int minimumThroughput,
+			TimeSpan durationOfBreak,
 			TimeSpan samplingDuration,
 			Action<DelegateResult<HttpResponseMessage>, TimeSpan> onBreak,
 			Action onReset,

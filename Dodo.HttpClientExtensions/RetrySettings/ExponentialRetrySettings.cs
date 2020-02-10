@@ -44,7 +44,7 @@ namespace Dodo.HttpClientExtensions
 				_defaultOnRetry
 			);
 
-		private const int DefaultRetryCount = 5;
+		private const int DefaultRetryCount = 3;
 
 		private static readonly Func<int, TimeSpan> _defaultSleepDurationProvider =
 			i => TimeSpan.FromMilliseconds(20 * Math.Pow(2, i));

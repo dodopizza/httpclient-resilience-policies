@@ -11,10 +11,24 @@ namespace Dodo.HttpClientExtensions.Tests
 		private HttpStatusCode _statusCode = HttpStatusCode.OK;
 		private IRetrySettings _retrySettings;
 		private ICircuitBreakerSettings _circuitBreakerSettings;
+		private TimeSpan _totalTimeout = TimeSpan.FromDays(1);
+		private TimeSpan _timeoutPerRequest = TimeSpan.FromDays(1);
 
 		public HttpClientWrapperBuilder WithStatusCode(HttpStatusCode statusCode)
 		{
 			_statusCode = statusCode;
+			return this;
+		}
+
+		public HttpClientWrapperBuilder WithTotalTimeout(TimeSpan totalTimeout)
+		{
+			_totalTimeout = totalTimeout;
+			return this;
+		}
+
+		public HttpClientWrapperBuilder WithTimeoutPerRequest(TimeSpan timeoutPerRequest)
+		{
+			_timeoutPerRequest = timeoutPerRequest;
 			return this;
 		}
 
@@ -35,7 +49,10 @@ namespace Dodo.HttpClientExtensions.Tests
 			var handler = new MockHttpMessageHandler(_statusCode);
 			var services = new ServiceCollection();
 			services
-				.AddHttpClient(ClientName)
+				.AddHttpClient(ClientName, c =>
+				{
+					c.Timeout = _timeoutPerRequest;
+				})
 				.AddDefaultPolicies(BuildClientSettings())
 				.ConfigurePrimaryHttpMessageHandler(() => handler);
 
@@ -47,11 +64,18 @@ namespace Dodo.HttpClientExtensions.Tests
 
 		private ClientSettings BuildClientSettings()
 		{
+			var defaultCircuitBreakerSettings = _circuitBreakerSettings ?? new CircuitBreakerSettings(
+				failureThreshold: 0.5,
+				minimumThroughput: int.MaxValue,
+				durationOfBreak: TimeSpan.FromMilliseconds(1),
+				samplingDuration: TimeSpan.FromMilliseconds(20)
+			);
+
 			return new ClientSettings(
-				TimeSpan.FromMilliseconds(ClientSettings.DefaultTotalTimeOutInMilliseconds),
-				TimeSpan.FromMilliseconds(ClientSettings.DefaultTimeOutPerRequestInMilliseconds),
+				_totalTimeout,
+				_timeoutPerRequest,
 				_retrySettings ?? JitterRetrySettings.Default(),
-				_circuitBreakerSettings ?? CircuitBreakerSettings.Default());
+				defaultCircuitBreakerSettings);
 		}
 	}
 }
