@@ -34,14 +34,15 @@ namespace Dodo.HttpClientExtensions.Tests
 		public async Task Should_retry_6_times_for_two_threads_when_client_returns_503()
 		{
 			const int retryCount = 3;
-			var retrySettings = new JitterRetrySettings(retryCount);
+			var retrySettings =
+				new JitterRetrySettings(retryCount, medianFirstRetryDelay: TimeSpan.FromMilliseconds(50));
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
 				.WithRetrySettings(retrySettings)
 				.Please();
 
 			const int taskCount = 2;
-			await InvokeMultipleHttpRequests(wrapper.Client, taskCount);
+			await Helper.InvokeMultipleHttpRequests(wrapper.Client, taskCount);
 
 			Assert.AreEqual((retryCount + 1) * taskCount, wrapper.NumberOfCalls);
 		}
@@ -51,29 +52,19 @@ namespace Dodo.HttpClientExtensions.Tests
 		{
 			const int retryCount = 3;
 			var retryAttempts = new Dictionary<string, List<TimeSpan>>();
-			var retrySettings = new JitterRetrySettings(retryCount, BuildOnRetryAction(retryAttempts));
+			var retrySettings = new JitterRetrySettings(
+				retryCount,
+				medianFirstRetryDelay: TimeSpan.FromMilliseconds(50),
+				onRetry: BuildOnRetryAction(retryAttempts));
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
 				.WithRetrySettings(retrySettings)
 				.Please();
 
 			const int taskCount = 2;
-			await InvokeMultipleHttpRequests(wrapper.Client, taskCount);
+			await Helper.InvokeMultipleHttpRequests(wrapper.Client, taskCount);
 
 			CollectionAssert.AreNotEquivalent(retryAttempts.First().Value, retryAttempts.Last().Value);
-		}
-
-		private static async Task InvokeMultipleHttpRequests(HttpClient client, int taskCount)
-		{
-			var tasks = new Task[taskCount];
-			for (var i = 0; i < taskCount; i++)
-			{
-				var requestMessage = new HttpRequestMessage(HttpMethod.Get, "http://localhost");
-				requestMessage.Headers.Add("TaskId", i.ToString());
-				tasks[i] = client.SendAsync(requestMessage);
-			}
-
-			await Task.WhenAll(tasks);
 		}
 
 		private Action<DelegateResult<HttpResponseMessage>, TimeSpan> BuildOnRetryAction(
