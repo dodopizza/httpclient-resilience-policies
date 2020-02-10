@@ -17,6 +17,11 @@ namespace Dodo.HttpClientExtensions
 		{
 		}
 
+		public JitterRetrySettings(int retryCount, Action<DelegateResult<HttpResponseMessage>, TimeSpan> onRetry) :
+			this(retryCount, _defaultMedianFirstRetryDelay, onRetry)
+		{
+		}
+
 		public JitterRetrySettings(int retryCount, TimeSpan medianFirstRetryDelay) : this(retryCount,
 			medianFirstRetryDelay, _defaultOnRetry)
 		{

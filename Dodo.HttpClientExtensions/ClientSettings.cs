@@ -4,10 +4,14 @@ namespace Dodo.HttpClientExtensions
 {
 	public class ClientSettings
 	{
+		public const int DefaultTotalTimeOutInMilliseconds = 10000;
+		public const int DefaultTimeOutPerRequestInMilliseconds = 2000;
+
 		public TimeSpan TotalTimeout { get; }
 		public TimeSpan TimeoutPerRequest { get; }
 		public IRetrySettings RetrySettings { get; }
 		public ICircuitBreakerSettings CircuitBreakerSettings { get; }
+
 
 		public ClientSettings(
 			TimeSpan totalTimeout,
@@ -37,8 +41,5 @@ namespace Dodo.HttpClientExtensions
 				JitterRetrySettings.Default(),
 				HttpClientExtensions.CircuitBreakerSettings.Default()
 			);
-
-		private const int DefaultTotalTimeOutInMilliseconds = 10000;
-		private const int DefaultTimeOutPerRequestInMilliseconds = 2000;
 	}
 }

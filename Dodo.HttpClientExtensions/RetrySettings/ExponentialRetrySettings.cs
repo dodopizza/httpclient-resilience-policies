@@ -20,6 +20,13 @@ namespace Dodo.HttpClientExtensions
 		{
 		}
 
+
+		public ExponentialRetrySettings(
+			int retryCount,
+			Action<DelegateResult<HttpResponseMessage>, TimeSpan> onRetry): this(retryCount, _defaultSleepDurationProvider, onRetry)
+		{
+		}
+
 		public ExponentialRetrySettings(
 			int retryCount,
 			Func<int, TimeSpan> sleepDurationProvider,
