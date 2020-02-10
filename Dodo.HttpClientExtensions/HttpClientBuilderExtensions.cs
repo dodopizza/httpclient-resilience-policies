@@ -30,6 +30,13 @@ namespace Dodo.HttpClientExtensions
 		}
 
 		public static IHttpClientBuilder AddDefaultPolicies(
+			this IHttpClientBuilder clientBuilder)
+		{
+			return clientBuilder
+				.AddDefaultPolicies(ClientSettings.Default());
+		}
+
+		public static IHttpClientBuilder AddDefaultPolicies(
 			this IHttpClientBuilder clientBuilder,
 			ClientSettings settings)
 		{

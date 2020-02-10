@@ -22,6 +22,7 @@ namespace Dodo.HttpClientExtensions.Tests
 			Interlocked.Increment(ref _numberOfCalls);
 			return new HttpResponseMessage
 			{
+				RequestMessage = request,
 				StatusCode = _statusCode
 			};
 		}
