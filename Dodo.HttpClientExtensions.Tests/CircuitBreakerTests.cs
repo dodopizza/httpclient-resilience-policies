@@ -1,8 +1,9 @@
 using System;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Polly.CircuitBreaker;
+using Polly.Timeout;
 
 namespace Dodo.HttpClientExtensions.Tests
 {
@@ -10,36 +11,35 @@ namespace Dodo.HttpClientExtensions.Tests
 	public class CircuitBreakerTests
 	{
 		[Test]
-		public async Task Should_break_after_4_concurrent_calls()
+		public void Should_break_after_4_concurrent_calls()
 		{
-			const int retryCount = 5;
-			var retrySettings =
-				new ExponentialRetrySettings(retryCount, i => TimeSpan.FromMilliseconds(1));
-			long breakCount = 0;
-			var circuitBreakerSettings =
-				new CircuitBreakerSettings(0.5, 4, TimeSpan.FromMinutes(1),
-					TimeSpan.FromMilliseconds(20), (_, __) => { breakCount++; },
-					() => { },
-					() => { });
+			const int minimumThroughput = 4;
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
 				.WithTotalTimeout(TimeSpan.FromSeconds(5))
-				.WithCircuitBreakerSettings(circuitBreakerSettings)
-				.WithRetrySettings(retrySettings)
+				.WithCircuitBreakerSettings(BuildCircuitBreakerSettings(minimumThroughput))
+				.WithRetrySettings(BuildRetrySettings())
 				.Please();
 
-			const int taskCount = 4;
-			try
-			{
-				await Helper.InvokeMultipleHttpRequests(wrapper.Client, taskCount);
-			}
-			catch (Polly.Timeout.TimeoutRejectedException)
-			{}
-			catch (Polly.CircuitBreaker.BrokenCircuitException)
-			{}
+			Assert.CatchAsync<BrokenCircuitException>(async () => await Helper.InvokeMultipleHttpRequests(wrapper.Client, taskCount: 4));
 
-			Assert.AreEqual(1, breakCount);
-			Assert.AreEqual(circuitBreakerSettings.MinimumThroughput, wrapper.NumberOfCalls);
+			Assert.AreEqual(minimumThroughput, wrapper.NumberOfCalls);
+		}
+
+		private static IRetrySettings BuildRetrySettings()
+		{
+			return new ExponentialRetrySettings(
+				retryCount: 5,
+				sleepDurationProvider: i => TimeSpan.FromMilliseconds(1));
+		}
+
+		private static ICircuitBreakerSettings BuildCircuitBreakerSettings(int throughput)
+		{
+			return new CircuitBreakerSettings(
+					failureThreshold: 0.5,
+					minimumThroughput: throughput,
+					durationOfBreak: TimeSpan.FromMinutes(1),
+					samplingDuration: TimeSpan.FromMilliseconds(20));
 		}
 	}
 }
