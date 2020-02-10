@@ -51,7 +51,7 @@ namespace Dodo.HttpClientExtensions
 			IRetrySettings settings)
 		{
 			return clientBuilder
-				.AddPolicyHandler(_ => HttpPolicyExtensions
+				.AddPolicyHandler(HttpPolicyExtensions
 					.HandleTransientHttpError()
 					.Or<TimeoutRejectedException>()
 					.WaitAndRetryAsync(

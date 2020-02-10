@@ -41,7 +41,7 @@ namespace Dodo.HttpClientExtensions.Tests
 				.Please();
 
 			const int taskCount = 2;
-			InvokeMultipleHttpRequests(wrapper.Client, taskCount);
+			await InvokeMultipleHttpRequests(wrapper.Client, taskCount);
 
 			Assert.AreEqual((retryCount + 1) * taskCount, wrapper.NumberOfCalls);
 		}
@@ -58,12 +58,12 @@ namespace Dodo.HttpClientExtensions.Tests
 				.Please();
 
 			const int taskCount = 2;
-			InvokeMultipleHttpRequests(wrapper.Client, taskCount);
+			await InvokeMultipleHttpRequests(wrapper.Client, taskCount);
 
 			CollectionAssert.AreNotEquivalent(retryAttempts.First().Value, retryAttempts.Last().Value);
 		}
 
-		private static void InvokeMultipleHttpRequests(HttpClient client, int taskCount)
+		private static async Task InvokeMultipleHttpRequests(HttpClient client, int taskCount)
 		{
 			var tasks = new Task[taskCount];
 			for (var i = 0; i < taskCount; i++)
@@ -73,7 +73,7 @@ namespace Dodo.HttpClientExtensions.Tests
 				tasks[i] = client.SendAsync(requestMessage);
 			}
 
-			Task.WaitAll(tasks);
+			await Task.WhenAll(tasks);
 		}
 
 		private Action<DelegateResult<HttpResponseMessage>, TimeSpan> BuildOnRetryAction(
