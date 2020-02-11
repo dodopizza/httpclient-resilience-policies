@@ -7,72 +7,75 @@ platform:
   arch: amd64
 
 steps:
-- name: nuget
-  pull: always
-  image: dodoreg.azurecr.io/drone-plugins/nuget:2.0.0
-  environment:
-    NUGET_CONFIG:
-      from_secret: global_nuget_config
-  depends_on:
-    - clone
-  when:
-    event:
-    - push
+  - name: nuget
+    pull: always
+    image: dodoreg.azurecr.io/drone-plugins/nuget:2.0.0
+    environment:
+      NUGET_CONFIG:
+        from_secret: global_nuget_config
+    depends_on:
+      - clone
+    when:
+      event:
+      - push
 
-- name: build-release
-  image: docker
-  commands:
-  - docker build -t httpclientextensions -f Dockerfile .
-  depends_on:
-    - nuget
-  volumes:
-  - name: 2f7661722f72756e2f646f636b65722e736f636b
-    path: /var/run/docker.sock
-  when:
-    branch:
-    - master
-    event:
-    - promote
-    - push
+  - name: build-release
+    image: docker
+    pull: default
+    commands:
+      - docker build -t httpclientextensions -f Dockerfile .
+    depends_on:
+      - nuget
+    volumes:
+      - name: 2f7661722f72756e2f646f636b65722e736f636b
+        path: /var/run/docker.sock
+    when:
+      branch:
+        - master
+      event:
+        - promote
+        - push
 
-- name: build-prerelease
-  image: docker
-  commands:
-    - docker build -t httpclientextensions -f Dockerfile --build-arg versionSuffix=${DRONE_BRANCH} .
-  depends_on:
-    - nuget
-  volumes:
-    - name: 2f7661722f72756e2f646f636b65722e736f636b
-      path: /var/run/docker.sock
-  when:
-    branch:
-      exclude:
-      - master
-    event:
-    - promote
-    - push
+  - name: build-prerelease
+    image: docker
+    pull: default
+    commands:
+      - docker build -t httpclientextensions -f Dockerfile --build-arg versionSuffix=${DRONE_BRANCH} .
+    depends_on:
+      - nuget
+    volumes:
+      - name: 2f7661722f72756e2f646f636b65722e736f636b
+        path: /var/run/docker.sock
+    when:
+      branch:
+        exclude:
+          - master
+      event:
+        - promote
+        - push
 
-- name: push
-  image: docker
-  commands:
-  - docker run httpclientextensions --api-key $NUGET_PASSWORD
-  environment:
-    NUGET_PASSWORD:
-      from_secret: global_nuget_password
-  depends_on:
-    - build
-  volumes:
-  - name: 2f7661722f72756e2f646f636b65722e736f636b
-    path: /var/run/docker.sock
-  when:
-    status:
-    - success
-    event:
-    - promote
+  - name: push
+    image: docker
+    pull: default
+    commands:
+      - docker run httpclientextensions --api-key $NUGET_PASSWORD
+    environment:
+      NUGET_PASSWORD:
+        from_secret: global_nuget_password
+    depends_on:
+      - build
+    volumes:
+      - name: 2f7661722f72756e2f646f636b65722e736f636b
+        path: /var/run/docker.sock
+    when:
+      status:
+        - success
+      event:
+        - promote
 
 volumes:
-- name: 2f7661722f72756e2f646f636b65722e736f636b
-  host:
-    path: /var/run/docker.sock
+  - name: 2f7661722f72756e2f646f636b65722e736f636b
+    host:
+      path: /var/run/docker.sock
 
 ...
