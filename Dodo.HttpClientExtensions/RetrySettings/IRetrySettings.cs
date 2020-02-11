@@ -8,6 +8,6 @@ namespace Dodo.HttpClientExtensions
 	{
 		int RetryCount { get; }
 		Func<int, TimeSpan> SleepDurationProvider { get; }
-		Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnRetry { get; }
+		Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnRetry { get; set; }
 	}
 }

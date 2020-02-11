@@ -10,9 +10,9 @@ namespace Dodo.HttpClientExtensions
 		public int MinimumThroughput { get; }
 		public TimeSpan DurationOfBreak { get; }
 		public TimeSpan SamplingDuration { get; }
-		public Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnBreak { get; }
-		public Action OnReset { get; }
-		public Action OnHalfOpen { get; }
+		public Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnBreak { get; set; }
+		public Action OnReset { get; set; }
+		public Action OnHalfOpen { get; set; }
 
 		public CircuitBreakerSettings(
 			double failureThreshold,
