@@ -20,11 +20,12 @@ namespace Dodo.HttpClientExtensions.Tests
 			CancellationToken cancellationToken)
 		{
 			Interlocked.Increment(ref _numberOfCalls);
-			return new HttpResponseMessage
-			{
-				RequestMessage = request,
-				StatusCode = _statusCode
-			};
+			return await Task.FromResult(
+				new HttpResponseMessage
+				{
+					RequestMessage = request,
+					StatusCode = _statusCode
+				});
 		}
 	}
 }

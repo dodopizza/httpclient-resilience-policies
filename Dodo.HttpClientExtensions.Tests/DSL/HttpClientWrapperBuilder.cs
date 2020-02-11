@@ -62,7 +62,7 @@ namespace Dodo.HttpClientExtensions.Tests
 			 return new HttpClientWrapper(client, handler);
 		}
 
-		private ClientSettings BuildClientSettings()
+		private HttpClientSettings BuildClientSettings()
 		{
 			var defaultCircuitBreakerSettings = _circuitBreakerSettings ?? new CircuitBreakerSettings(
 				failureThreshold: 0.5,
@@ -71,7 +71,7 @@ namespace Dodo.HttpClientExtensions.Tests
 				samplingDuration: TimeSpan.FromMilliseconds(20)
 			);
 
-			return new ClientSettings(
+			return new HttpClientSettings(
 				_totalTimeout,
 				_timeoutPerRequest,
 				_retrySettings ?? JitterRetrySettings.Default(),

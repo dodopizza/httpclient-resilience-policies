@@ -1,9 +1,7 @@
 using System;
 using System.Net;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using Polly.CircuitBreaker;
-using Polly.Timeout;
 
 namespace Dodo.HttpClientExtensions.Tests
 {

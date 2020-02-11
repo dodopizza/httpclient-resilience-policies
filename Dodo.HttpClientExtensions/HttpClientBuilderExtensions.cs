@@ -14,7 +14,7 @@ namespace Dodo.HttpClientExtensions
 		public static IHttpClientBuilder AddJsonClient<TClientInterface, TClientImplementation>(
 			this IServiceCollection sc,
 			Uri baseAddress,
-			ClientSettings settings,
+			HttpClientSettings settings,
 			string clientName = null) where TClientInterface : class
 			where TClientImplementation : class, TClientInterface
 		{
@@ -33,12 +33,12 @@ namespace Dodo.HttpClientExtensions
 			this IHttpClientBuilder clientBuilder)
 		{
 			return clientBuilder
-				.AddDefaultPolicies(ClientSettings.Default());
+				.AddDefaultPolicies(HttpClientSettings.Default());
 		}
 
 		public static IHttpClientBuilder AddDefaultPolicies(
 			this IHttpClientBuilder clientBuilder,
-			ClientSettings settings)
+			HttpClientSettings settings)
 		{
 			return clientBuilder
 				.AddTimeoutPolicy(settings.TotalTimeout)
