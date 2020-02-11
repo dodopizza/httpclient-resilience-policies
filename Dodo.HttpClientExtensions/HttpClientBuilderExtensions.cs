@@ -14,53 +14,68 @@ namespace Dodo.HttpClientExtensions
 		public static IHttpClientBuilder AddJsonClient<TClientInterface, TClientImplementation>(
 			this IServiceCollection sc,
 			Uri baseAddress,
-			ClientSettings settings,
-			string clientName = null) where TClientInterface : class where TClientImplementation : class, TClientInterface
+			HttpClientSettings settings,
+			string clientName = null) where TClientInterface : class
+			where TClientImplementation : class, TClientInterface
 		{
 			var httpClientBuilder = sc.AddHttpClient<TClientInterface, TClientImplementation>(client =>
 				{
 					client.BaseAddress = baseAddress;
 					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-					client.Timeout = settings.TimeOutPerRequest;
+					client.Timeout = settings.TimeoutPerRequest;
 				})
 				.AddDefaultPolicies(settings);
-			
+
 			return httpClientBuilder;
 		}
 
-		public static IHttpClientBuilder AddDefaultPolicies(this IHttpClientBuilder clientBuilder, ClientSettings settings)
+		public static IHttpClientBuilder AddDefaultPolicies(
+			this IHttpClientBuilder clientBuilder)
 		{
 			return clientBuilder
-				.AddTimeoutPolicy(settings.TotalTimeOut)
-				.AddRetryPolicy(settings.RetryCount, settings.SleepDurationProvider)
-				.AddCircuitBreakerPolicy(settings.FailureThreshold, settings.MinimumThroughput, settings.DurationOfBreak, settings.SamplingDuration);
+				.AddDefaultPolicies(HttpClientSettings.Default());
 		}
 
-		private static IHttpClientBuilder AddRetryPolicy(this IHttpClientBuilder clientBuilder, int retryCount, Func<int, TimeSpan> sleepDurationProvider)
+		public static IHttpClientBuilder AddDefaultPolicies(
+			this IHttpClientBuilder clientBuilder,
+			HttpClientSettings settings)
+		{
+			return clientBuilder
+				.AddTimeoutPolicy(settings.TotalTimeout)
+				.AddRetryPolicy(settings.RetrySettings)
+				.AddCircuitBreakerPolicy(settings.CircuitBreakerSettings);
+		}
+
+		private static IHttpClientBuilder AddRetryPolicy(
+			this IHttpClientBuilder clientBuilder,
+			IRetrySettings settings)
 		{
 			return clientBuilder
 				.AddPolicyHandler(HttpPolicyExtensions
 					.HandleTransientHttpError()
 					.Or<TimeoutRejectedException>()
-					.WaitAndRetryAsync(retryCount, sleepDurationProvider));
+					.WaitAndRetryAsync(
+						settings.RetryCount,
+						settings.SleepDurationProvider,
+						settings.OnRetry));
 		}
 
 		private static IHttpClientBuilder AddCircuitBreakerPolicy(
 			this IHttpClientBuilder clientBuilder,
-			double failureThreshold,
-			int minimumThroughput,
-			TimeSpan durationOfBreak,
-			TimeSpan samplingDuration)
+			ICircuitBreakerSettings settings)
 		{
-			return clientBuilder.AddPolicyHandler( 
+			return clientBuilder.AddPolicyHandler(
 				HttpPolicyExtensions
 					.HandleTransientHttpError()
 					.OrResult(r => r.StatusCode == (HttpStatusCode) 429) // Too Many Requests
 					.AdvancedCircuitBreakerAsync(
-						failureThreshold: failureThreshold,
-						samplingDuration: samplingDuration, 
-						minimumThroughput: minimumThroughput,
-						durationOfBreak: durationOfBreak));
+						settings.FailureThreshold,
+						settings.SamplingDuration,
+						settings.MinimumThroughput,
+						settings.DurationOfBreak,
+						settings.OnBreak,
+						settings.OnReset,
+						settings.OnHalfOpen));
 		}
 
 		private static IHttpClientBuilder AddTimeoutPolicy(this IHttpClientBuilder httpClientBuilder, TimeSpan timeout)

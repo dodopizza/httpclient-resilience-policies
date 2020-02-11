@@ -1,10 +1,18 @@
-FROM microsoft/dotnet:2.1-sdk AS build
+FROM microsoft/dotnet:2.2-sdk AS build
 WORKDIR /app
-COPY ./Dodo.HttpClientExtensions .
-COPY ./NuGet.config ./
-RUN dotnet restore
-RUN dotnet build -c Release
-RUN dotnet pack -c Release --no-restore --no-build
-RUN mv bin/Release/*.nupkg ./
+
+COPY ./NuGet.config /root/.nuget/NuGet/NuGet.Config
+
+COPY ./Dodo.HttpClientExtensions ./Dodo.HttpClientExtensions
+COPY ./Dodo.HttpClientExtensions.Tests ./Dodo.HttpClientExtensions.Tests
+
+ARG versionSuffix
+
+RUN dotnet restore ./Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
+RUN dotnet build --version-suffix "$versionSuffix" --no-restore --configuration Release ./Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
+RUN dotnet test --configuration Release ./Dodo.HttpClientExtensions.Tests/Dodo.HttpClientExtensions.Tests.csproj
+RUN dotnet pack --version-suffix "$versionSuffix" --no-restore --no-build --configuration Release ./Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
+
+RUN mv ./Dodo.HttpClientExtensions/bin/Release/*.nupkg ./
 
 ENTRYPOINT ["dotnet", "nuget", "push", "*.nupkg", "--source", "https://www.myget.org/F/dodopizza/"]

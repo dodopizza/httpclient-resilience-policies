@@ -17,42 +17,62 @@ steps:
     - clone
   when:
     event:
+    - promote
     - push
 
-- name: build
-  pull: default
+- name: build-release
   image: docker
   commands:
-  - docker build . -t httpclientextensions -f Dockerfile
+    - docker build -t httpclientextensions -f Dockerfile .
   depends_on:
     - nuget
   volumes:
-  - name: 2f7661722f72756e2f646f636b65722e736f636b
-    path: /var/run/docker.sock
+    - name: 2f7661722f72756e2f646f636b65722e736f636b
+      path: /var/run/docker.sock
   when:
+    branch:
+      - master
     event:
-    - push
+      - promote
+      - push
 
-- name: push
-  pull: default
+- name: build-prerelease
   image: docker
   commands:
-  - docker run httpclientextensions --api-key $NUGET_PASSWORD
+    - docker build -t httpclientextensions -f Dockerfile --build-arg versionSuffix=${DRONE_BRANCH} .
+  depends_on:
+    - nuget
+  volumes:
+    - name: 2f7661722f72756e2f646f636b65722e736f636b
+      path: /var/run/docker.sock
+  when:
+    branch:
+      exclude:
+        - master
+    event:
+      - promote
+      - push
+
+- name: publish-myget
+  image: docker
+  commands:
+    - docker run httpclientextensions --api-key $NUGET_PASSWORD
+  depends_on:
+    - build-release
+    - build-prerelease
   environment:
     NUGET_PASSWORD:
       from_secret: global_nuget_password
-  depends_on:
-    - build
   volumes:
-  - name: 2f7661722f72756e2f646f636b65722e736f636b
-    path: /var/run/docker.sock
+    - name: 2f7661722f72756e2f646f636b65722e736f636b
+      path: /var/run/docker.sock
   when:
     event:
-    - push
+      - promote
 
 volumes:
-- name: 2f7661722f72756e2f646f636b65722e736f636b
-  host:
-    path: /var/run/docker.sock
+  - name: 2f7661722f72756e2f646f636b65722e736f636b
+    host:
+      path: /var/run/docker.sock
 
 ...

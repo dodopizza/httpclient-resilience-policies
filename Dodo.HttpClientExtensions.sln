@@ -8,6 +8,8 @@ ProjectSection(SolutionItems) = preProject
 	Dockerfile = Dockerfile
 EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dodo.HttpClientExtensions.Tests", "Dodo.HttpClientExtensions.Tests\Dodo.HttpClientExtensions.Tests.csproj", "{F9AA2D51-3A10-4323-BDFF-D3568C065DA2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,5 +24,9 @@ Global
 		{558A02C8-BC81-4ED0-8C10-E9F5C2DF9351}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{558A02C8-BC81-4ED0-8C10-E9F5C2DF9351}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{558A02C8-BC81-4ED0-8C10-E9F5C2DF9351}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9AA2D51-3A10-4323-BDFF-D3568C065DA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9AA2D51-3A10-4323-BDFF-D3568C065DA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9AA2D51-3A10-4323-BDFF-D3568C065DA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9AA2D51-3A10-4323-BDFF-D3568C065DA2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
