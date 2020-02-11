@@ -23,6 +23,16 @@ namespace Dodo.HttpClientExtensions
 		}
 
 		public HttpClientSettings(
+			IRetrySettings retrySettings,
+			ICircuitBreakerSettings circuitBreakerSettings) : this(
+			TimeSpan.FromMilliseconds(DefaultTotalTimeOutInMilliseconds),
+			TimeSpan.FromMilliseconds(DefaultTimeOutPerRequestInMilliseconds),
+			retrySettings,
+			circuitBreakerSettings)
+		{
+		}
+
+		public HttpClientSettings(
 			TimeSpan totalTimeout,
 			TimeSpan timeoutPerRequest,
 			IRetrySettings retrySettings,

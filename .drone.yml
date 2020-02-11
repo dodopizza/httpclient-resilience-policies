@@ -20,7 +20,6 @@ steps:
     - push
 
 - name: build
-  pull: default
   image: docker
   commands:
   - docker build . -t httpclientextensions -f Dockerfile
@@ -34,7 +33,6 @@ steps:
     - push
 
 - name: push
-  pull: default
   image: docker
   commands:
   - docker run httpclientextensions --api-key $NUGET_PASSWORD
