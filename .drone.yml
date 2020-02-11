@@ -19,17 +19,37 @@ steps:
     event:
     - push
 
-- name: build
+- name: build-release
   image: docker
   commands:
-  - docker build . -t httpclientextensions -f Dockerfile
+  - docker build -t httpclientextensions -f Dockerfile .
   depends_on:
     - nuget
   volumes:
   - name: 2f7661722f72756e2f646f636b65722e736f636b
     path: /var/run/docker.sock
   when:
+    branch:
+    - master
     event:
+    - promote
+    - push
+
+- name: build-prerelease
+  image: docker
+  commands:
+    - docker build -t httpclientextensions -f Dockerfile --build-arg versionSuffix=${DRONE_BRANCH} .
+  depends_on:
+    - nuget
+  volumes:
+    - name: 2f7661722f72756e2f646f636b65722e736f636b
+      path: /var/run/docker.sock
+  when:
+    branch:
+      exclude:
+      - master
+    event:
+    - promote
     - push
 
 - name: push
@@ -45,8 +65,10 @@ steps:
   - name: 2f7661722f72756e2f646f636b65722e736f636b
     path: /var/run/docker.sock
   when:
+    status:
+    - success
     event:
-    - push
+    - promote
 
 volumes:
 - name: 2f7661722f72756e2f646f636b65722e736f636b
