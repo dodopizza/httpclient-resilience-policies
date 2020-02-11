@@ -17,6 +17,7 @@ steps:
     - clone
   when:
     event:
+    - promote
     - push
 
 - name: build-release
