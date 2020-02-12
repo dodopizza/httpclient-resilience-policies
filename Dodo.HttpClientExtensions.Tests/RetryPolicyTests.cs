@@ -65,6 +65,21 @@ namespace Dodo.HttpClientExtensions.Tests
 			CollectionAssert.AreNotEquivalent(retryAttempts.First().Value, retryAttempts.Last().Value);
 		}
 
+		[Test]
+		public async Task Should_retry_when_client_returns_500()
+		{
+			const int retryCount = 3;
+			var retrySettings = new ExponentialRetrySettings(retryCount);
+			var wrapper = Create.HttpClientWrapperWrapperBuilder
+				.WithStatusCode(HttpStatusCode.InternalServerError)
+				.WithRetrySettings(retrySettings)
+				.Please();
+
+			var result = await wrapper.Client.GetAsync("http://localhost");
+
+			Assert.AreEqual(retryCount + 1, wrapper.NumberOfCalls);
+		}
+
 		private Action<DelegateResult<HttpResponseMessage>, TimeSpan> BuildOnRetryAction(
 			IDictionary<string, List<TimeSpan>> retryAttempts)
 		{

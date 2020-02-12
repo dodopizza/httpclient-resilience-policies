@@ -44,7 +44,7 @@ namespace Dodo.HttpClientExtensions
 				_defaultOnRetry
 			);
 
-		private const int DefaultRetryCount = 3;
+		private const int DefaultRetryCount = 2;
 		private static readonly TimeSpan _defaultMedianFirstRetryDelay = TimeSpan.FromSeconds(2);
 
 		// i - retry attempt
