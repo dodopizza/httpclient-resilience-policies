@@ -42,7 +42,7 @@ namespace Dodo.HttpClientExtensions
 		{
 			return clientBuilder
 				.AddRetryPolicy(settings.RetrySettings)
-				.AddTimeoutPolicy(settings.HttpClientTimeout)
+				.AddTimeoutPolicy(settings.TimeoutPerTry)
 				.AddCircuitBreakerPolicy(settings.CircuitBreakerSettings);
 		}
 
