@@ -11,8 +11,8 @@ namespace Dodo.HttpClientExtensions.Tests
 		private HttpStatusCode _statusCode = HttpStatusCode.OK;
 		private IRetrySettings _retrySettings;
 		private ICircuitBreakerSettings _circuitBreakerSettings;
-		private TimeSpan _totalTimeout = TimeSpan.FromDays(1);
-		private TimeSpan _timeoutPerRequest = TimeSpan.FromDays(1);
+		private TimeSpan _httpClientTimeout = TimeSpan.FromDays(1);
+		private TimeSpan _timeoutPerTry = TimeSpan.FromDays(1);
 
 		public HttpClientWrapperBuilder WithStatusCode(HttpStatusCode statusCode)
 		{
@@ -20,15 +20,15 @@ namespace Dodo.HttpClientExtensions.Tests
 			return this;
 		}
 
-		public HttpClientWrapperBuilder WithTotalTimeout(TimeSpan totalTimeout)
+		public HttpClientWrapperBuilder WithHttpClientTimeout(TimeSpan httpClientTimeout)
 		{
-			_totalTimeout = totalTimeout;
+			_httpClientTimeout = httpClientTimeout;
 			return this;
 		}
 
-		public HttpClientWrapperBuilder WithTimeoutPerRequest(TimeSpan timeoutPerRequest)
+		public HttpClientWrapperBuilder WithTimeoutPerTry(TimeSpan timeoutPerTry)
 		{
-			_timeoutPerRequest = timeoutPerRequest;
+			_timeoutPerTry = timeoutPerTry;
 			return this;
 		}
 
@@ -49,31 +49,28 @@ namespace Dodo.HttpClientExtensions.Tests
 			var handler = new MockHttpMessageHandler(_statusCode);
 			var services = new ServiceCollection();
 			services
-				.AddHttpClient(ClientName, c =>
-				{
-					c.Timeout = _timeoutPerRequest;
-				})
+				.AddHttpClient(ClientName, c => { c.Timeout = _httpClientTimeout; })
 				.AddDefaultPolicies(BuildClientSettings())
 				.ConfigurePrimaryHttpMessageHandler(() => handler);
 
 			var serviceProvider = services.BuildServiceProvider();
-			 var factory = serviceProvider.GetService<IHttpClientFactory>();
-			 var client = factory.CreateClient(ClientName);
-			 return new HttpClientWrapper(client, handler);
+			var factory = serviceProvider.GetService<IHttpClientFactory>();
+			var client = factory.CreateClient(ClientName);
+			return new HttpClientWrapper(client, handler);
 		}
 
 		private HttpClientSettings BuildClientSettings()
 		{
 			var defaultCircuitBreakerSettings = _circuitBreakerSettings ?? new CircuitBreakerSettings(
-				failureThreshold: 0.5,
-				minimumThroughput: int.MaxValue,
-				durationOfBreak: TimeSpan.FromMilliseconds(1),
-				samplingDuration: TimeSpan.FromMilliseconds(20)
-			);
+				                                    failureThreshold: 0.5,
+				                                    minimumThroughput: int.MaxValue,
+				                                    durationOfBreak: TimeSpan.FromMilliseconds(1),
+				                                    samplingDuration: TimeSpan.FromMilliseconds(20)
+			                                    );
 
 			return new HttpClientSettings(
-				_totalTimeout,
-				_timeoutPerRequest,
+				_httpClientTimeout,
+				_timeoutPerTry,
 				_retrySettings ?? JitterRetrySettings.Default(),
 				defaultCircuitBreakerSettings);
 		}

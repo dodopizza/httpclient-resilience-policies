@@ -4,19 +4,19 @@ namespace Dodo.HttpClientExtensions
 {
 	public class HttpClientSettings
 	{
-		public const int DefaultTotalTimeOutInMilliseconds = 10000;
-		public const int DefaultTimeOutPerRequestInMilliseconds = 2000;
+		public const int DefaultHttpClientTimeoutInMilliseconds = 10000;
+		public const int DefaultTimeoutPerTryInMilliseconds = 2000;
 
-		public TimeSpan TotalTimeout { get; }
-		public TimeSpan TimeoutPerRequest { get; }
+		public TimeSpan HttpClientTimeout { get; }
+		public TimeSpan TimeoutPerTry { get; }
 		public IRetrySettings RetrySettings { get; }
 		public ICircuitBreakerSettings CircuitBreakerSettings { get; }
 
 
 		public HttpClientSettings(
-			TimeSpan totalTimeout,
-			TimeSpan timeoutPerRequest,
-			int retryCount) : this(totalTimeout, timeoutPerRequest,
+			TimeSpan httpClientTimeout,
+			TimeSpan timeoutPerTry,
+			int retryCount) : this(httpClientTimeout, timeoutPerTry,
 			new JitterRetrySettings(retryCount),
 			Dodo.HttpClientExtensions.CircuitBreakerSettings.Default())
 		{
@@ -25,29 +25,29 @@ namespace Dodo.HttpClientExtensions
 		public HttpClientSettings(
 			IRetrySettings retrySettings,
 			ICircuitBreakerSettings circuitBreakerSettings) : this(
-			TimeSpan.FromMilliseconds(DefaultTotalTimeOutInMilliseconds),
-			TimeSpan.FromMilliseconds(DefaultTimeOutPerRequestInMilliseconds),
+			TimeSpan.FromMilliseconds(DefaultHttpClientTimeoutInMilliseconds),
+			TimeSpan.FromMilliseconds(DefaultTimeoutPerTryInMilliseconds),
 			retrySettings,
 			circuitBreakerSettings)
 		{
 		}
 
 		public HttpClientSettings(
-			TimeSpan totalTimeout,
-			TimeSpan timeoutPerRequest,
+			TimeSpan httpClientTimeout,
+			TimeSpan timeoutPerTry,
 			IRetrySettings retrySettings,
 			ICircuitBreakerSettings circuitBreakerSettings)
 		{
-			TotalTimeout = totalTimeout;
-			TimeoutPerRequest = timeoutPerRequest;
+			HttpClientTimeout = httpClientTimeout;
+			TimeoutPerTry = timeoutPerTry;
 			RetrySettings = retrySettings;
 			CircuitBreakerSettings = circuitBreakerSettings;
 		}
 
 		public static HttpClientSettings Default() =>
 			new HttpClientSettings(
-				TimeSpan.FromMilliseconds(DefaultTotalTimeOutInMilliseconds),
-				TimeSpan.FromMilliseconds(DefaultTimeOutPerRequestInMilliseconds),
+				TimeSpan.FromMilliseconds(DefaultHttpClientTimeoutInMilliseconds),
+				TimeSpan.FromMilliseconds(DefaultTimeoutPerTryInMilliseconds),
 				JitterRetrySettings.Default(),
 				HttpClientExtensions.CircuitBreakerSettings.Default()
 			);

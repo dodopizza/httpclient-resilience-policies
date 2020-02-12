@@ -22,7 +22,7 @@ namespace Dodo.HttpClientExtensions
 				{
 					client.BaseAddress = baseAddress;
 					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-					client.Timeout = settings.TimeoutPerRequest;
+					client.Timeout = settings.HttpClientTimeout;
 				})
 				.AddDefaultPolicies(settings);
 
@@ -41,8 +41,8 @@ namespace Dodo.HttpClientExtensions
 			HttpClientSettings settings)
 		{
 			return clientBuilder
-				.AddTimeoutPolicy(settings.TotalTimeout)
 				.AddRetryPolicy(settings.RetrySettings)
+				.AddTimeoutPolicy(settings.HttpClientTimeout)
 				.AddCircuitBreakerPolicy(settings.CircuitBreakerSettings);
 		}
 

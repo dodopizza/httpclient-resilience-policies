@@ -17,7 +17,7 @@ namespace Dodo.HttpClientExtensions.Tests
 				sleepDurationProvider: i => TimeSpan.FromMilliseconds(50));
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
-				.WithTotalTimeout(TimeSpan.FromSeconds(5))
+				.WithHttpClientTimeout(TimeSpan.FromSeconds(5))
 				.WithCircuitBreakerSettings(BuildCircuitBreakerSettings(minimumThroughput))
 				.WithRetrySettings(retrySettings)
 				.Please();
@@ -35,7 +35,7 @@ namespace Dodo.HttpClientExtensions.Tests
 				failureThreshold: 0.5,
 				minimumThroughput: throughput,
 				durationOfBreak: TimeSpan.FromMinutes(1),
-				samplingDuration: TimeSpan.FromMilliseconds(20), (_, __) => { }, () => { }, () => { Console.WriteLine("HO");});
+				samplingDuration: TimeSpan.FromMilliseconds(20));
 		}
 	}
 }
