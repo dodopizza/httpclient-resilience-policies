@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,7 +9,7 @@ namespace Dodo.HttpClientExtensions.Tests
 	public sealed class HttpClientWrapperBuilder
 	{
 		private const string ClientName = "TestClient";
-		private HttpStatusCode _statusCode = HttpStatusCode.OK;
+		private readonly Dictionary<string, HttpStatusCode> _hostsResponseCodes = new Dictionary<string, HttpStatusCode>();
 		private IRetrySettings _retrySettings;
 		private ICircuitBreakerSettings _circuitBreakerSettings;
 		private TimeSpan _httpClientTimeout = TimeSpan.FromDays(1);
@@ -16,7 +17,13 @@ namespace Dodo.HttpClientExtensions.Tests
 
 		public HttpClientWrapperBuilder WithStatusCode(HttpStatusCode statusCode)
 		{
-			_statusCode = statusCode;
+			_hostsResponseCodes.Add(string.Empty, statusCode);
+			return this;
+		}
+
+		public HttpClientWrapperBuilder WithHostAndStatusCode(string host, HttpStatusCode statusCode)
+		{
+			_hostsResponseCodes.Add(host, statusCode);
 			return this;
 		}
 
@@ -46,7 +53,7 @@ namespace Dodo.HttpClientExtensions.Tests
 
 		public HttpClientWrapper Please()
 		{
-			var handler = new MockHttpMessageHandler(_statusCode);
+			var handler = new MockHttpMessageHandler(_hostsResponseCodes);
 			var services = new ServiceCollection();
 			services
 				.AddHttpClient(ClientName, c => { c.Timeout = _httpClientTimeout; })
@@ -59,14 +66,29 @@ namespace Dodo.HttpClientExtensions.Tests
 			return new HttpClientWrapper(client, handler);
 		}
 
+		public HttpClientWrapper PleaseCountyAgnostic()
+		{
+			var handler = new MockHttpMessageHandler(_hostsResponseCodes);
+			var services = new ServiceCollection();
+			services
+				.AddHttpClient(ClientName, c => { c.Timeout = _httpClientTimeout; })
+				.AddDefaultHostSpecificPolicies(BuildClientSettings())
+				.ConfigurePrimaryHttpMessageHandler(() => handler);
+
+			var serviceProvider = services.BuildServiceProvider();
+			var factory = serviceProvider.GetService<IHttpClientFactory>();
+			var client = factory.CreateClient(ClientName);
+			return new HttpClientWrapper(client, handler);
+		}
+
 		private HttpClientSettings BuildClientSettings()
 		{
 			var defaultCircuitBreakerSettings = _circuitBreakerSettings ?? new CircuitBreakerSettings(
-				                                    failureThreshold: 0.5,
-				                                    minimumThroughput: int.MaxValue,
-				                                    durationOfBreak: TimeSpan.FromMilliseconds(1),
-				                                    samplingDuration: TimeSpan.FromMilliseconds(20)
-			                                    );
+				failureThreshold: 0.5,
+				minimumThroughput: int.MaxValue,
+				durationOfBreak: TimeSpan.FromMilliseconds(1),
+				samplingDuration: TimeSpan.FromMilliseconds(20)
+				);
 
 			return new HttpClientSettings(
 				_httpClientTimeout,

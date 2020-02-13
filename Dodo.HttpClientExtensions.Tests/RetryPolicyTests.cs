@@ -75,7 +75,7 @@ namespace Dodo.HttpClientExtensions.Tests
 				.WithRetrySettings(retrySettings)
 				.Please();
 
-			var result = await wrapper.Client.GetAsync("http://localhost");
+			await wrapper.Client.GetAsync("http://localhost");
 
 			Assert.AreEqual(retryCount + 1, wrapper.NumberOfCalls);
 		}
