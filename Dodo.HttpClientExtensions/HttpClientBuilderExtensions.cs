@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
+using Polly.CircuitBreaker;
 using Polly.Extensions.Http;
 using Polly.Registry;
 using Polly.Timeout;
@@ -82,18 +83,7 @@ namespace Dodo.HttpClientExtensions
 			this IHttpClientBuilder clientBuilder,
 			ICircuitBreakerSettings settings)
 		{
-			return clientBuilder.AddPolicyHandler(
-				HttpPolicyExtensions
-					.HandleTransientHttpError()
-					.OrResult(r => r.StatusCode == (HttpStatusCode) 429) // Too Many Requests
-					.AdvancedCircuitBreakerAsync(
-						settings.FailureThreshold,
-						settings.SamplingDuration,
-						settings.MinimumThroughput,
-						settings.DurationOfBreak,
-						settings.OnBreak,
-						settings.OnReset,
-						settings.OnHalfOpen));
+			return clientBuilder.AddPolicyHandler(BuildCircuitBreakerPolicy(settings));
 		}
 
 		private static IHttpClientBuilder AddHostSpecificCircuitBreakerPolicy(
@@ -104,19 +94,25 @@ namespace Dodo.HttpClientExtensions
 			return clientBuilder.AddPolicyHandler(message =>
 			{
 				var policyKey = message.RequestUri.Host;
-				var policy = registry.GetOrAdd(policyKey, HttpPolicyExtensions
-					.HandleTransientHttpError()
-					.OrResult(r => r.StatusCode == (HttpStatusCode) 429) // Too Many Requests
-					.AdvancedCircuitBreakerAsync(
-						settings.FailureThreshold,
-						settings.SamplingDuration,
-						settings.MinimumThroughput,
-						settings.DurationOfBreak,
-						settings.OnBreak,
-						settings.OnReset,
-						settings.OnHalfOpen));
+				var policy = registry.GetOrAdd(policyKey, BuildCircuitBreakerPolicy(settings));
 				return policy;
 			});
+		}
+
+		private static AsyncCircuitBreakerPolicy<HttpResponseMessage> BuildCircuitBreakerPolicy(
+			ICircuitBreakerSettings settings)
+		{
+			return HttpPolicyExtensions
+				.HandleTransientHttpError()
+				.OrResult(r => r.StatusCode == (HttpStatusCode) 429) // Too Many Requests
+				.AdvancedCircuitBreakerAsync(
+					settings.FailureThreshold,
+					settings.SamplingDuration,
+					settings.MinimumThroughput,
+					settings.DurationOfBreak,
+					settings.OnBreak,
+					settings.OnReset,
+					settings.OnHalfOpen);
 		}
 
 		private static IHttpClientBuilder AddTimeoutPolicy(this IHttpClientBuilder httpClientBuilder, TimeSpan timeout)
