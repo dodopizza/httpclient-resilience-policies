@@ -22,7 +22,8 @@ namespace Dodo.HttpClientExtensions
 
 		public SimpleRetrySettings(
 			int retryCount,
-			Action<DelegateResult<HttpResponseMessage>, TimeSpan> onRetry): this(retryCount, _defaultSleepDurationProvider, onRetry)
+			Action<DelegateResult<HttpResponseMessage>, TimeSpan> onRetry) : this(retryCount,
+			_defaultSleepDurationProvider, onRetry)
 		{
 		}
 
@@ -36,10 +37,7 @@ namespace Dodo.HttpClientExtensions
 			OnRetry = onRetry;
 		}
 
-		public static IRetrySettings Default() =>
-			new SimpleRetrySettings(
-				Defaults.Retry.RetryCount
-			);
+		public static IRetrySettings Default() => new SimpleRetrySettings(Defaults.Retry.RetryCount);
 
 		private static readonly Func<int, TimeSpan> _defaultSleepDurationProvider =
 			i => TimeSpan.FromMilliseconds(20 * Math.Pow(2, i));
