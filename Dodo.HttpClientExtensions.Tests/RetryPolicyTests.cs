@@ -16,7 +16,7 @@ namespace Dodo.HttpClientExtensions.Tests
 		public async Task Should_retry_3_times_when_client_returns_503()
 		{
 			const int retryCount = 3;
-			var retrySettings = new ExponentialRetrySettings(retryCount);
+			var retrySettings = new SimpleRetrySettings(retryCount);
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
 				.WithRetrySettings(retrySettings)
@@ -69,7 +69,7 @@ namespace Dodo.HttpClientExtensions.Tests
 		public async Task Should_retry_when_client_returns_500()
 		{
 			const int retryCount = 3;
-			var retrySettings = new ExponentialRetrySettings(retryCount);
+			var retrySettings = new SimpleRetrySettings(retryCount);
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.InternalServerError)
 				.WithRetrySettings(retrySettings)

@@ -13,7 +13,7 @@ namespace Dodo.HttpClientExtensions.Tests
 		public void Should_break_after_4_concurrent_calls()
 		{
 			const int minimumThroughput = 2;
-			var retrySettings = new ExponentialRetrySettings(
+			var retrySettings = new SimpleRetrySettings(
 				retryCount: 5,
 				sleepDurationProvider: i => TimeSpan.FromMilliseconds(50));
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
@@ -34,7 +34,7 @@ namespace Dodo.HttpClientExtensions.Tests
 		public async Task Should_Open_Circuit_Breaker_for_RU_and_do_not_affect_EE()
 		{
 			const int minimumThroughput = 2;
-			var retrySettings = new ExponentialRetrySettings(
+			var retrySettings = new SimpleRetrySettings(
 				retryCount: 5,
 				sleepDurationProvider: i => TimeSpan.FromMilliseconds(50));
 			var wrapper = Create.HttpClientWrapperWrapperBuilder

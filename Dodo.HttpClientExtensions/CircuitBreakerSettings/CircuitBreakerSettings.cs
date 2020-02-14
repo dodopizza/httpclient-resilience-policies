@@ -24,21 +24,6 @@ namespace Dodo.HttpClientExtensions
 		}
 
 		public CircuitBreakerSettings(
-			Action<DelegateResult<HttpResponseMessage>, TimeSpan> onBreak,
-			Action onReset,
-			Action onHalfOpen) : this(DefaultFailureThreshold,
-			DefaultMinimumThroughput,
-			TimeSpan.FromSeconds(DefaultDurationOfBreakInSec),
-			TimeSpan.FromSeconds(DefaultSamplingDurationInSec),
-			onBreak, onReset, onHalfOpen)
-		{
-			OnBreak = onBreak;
-			OnReset = onReset;
-			OnHalfOpen = onHalfOpen;
-		}
-
-
-		public CircuitBreakerSettings(
 			double failureThreshold,
 			int minimumThroughput,
 			TimeSpan durationOfBreak,
@@ -58,21 +43,14 @@ namespace Dodo.HttpClientExtensions
 
 		public static ICircuitBreakerSettings Default() =>
 			new CircuitBreakerSettings(
-				DefaultFailureThreshold,
-				DefaultMinimumThroughput,
-				TimeSpan.FromSeconds(DefaultDurationOfBreakInSec),
-				TimeSpan.FromSeconds(DefaultSamplingDurationInSec),
-				_defaultOnBreak,
-				_defaultOnReset,
-				_defaultOnHalfOpen
+				Defaults.CircuitBreaker.FailureThreshold,
+				Defaults.CircuitBreaker.MinimumThroughput,
+				TimeSpan.FromMilliseconds(Defaults.CircuitBreaker.DurationOfBreakInMilliseconds),
+				TimeSpan.FromMilliseconds(Defaults.CircuitBreaker.SamplingDurationInMilliseconds)
 			);
 
 		private static readonly Action<DelegateResult<HttpResponseMessage>, TimeSpan> _defaultOnBreak = (_, __) => { };
 		private static readonly Action _defaultOnReset = () => { };
 		private static readonly Action _defaultOnHalfOpen = () => { };
-		private const double DefaultFailureThreshold = 0.5;
-		private const int DefaultMinimumThroughput = 10;
-		private const int DefaultDurationOfBreakInSec = 5;
-		private const int DefaultSamplingDurationInSec = 30;
 	}
 }
