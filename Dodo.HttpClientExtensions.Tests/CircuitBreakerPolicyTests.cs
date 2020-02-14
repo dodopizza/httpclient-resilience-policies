@@ -43,7 +43,7 @@ namespace Dodo.HttpClientExtensions.Tests
 				.WithHttpClientTimeout(TimeSpan.FromSeconds(5))
 				.WithCircuitBreakerSettings(BuildCircuitBreakerSettings(minimumThroughput))
 				.WithRetrySettings(retrySettings)
-				.PleaseCountyAgnostic();
+				.PleaseHostSpecific();
 
 			const int taskCount = 4;
 			Assert.CatchAsync<BrokenCircuitException>(async () =>

@@ -14,6 +14,7 @@ namespace Dodo.HttpClientExtensions.Tests
 		private ICircuitBreakerSettings _circuitBreakerSettings;
 		private TimeSpan _httpClientTimeout = TimeSpan.FromDays(1);
 		private TimeSpan _timeoutPerTry = TimeSpan.FromDays(1);
+		private TimeSpan _responseLatency = TimeSpan.Zero;
 
 		public HttpClientWrapperBuilder WithStatusCode(HttpStatusCode statusCode)
 		{
@@ -51,9 +52,15 @@ namespace Dodo.HttpClientExtensions.Tests
 			return this;
 		}
 
+		public HttpClientWrapperBuilder WithResponseLatency(TimeSpan responseLatency)
+		{
+			_responseLatency = responseLatency;
+			return this;
+		}
+
 		public HttpClientWrapper Please()
 		{
-			var handler = new MockHttpMessageHandler(_hostsResponseCodes);
+			var handler = new MockHttpMessageHandler(_hostsResponseCodes, _responseLatency);
 			var services = new ServiceCollection();
 			services
 				.AddHttpClient(ClientName, c => { c.Timeout = _httpClientTimeout; })
@@ -66,9 +73,9 @@ namespace Dodo.HttpClientExtensions.Tests
 			return new HttpClientWrapper(client, handler);
 		}
 
-		public HttpClientWrapper PleaseCountyAgnostic()
+		public HttpClientWrapper PleaseHostSpecific()
 		{
-			var handler = new MockHttpMessageHandler(_hostsResponseCodes);
+			var handler = new MockHttpMessageHandler(_hostsResponseCodes, _responseLatency);
 			var services = new ServiceCollection();
 			services
 				.AddHttpClient(ClientName, c => { c.Timeout = _httpClientTimeout; })
