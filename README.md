@@ -16,19 +16,19 @@ There are list of public methods to use:
 
 ```csharp
 // Default policies for a single host environment using all defaults
-- IHttpClientBuilder AddDefaultPolicies(this IHttpClientBuilder clientBuilder);
+IHttpClientBuilder AddDefaultPolicies(this IHttpClientBuilder clientBuilder);
 
 // Default policies for a single host environment with custom settings
-- IHttpClientBuilder AddDefaultPolicies(this IHttpClientBuilder clientBuilder, HttpClientSettings settings);
+IHttpClientBuilder AddDefaultPolicies(this IHttpClientBuilder clientBuilder, HttpClientSettings settings);
 
 // Default policies for a multi host environments using all defaults
-- IHttpClientBuilder AddDefaultHostSpecificPolicies(this IHttpClientBuilder clientBuilder);
+IHttpClientBuilder AddDefaultHostSpecificPolicies(this IHttpClientBuilder clientBuilder);
 
 // Default policies for a multi host environments with custom settings
-- IHttpClientBuilder AddDefaultHostSpecificPolicies(this IHttpClientBuilder clientBuilder, HttpClientSettings settings);
+IHttpClientBuilder AddDefaultHostSpecificPolicies(this IHttpClientBuilder clientBuilder, HttpClientSettings settings);
 
 // Default JsonClient includes DefaultPolicies with custom settings
-- IHttpClientBuilder AddJsonClient<TClientInterface, TClientImplementation>(
+IHttpClientBuilder AddJsonClient<TClientInterface, TClientImplementation>(
     this IServiceCollection sc,
     Uri baseAddress,
     HttpClientSettings settings,
@@ -42,9 +42,9 @@ There are also available `HttpClientSettings`, `IRetrySettings` and `ICircuitBre
 ## Single host versus multi host environments
 
 You may notice that there are two group of methods:
-`DefaultPolicy` for a single host environment and `DefaultHostSpecificPolicy` for a multi host enironments.
+`DefaultPolicy` for single host environment and `DefaultHostSpecificPolicy` for multi host environments.
 
-The single host environment means that our HttpClient send requests to a single host (the uri of host is never changed). It also means that if the CircuitBreaker will be opened that **all** requests to this host will be stopped for the duration of break.
+The single host environment means that our HttpClient send requests to a single host (the uri of host is never changed). It also means that if the CircuitBreaker will be opened, **all** requests to this host will be stopped for the duration of break.
 
 In the other hand in multi host environment we suppose that we use single client against multiple hosts. For example in the "country agnostic service" scenario when we use a single HttpClient to send requests against the several host for different countries with the same URL pattern like: `ru-host`, `us-host`, `ng-host`, etc. We can't use `DefaultPolicy` as with single host environment scenario. If the CircuitBreaker will be opened on the one host, ex. `ru-host`, all requests to all other hosts will be stopped too, because of the single HttpClient. `DefaultHostSpecificPolicy` handles this situation by "memorizing" the distinct hosts and policies will match requests to the specific hosts to avoid such situations.
 
@@ -122,7 +122,7 @@ To publish the library you should use Drone-CLI promote command:
 drone build promote dodopizza/httpclientextensions <build_number> myget
 ```
 
-The last parameter is the environment. In case of library you may provide any value there because it is not used.
+The last argument stands for the environment name. In case of library you may provide any value there because it is not used.
 
 You may publish library as the stable or as pre-release NuGet package.
 
