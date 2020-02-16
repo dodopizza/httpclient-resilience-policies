@@ -39,6 +39,35 @@ IHttpClientBuilder AddJsonClient<TClientInterface, TClientImplementation>(
 
 There are also available `HttpClientSettings`, `IRetrySettings` and `ICircuitBreakerSettings` to tune-in the default policies. See the corresponding sections of the README.
 
+## HttpClient configuration
+
+You have two options how to add HttpClient in your code.
+
+1. Just use default client provided by the library and add it to the `ServiceCollection` in the Startup like this:
+
+```csharp
+service                     // IServiceCollection
+    .AddJsonClient(...)     // Default client with policies
+```
+
+2. You may add your own HttpClient and then add default policies. In this case it is important to configure Timeout property in the client:
+
+```csharp
+service                     // IServiceCollection
+    .AddHttpClient("named-client",
+        client =>
+        {
+            client.Timeout = TimeSpan.FromMilliseconds(Defaults.Timeout.HttpClientTimeoutInMilliseconds); // Constant provided by the library
+        }))
+    .AddDefaultPolicies()   // Default policies provided by the library
+```
+
+Or if you use custom HttpClientSettings you may get client timeout value from the `HttpClientSettings.HttpClientTimeout` property instead of constant.
+
+Configure `HttpClient.Timeout` is important because HttpClient will use default value of 100 seconds without this configuration. `AddJsonClient` provided by the library is already pre-configured.
+
+More details about TimeoutPolicy in the corresponding section of the README.
+
 ## Single host versus multi host environments
 
 You may notice that there are two group of methods:
