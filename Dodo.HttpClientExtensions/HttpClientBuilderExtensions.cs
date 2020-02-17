@@ -11,8 +11,16 @@ using Polly.Timeout;
 
 namespace Dodo.HttpClientExtensions
 {
+	/// <summary>
+	/// Extension methods for configuring <see cref="IHttpClientBuilder"/> with Polly retry, timeout, circuit breaker policies.
+	/// </summary>
 	public static class HttpClientBuilderExtensions
 	{
+		/// <summary>
+		/// Adds the <see cref="IHttpClientFactory"/> and related services to the <see cref="IServiceCollection"/>
+		/// with pre-configured JSON headers, client Timeout and default policies.
+		/// </summary>
+		/// <returns>An <see cref="IHttpClientBuilder"/> that can be used to configure the client.</returns>
 		public static IHttpClientBuilder AddJsonClient<TClientInterface, TClientImplementation>(
 			this IServiceCollection sc,
 			Uri baseAddress,
@@ -31,6 +39,11 @@ namespace Dodo.HttpClientExtensions
 			return httpClientBuilder;
 		}
 
+		/// <summary>
+		/// Adds pre-configured default policies.
+		/// </summary>
+		/// <param name="clientBuilder">Configured HttpClient builder.</param>
+		/// <returns>An <see cref="IHttpClientBuilder"/> that can be used to configure the client.</returns>
 		public static IHttpClientBuilder AddDefaultPolicies(
 			this IHttpClientBuilder clientBuilder)
 		{
@@ -38,6 +51,12 @@ namespace Dodo.HttpClientExtensions
 				.AddDefaultPolicies(HttpClientSettings.Default());
 		}
 
+		/// <summary>
+		/// Adds and configures custom policies.
+		/// </summary>
+		/// <param name="clientBuilder">Configured HttpClient builder.</param>
+		/// <param name="settings">Custom policy settings.</param>
+		/// <returns>An <see cref="IHttpClientBuilder"/> that can be used to configure the client.</returns>
 		public static IHttpClientBuilder AddDefaultPolicies(
 			this IHttpClientBuilder clientBuilder,
 			HttpClientSettings settings)
@@ -48,6 +67,11 @@ namespace Dodo.HttpClientExtensions
 				.AddCircuitBreakerPolicy(settings.CircuitBreakerSettings);
 		}
 
+		/// <summary>
+		/// Adds pre-configured default policies to use single HttpClient against multiple hosts.
+		/// </summary>
+		/// <param name="clientBuilder">Configured HttpClient builder.</param>
+		/// <returns>An <see cref="IHttpClientBuilder"/> that can be used to configure the client.</returns>
 		public static IHttpClientBuilder AddDefaultHostSpecificPolicies(
 			this IHttpClientBuilder clientBuilder)
 		{
@@ -55,6 +79,12 @@ namespace Dodo.HttpClientExtensions
 				.AddDefaultHostSpecificPolicies(HttpClientSettings.Default());
 		}
 
+		/// <summary>
+		/// Adds and configures custom policies to use single HttpClient against multiple hosts.
+		/// </summary>
+		/// <param name="clientBuilder">Configured HttpClient builder.</param>
+		/// <param name="settings">Custom policy settings.</param>
+		/// <returns>An <see cref="IHttpClientBuilder"/> that can be used to configure the client.</returns>
 		public static IHttpClientBuilder AddDefaultHostSpecificPolicies(
 			this IHttpClientBuilder clientBuilder,
 			HttpClientSettings settings)
