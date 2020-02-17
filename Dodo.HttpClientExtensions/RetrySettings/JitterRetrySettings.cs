@@ -37,15 +37,10 @@ namespace Dodo.HttpClientExtensions
 			OnRetry = onRetry;
 		}
 
-		public static IRetrySettings Default() =>
-			new JitterRetrySettings(
-				DefaultRetryCount,
-				_defaultMedianFirstRetryDelay,
-				_defaultOnRetry
-			);
+		public static IRetrySettings Default() => new JitterRetrySettings(Defaults.Retry.RetryCount);
 
-		private const int DefaultRetryCount = 3;
-		private static readonly TimeSpan _defaultMedianFirstRetryDelay = TimeSpan.FromSeconds(2);
+		private static readonly TimeSpan _defaultMedianFirstRetryDelay =
+			TimeSpan.FromMilliseconds(Defaults.Retry.MedianFirstRetryDelayInMilliseconds);
 
 		// i - retry attempt
 		private static readonly Func<int, TimeSpan, Func<int, TimeSpan>> _defaultSleepDurationProvider =

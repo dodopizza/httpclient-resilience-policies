@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,27 +9,34 @@ namespace Dodo.HttpClientExtensions.Tests
 	public sealed class HttpClientWrapperBuilder
 	{
 		private const string ClientName = "TestClient";
-		private HttpStatusCode _statusCode = HttpStatusCode.OK;
+		private readonly Dictionary<string, HttpStatusCode> _hostsResponseCodes = new Dictionary<string, HttpStatusCode>();
 		private IRetrySettings _retrySettings;
 		private ICircuitBreakerSettings _circuitBreakerSettings;
-		private TimeSpan _totalTimeout = TimeSpan.FromDays(1);
-		private TimeSpan _timeoutPerRequest = TimeSpan.FromDays(1);
+		private TimeSpan _httpClientTimeout = TimeSpan.FromDays(1);
+		private TimeSpan _timeoutPerTry = TimeSpan.FromDays(1);
+		private TimeSpan _responseLatency = TimeSpan.Zero;
 
 		public HttpClientWrapperBuilder WithStatusCode(HttpStatusCode statusCode)
 		{
-			_statusCode = statusCode;
+			_hostsResponseCodes.Add(string.Empty, statusCode);
 			return this;
 		}
 
-		public HttpClientWrapperBuilder WithTotalTimeout(TimeSpan totalTimeout)
+		public HttpClientWrapperBuilder WithHostAndStatusCode(string host, HttpStatusCode statusCode)
 		{
-			_totalTimeout = totalTimeout;
+			_hostsResponseCodes.Add(host, statusCode);
 			return this;
 		}
 
-		public HttpClientWrapperBuilder WithTimeoutPerRequest(TimeSpan timeoutPerRequest)
+		public HttpClientWrapperBuilder WithHttpClientTimeout(TimeSpan httpClientTimeout)
 		{
-			_timeoutPerRequest = timeoutPerRequest;
+			_httpClientTimeout = httpClientTimeout;
+			return this;
+		}
+
+		public HttpClientWrapperBuilder WithTimeoutPerTry(TimeSpan timeoutPerTry)
+		{
+			_timeoutPerTry = timeoutPerTry;
 			return this;
 		}
 
@@ -44,22 +52,40 @@ namespace Dodo.HttpClientExtensions.Tests
 			return this;
 		}
 
+		public HttpClientWrapperBuilder WithResponseLatency(TimeSpan responseLatency)
+		{
+			_responseLatency = responseLatency;
+			return this;
+		}
+
 		public HttpClientWrapper Please()
 		{
-			var handler = new MockHttpMessageHandler(_statusCode);
+			var handler = new MockHttpMessageHandler(_hostsResponseCodes, _responseLatency);
 			var services = new ServiceCollection();
 			services
-				.AddHttpClient(ClientName, c =>
-				{
-					c.Timeout = _timeoutPerRequest;
-				})
+				.AddHttpClient(ClientName, c => { c.Timeout = _httpClientTimeout; })
 				.AddDefaultPolicies(BuildClientSettings())
 				.ConfigurePrimaryHttpMessageHandler(() => handler);
 
 			var serviceProvider = services.BuildServiceProvider();
-			 var factory = serviceProvider.GetService<IHttpClientFactory>();
-			 var client = factory.CreateClient(ClientName);
-			 return new HttpClientWrapper(client, handler);
+			var factory = serviceProvider.GetService<IHttpClientFactory>();
+			var client = factory.CreateClient(ClientName);
+			return new HttpClientWrapper(client, handler);
+		}
+
+		public HttpClientWrapper PleaseHostSpecific()
+		{
+			var handler = new MockHttpMessageHandler(_hostsResponseCodes, _responseLatency);
+			var services = new ServiceCollection();
+			services
+				.AddHttpClient(ClientName, c => { c.Timeout = _httpClientTimeout; })
+				.AddDefaultHostSpecificPolicies(BuildClientSettings())
+				.ConfigurePrimaryHttpMessageHandler(() => handler);
+
+			var serviceProvider = services.BuildServiceProvider();
+			var factory = serviceProvider.GetService<IHttpClientFactory>();
+			var client = factory.CreateClient(ClientName);
+			return new HttpClientWrapper(client, handler);
 		}
 
 		private HttpClientSettings BuildClientSettings()
@@ -69,11 +95,11 @@ namespace Dodo.HttpClientExtensions.Tests
 				minimumThroughput: int.MaxValue,
 				durationOfBreak: TimeSpan.FromMilliseconds(1),
 				samplingDuration: TimeSpan.FromMilliseconds(20)
-			);
+				);
 
 			return new HttpClientSettings(
-				_totalTimeout,
-				_timeoutPerRequest,
+				_httpClientTimeout,
+				_timeoutPerTry,
 				_retrySettings ?? JitterRetrySettings.Default(),
 				defaultCircuitBreakerSettings);
 		}
