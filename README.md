@@ -6,7 +6,7 @@ The main goal of this library is to provide unified http request retrying polici
 
 Actually this library wraps awesome [Polly](https://github.com/App-vNext/Polly) liberary with the predifined settings to allow developers to use it as is without a deep dive to Polly.
 
-The `DefaultPolicy` provided by this library combines `RetryPolicy`, `TimeoutPolicy` and `CircuitBreakerPolicy` under the hood. See the corresponding sections of the README.
+The `DefaultPolicy` provided by this library combines `RetryPolicy`, `CircuitBreakerPolicy` and `TimeoutPolicy` under the hood. See the corresponding sections of the README.
 
 ## Functionality provided by the library
 
@@ -89,6 +89,24 @@ The most important parameter in the retry policy is `RetryCount` which means eac
 
 You also may implement your own policy settings by implement the `IRetrySettings`. Also you may check the default values in the `Defaults` class.
 
+## CircuitBreaker Policy
+
+Circuit breaker's goal is to prevent requests to the server if it doesn't answer for a while to mostly of the requests. In practice the reason to have a circuit breaker is to prevent requests when server is down or overloaded.
+
+CircuitBreaker has several importatnt parameters:
+
+- `FailureThreshold` means what percentage of failed requests should be for the CircuitBreaker to open.
+- `MinimumThroughput` the minimum amount of the requests should be for the CircuitBreaker to open.
+- `DurationOfBreak` amount of time when the CircuitBreaker prevents all the requests to the host.
+- `SamplingDuration` during this amount of time CircuitBreaker will count success/failed requests and check two parameters above to make a decision should it opens or not.
+
+[More information about Circuit Breakers in the Polly documentation](https://github.com/App-vNext/Polly/wiki/Advanced-Circuit-Breaker).
+
+
+The library provides interface `ICircuitBreakerSettings` to setup circuit breaker policy and default implementation `CircuitBreakerSettings` which has a several constructors to tune-in parameters above.
+
+You also may implement your own policy settings by implement the `ICircuitBreakerSettings`. Also you may check the default values in the `Defaults` class.
+
 ## Timeout policy
 
 The timeout policy cancels requests in case of long responses (server doesn't response for a long time).
@@ -109,24 +127,6 @@ Notice that the `HttpClientTimeout` should be **greater** than `TimeoutPerRetry`
 One more important thing is the order of the policies. `TimeoutPolicy` should always be **after** the RetryPolicy otherwise the `TimeoutPerRetry` paramater will play the same role as a `HttpClientTimeout`. [Clarification from the Polly documentation](https://github.com/App-vNext/Polly/wiki/Polly-and-HttpClientFactory#use-case-applying-timeouts).
 
 You may setup your own timeout parameters by providing it to the `HttpClientSettings` constructor. Also you may check the default values in the `Defaults` class.
-
-## CircuitBreaker Policy
-
-Circuit breaker's goal is to prevent requests to the server if it doesn't answer for a while to mostly of the requests. In practice the reason to have a circuit breaker is to prevent requests when server is down or overloaded.
-
-CircuitBreaker has several importatnt parameters:
-
-- `FailureThreshold` means what percentage of failed requests should be for the CircuitBreaker to open.
-- `MinimumThroughput` the minimum amount of the requests should be for the CircuitBreaker to open.
-- `DurationOfBreak` amount of time when the CircuitBreaker prevents all the requests to the host.
-- `SamplingDuration` during this amount of time CircuitBreaker will count success/failed requests and check two parameters above to make a decision should it opens or not.
-
-[More information about Circuit Breakers in the Polly documentation](https://github.com/App-vNext/Polly/wiki/Advanced-Circuit-Breaker).
-
-
-The library provides interface `ICircuitBreakerSettings` to setup circuit breaker policy and default implementation `CircuitBreakerSettings` which has a several constructors to tune-in parameters above.
-
-You also may implement your own policy settings by implement the `ICircuitBreakerSettings`. Also you may check the default values in the `Defaults` class.
 
 ## Library versions
 

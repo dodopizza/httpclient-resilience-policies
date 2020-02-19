@@ -63,8 +63,8 @@ namespace Dodo.HttpClientExtensions
 		{
 			return clientBuilder
 				.AddRetryPolicy(settings.RetrySettings)
-				.AddTimeoutPolicy(settings.TimeoutPerTry)
-				.AddCircuitBreakerPolicy(settings.CircuitBreakerSettings);
+				.AddCircuitBreakerPolicy(settings.CircuitBreakerSettings)
+				.AddTimeoutPolicy(settings.TimeoutPerTry);
 		}
 
 		/// <summary>
@@ -91,8 +91,8 @@ namespace Dodo.HttpClientExtensions
 		{
 			return clientBuilder
 				.AddRetryPolicy(settings.RetrySettings)
-				.AddTimeoutPolicy(settings.TimeoutPerTry)
-				.AddHostSpecificCircuitBreakerPolicy(settings.CircuitBreakerSettings);
+				.AddHostSpecificCircuitBreakerPolicy(settings.CircuitBreakerSettings)
+				.AddTimeoutPolicy(settings.TimeoutPerTry);
 		}
 
 		private static IHttpClientBuilder AddRetryPolicy(
