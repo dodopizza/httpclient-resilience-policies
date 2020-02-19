@@ -134,6 +134,7 @@ namespace Dodo.HttpClientExtensions
 		{
 			return HttpPolicyExtensions
 				.HandleTransientHttpError()
+				.Or<TimeoutRejectedException>()
 				.OrResult(r => r.StatusCode == (HttpStatusCode) 429) // Too Many Requests
 				.AdvancedCircuitBreakerAsync(
 					settings.FailureThreshold,
