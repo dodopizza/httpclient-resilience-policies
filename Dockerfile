@@ -1,10 +1,10 @@
 FROM microsoft/dotnet:2.2-sdk AS build
 WORKDIR /app
 
-COPY ./NuGet.config /root/.nuget/NuGet/NuGet.Config
+COPY NuGet.config /root/.nuget/NuGet/NuGet.Config
 
-COPY ./Dodo.HttpClientExtensions ./Dodo.HttpClientExtensions
-COPY ./Dodo.HttpClientExtensions.Tests ./Dodo.HttpClientExtensions.Tests
+COPY src/Dodo.HttpClientExtensions ./Dodo.HttpClientExtensions
+COPY src/Dodo.HttpClientExtensions.Tests ./Dodo.HttpClientExtensions.Tests
 
 ARG versionSuffix
 
