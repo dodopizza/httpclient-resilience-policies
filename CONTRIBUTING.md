@@ -30,3 +30,7 @@ Please, use consistent code style in your contributions.
 ## License
 
 By contributing, you agree that your contributions will be licensed under its [Apache License 2.0](LICENSE).
+
+## Code of Conduct
+
+This project has adopted the [Code of Conduct](./CODE_OF_CONDUCT.md).
