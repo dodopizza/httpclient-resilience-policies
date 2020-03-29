@@ -10,11 +10,11 @@ jobs:
       - name: Setup dotnet
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '3.1.201'
+          dotnet-version: '2.2.110'
       - name: Restore and build
         run: |
           dotnet build --configuration Release ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
-          ls ./src/Dodo.HttpClientExtensions/bin/Release/netstandard2.0
+          dotnet test --configuration Release ./src/Dodo.HttpClientExtensions.Tests/Dodo.HttpClientExtensions.Tests.csproj
       # - name: Upload build artifacts
       #   uses: actions/upload-artifact@master
       #   with:
