@@ -25,7 +25,7 @@ namespace Dodo.HttpClientExtensions.Tests
 			var result = await wrapper.Client.GetAsync("http://localhost");
 
 			Assert.AreEqual(HttpStatusCode.ServiceUnavailable, result.StatusCode);
-			Assert.AreEqual(retryCount + 1, wrapper.NumberOfCalls);
+			Assert.AreEqual(retryCount + 100, wrapper.NumberOfCalls);
 		}
 
 		[Test]
