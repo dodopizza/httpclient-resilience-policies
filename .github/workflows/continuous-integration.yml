@@ -3,7 +3,7 @@ on: push
 
 jobs:
   build:
-    name: Build library and run tests
+    name: Build library
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -15,4 +15,29 @@ jobs:
         run: |
           dotnet restore ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
           dotnet build --no-restore --configuration Release ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
-          dotnet test --configuration Release ./src/Dodo.HttpClientExtensions.Tests/Dodo.HttpClientExtensions.Tests.csproj
+      # - name: Upload build artifacts
+      #   uses: actions/upload-artifact@master
+      #   with:
+      #     name: Library artifacts
+      #     path: ./src/Dodo.HttpClientExtensions/bin/Release/netstandard2.0
+
+  # test:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       dotnet: [ '2.2.110', '3.1.201' ]
+  #   name: Test library on .NET Core ${{ matrix.dotnet }}
+  #   steps:
+  #     - uses: actions/checkout@master
+  #     - name: Setup dotnet
+  #       uses: actions/setup-dotnet@v1
+  #       with:
+  #         dotnet-version: ${{ matrix.dotnet }}
+  #     - name: Download build artifacts
+  #       uses: actions/download-artifact@master
+  #       with:
+  #         name: Library artifacts
+  #         path: ./src/Dodo.HttpClientExtensions/bin/Release/netstandard2.0
+  #     - name: Run tests
+  #       run: dotnet test --configuration Release ./src/Dodo.HttpClientExtensions.Tests/Dodo.HttpClientExtensions.Tests.csproj
