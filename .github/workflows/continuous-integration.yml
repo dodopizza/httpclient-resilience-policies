@@ -2,7 +2,7 @@ name: Continuous Integration
 on: push
 
 jobs:
-  build:
+  build-and-test:
     name: Build library
     runs-on: ubuntu-latest
     steps:
@@ -11,32 +11,7 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '3.1.100'
-      - name: Restore and build
+      - name: Build and run tests
         run: |
           dotnet build --configuration Release ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@master
-        with:
-          name: Library artifacts
-          path: ./src/Dodo.HttpClientExtensions/bin/Release/netstandard2.0
-
-  test:
-    needs: build
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        dotnet: [ '2.2.110', '3.1.201' ]
-    name: Test library on .NET Core ${{ matrix.dotnet }}
-    steps:
-      - uses: actions/checkout@master
-      - name: Setup dotnet
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: ${{ matrix.dotnet }}
-      - name: Download build artifacts
-        uses: actions/download-artifact@master
-        with:
-          name: Library artifacts
-          path: ./src/Dodo.HttpClientExtensions/bin/Release/netstandard2.0
-      - name: Run tests
-        run: dotnet test --configuration Release ./src/Dodo.HttpClientExtensions.Tests/Dodo.HttpClientExtensions.Tests.csproj
+          dotnet test --configuration Release ./src/Dodo.HttpClientExtensions.Tests/Dodo.HttpClientExtensions.Tests.csproj
