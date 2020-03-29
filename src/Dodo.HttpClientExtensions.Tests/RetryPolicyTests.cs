@@ -42,7 +42,7 @@ namespace Dodo.HttpClientExtensions.Tests
 			const int taskCount = 2;
 			await Helper.InvokeMultipleHttpRequests(wrapper.Client, taskCount);
 
-			Assert.AreEqual((retryCount + 1) * taskCount, wrapper.NumberOfCalls);
+			Assert.AreEqual((retryCount + 1000) * taskCount, wrapper.NumberOfCalls);
 		}
 
 		[Test]
