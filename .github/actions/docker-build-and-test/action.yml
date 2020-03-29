@@ -1,7 +1,0 @@
-name: "Docker: dotnet build and dotnet tests"
-description: "Docker: dotnet build and dotnet test"
-author: "devcommunity@dodopizza.com"
-
-runs:
-  using: "docker"
-  image: "../../../Dockerfile"
