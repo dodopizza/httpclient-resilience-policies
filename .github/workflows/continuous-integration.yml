@@ -13,8 +13,8 @@ jobs:
           dotnet-version: '3.1.201'
       - name: Restore and build
         run: |
-          dotnet restore ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
-          dotnet build --no-restore --configuration Release ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
+          dotnet build --configuration Release ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
+          ls ./src/Dodo.HttpClientExtensions/bin/Release/netstandard2.0
       # - name: Upload build artifacts
       #   uses: actions/upload-artifact@master
       #   with:
