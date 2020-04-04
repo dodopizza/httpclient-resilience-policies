@@ -1,0 +1,57 @@
+name: Push to master branch
+
+on:
+  push:
+    branches:
+      - github-actions
+
+jobs:
+  build-and-pack:
+    name: Build and test library
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "3.1.100"
+      - name: Build and tests library
+        run: |
+          dotnet build --configuration Release ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
+          dotnet test --configuration Release ./src/Dodo.HttpClientExtensions.Tests/Dodo.HttpClientExtensions.Tests.csproj
+          dotnet pack --no-restore --no-build --configuration Release --output out/ ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
+      - uses: actions/upload-artifact@master
+        with:
+          name: NuGet package
+          path: out/
+
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@master
+        with:
+          name: NuGet package
+          path: out
+      - name: Extract version
+        run: |
+          package_version=$(ls | sed -e 's/Dodo.HttpClientExtensions.//' -e 's/.nupkg//')
+          echo "Current package version: $package_version"
+          echo ::set-env name=package_version::$package_version
+      - name: Read version
+        run: echo $package_version
+      # - name: Create Release
+      #   uses: actions/create-release@latest
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     tag_name: ${{ github.ref }}
+      #     release_name: Release ${{ github.ref }}
+      #     body: |
+      #       Changes in this Release
+      #       - First Change
+      #       - Second Change
+      #     draft: false
+      #     prerelease: false
