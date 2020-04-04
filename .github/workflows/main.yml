@@ -18,6 +18,10 @@ jobs:
           dotnet build --configuration Release ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
           dotnet test --configuration Release ./src/Dodo.HttpClientExtensions.Tests/Dodo.HttpClientExtensions.Tests.csproj
           dotnet pack --no-restore --no-build --configuration Release --output out/ ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
+
+          echo "github.ref: $ref"
+          echo "github.base_ref: $base_ref"
+          echo "github.head_ref: $head_ref"
         env:
           ref: ${{ github.ref }}
           base_ref: ${{ github.base_ref }}
