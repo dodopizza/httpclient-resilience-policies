@@ -30,6 +30,8 @@ jobs:
     name: Create Release
     runs-on: ubuntu-latest
 
+    needs: build-and-pack
+
     steps:
       - uses: actions/download-artifact@master
         with:
