@@ -1,0 +1,56 @@
+name: CI/CD
+
+on: [push, pull_request]
+
+jobs:
+  build-and-test:
+    name: Build library
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "3.1.100"
+      - name: Build and run tests
+        run: |
+          dotnet build --configuration Release ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
+          dotnet test --configuration Release ./src/Dodo.HttpClientExtensions.Tests/Dodo.HttpClientExtensions.Tests.csproj
+          dotnet pack --no-restore --no-build --configuration Release --version-suffix "$version_suffix" --output ./out ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
+          pwd
+          ls ./out
+        env:
+          version_suffix: ${{ github.ref }}
+      - uses: actions/upload-artifact@master
+        with:
+          name: upload NuGet package
+          path: ./out/
+
+  # release:
+  #   name: Create Release
+  #   runs-on: ubuntu-latest
+  #   if: github.event.pull_request.merged && github.ref == "refs/heads/master"
+  #   steps:
+  #     - uses: actions/checkout@master
+  #     - name: Setup dotnet
+  #       uses: actions/setup-dotnet@v1
+  #       with:
+  #         dotnet-version: "3.1.100"
+  #     - uses: actions/download-artifact@master
+  #       with:
+  #         name: upload artifacts
+  #         path: ./src/Dodo.HttpClientExtensions/
+  #     - name: Create Release
+  #       uses: actions/create-release@latest
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       with:
+  #         tag_name: ${{ github.ref }}
+  #         release_name: Release ${{ github.ref }}
+  #         body: |
+  #           Changes in this Release
+  #           - First Change
+  #           - Second Change
+  #         draft: false
+  #         prerelease: false
