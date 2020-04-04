@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build-and-pack:
-    name: Build, run tests and pack library
+    name: Build and pack library
     runs-on: ubuntu-latest
 
     steps:
@@ -13,19 +13,19 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: "3.1.100"
-      - name: Build and run tests
+      - name: Build, run tests and pack library
         run: |
           dotnet build --configuration Release ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
           dotnet test --configuration Release ./src/Dodo.HttpClientExtensions.Tests/Dodo.HttpClientExtensions.Tests.csproj
-          dotnet pack --no-restore --no-build --configuration Release --output ./out ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
+          dotnet pack --no-restore --no-build --configuration Release --output out/ ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
           pwd
-          ls ./out
+          ls out
         env:
           version_suffix: ${{ github.ref }}
       - uses: actions/upload-artifact@master
         with:
           name: upload NuGet package
-          path: ./out/
+          path: out/
 
   # release:
   #   name: Create Release
