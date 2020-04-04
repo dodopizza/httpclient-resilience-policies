@@ -39,7 +39,7 @@ jobs:
           path: out
       - name: Extract version
         run: |
-          package_version=$(ls | sed -e 's/Dodo.HttpClientExtensions.//' -e 's/.nupkg//')
+          package_version=$(ls out/ | sed -e 's/Dodo.HttpClientExtensions.//' -e 's/.nupkg//')
           echo "Current package version: $package_version"
           echo ::set-env name=package_version::$package_version
       - name: Read version
