@@ -3,7 +3,7 @@ name: Push to master branch
 on:
   push:
     branches:
-      - github-actions
+      - master
 
 jobs:
   build-and-pack:
