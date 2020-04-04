@@ -18,10 +18,10 @@ jobs:
           dotnet build --configuration Release ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
           dotnet test --configuration Release ./src/Dodo.HttpClientExtensions.Tests/Dodo.HttpClientExtensions.Tests.csproj
           dotnet pack --no-restore --no-build --configuration Release --output out/ ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
-          pwd
-          ls out
         env:
-          version_suffix: ${{ github.ref }}
+          ref: ${{ github.ref }}
+          base_ref: ${{ github.base_ref }}
+          head_ref: ${{ github.head_ref }}
       - uses: actions/upload-artifact@master
         with:
           name: upload NuGet package
@@ -31,16 +31,14 @@ jobs:
   #   name: Create Release
   #   runs-on: ubuntu-latest
   #   if: github.event.pull_request.merged && github.ref == "refs/heads/master"
+
   #   steps:
   #     - uses: actions/checkout@master
   #     - name: Setup dotnet
-  #       uses: actions/setup-dotnet@v1
-  #       with:
-  #         dotnet-version: "3.1.100"
   #     - uses: actions/download-artifact@master
   #       with:
   #         name: upload artifacts
-  #         path: ./src/Dodo.HttpClientExtensions/
+  #         path: out
   #     - name: Create Release
   #       uses: actions/create-release@latest
   #       env:
