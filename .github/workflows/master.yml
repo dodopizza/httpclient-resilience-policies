@@ -42,18 +42,16 @@ jobs:
           package_version=$(ls out/ | sed -e 's/Dodo.HttpClientExtensions.//' -e 's/.nupkg//')
           echo "Current package version: $package_version"
           echo ::set-env name=package_version::$package_version
-      - name: Read version
-        run: echo $package_version
-      # - name: Create Release
-      #   uses: actions/create-release@latest
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     tag_name: ${{ github.ref }}
-      #     release_name: Release ${{ github.ref }}
-      #     body: |
-      #       Changes in this Release
-      #       - First Change
-      #       - Second Change
-      #     draft: false
-      #     prerelease: false
+      - name: Create Release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ package_version }}
+          release_name: Release v${{ package_version }}
+          body: |
+            Changes in this Release
+            - First Change
+            - Second Change
+          draft: true
+          prerelease: false
