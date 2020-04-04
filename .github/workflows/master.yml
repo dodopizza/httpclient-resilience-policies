@@ -47,8 +47,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ package_version }}
-          release_name: Release v${{ package_version }}
+          tag_name: v"${package_version}"
+          release_name: Release v"${package_version }"
           body: |
             Changes in this Release
             - First Change
