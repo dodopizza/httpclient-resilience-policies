@@ -3,8 +3,8 @@ name: CI/CD
 on: [push, pull_request]
 
 jobs:
-  build-and-test:
-    name: Build library
+  build-and-pack:
+    name: Build, run tests and pack library
     runs-on: ubuntu-latest
 
     steps:
@@ -17,7 +17,7 @@ jobs:
         run: |
           dotnet build --configuration Release ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
           dotnet test --configuration Release ./src/Dodo.HttpClientExtensions.Tests/Dodo.HttpClientExtensions.Tests.csproj
-          dotnet pack --no-restore --no-build --configuration Release --version-suffix "$version_suffix" --output ./out ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
+          dotnet pack --no-restore --no-build --configuration Release --output ./out ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
           pwd
           ls ./out
         env:
