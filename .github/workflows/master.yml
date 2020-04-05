@@ -3,7 +3,7 @@ name: Draft Release on master
 on:
   push:
     branches:
-      - master
+      - github-actions
 
 jobs:
   build-and-pack:
