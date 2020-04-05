@@ -14,28 +14,28 @@ Library provides few methods which returns the IHttpClientBuilder and you may ch
 
 There are list of public methods to use:
 
-    ```csharp
-    // Default policies for a single host environment using all defaults
-    IHttpClientBuilder AddDefaultPolicies(this IHttpClientBuilder clientBuilder);
+```csharp
+// Default policies for a single host environment using all defaults
+IHttpClientBuilder AddDefaultPolicies(this IHttpClientBuilder clientBuilder);
 
-    // Default policies for a single host environment with custom settings
-    IHttpClientBuilder AddDefaultPolicies(this IHttpClientBuilder clientBuilder, HttpClientSettings settings);
+// Default policies for a single host environment with custom settings
+IHttpClientBuilder AddDefaultPolicies(this IHttpClientBuilder clientBuilder, HttpClientSettings settings);
 
-    // Default policies for a multi host environments using all defaults
-    IHttpClientBuilder AddDefaultHostSpecificPolicies(this IHttpClientBuilder clientBuilder);
+// Default policies for a multi host environments using all defaults
+IHttpClientBuilder AddDefaultHostSpecificPolicies(this IHttpClientBuilder clientBuilder);
 
-    // Default policies for a multi host environments with custom settings
-    IHttpClientBuilder AddDefaultHostSpecificPolicies(this IHttpClientBuilder clientBuilder, HttpClientSettings settings);
+// Default policies for a multi host environments with custom settings
+IHttpClientBuilder AddDefaultHostSpecificPolicies(this IHttpClientBuilder clientBuilder, HttpClientSettings settings);
 
-    // Default JsonClient includes DefaultPolicies with custom settings
-    IHttpClientBuilder AddJsonClient<TClientInterface, TClientImplementation>(
-        this IServiceCollection sc,
-        Uri baseAddress,
-        HttpClientSettings settings,
-        string clientName = null)
-            where TClientInterface : class
-            where TClientImplementation : class, TClientInterface
-    ```
+// Default JsonClient includes DefaultPolicies with custom settings
+IHttpClientBuilder AddJsonClient<TClientInterface, TClientImplementation>(
+    this IServiceCollection sc,
+    Uri baseAddress,
+    HttpClientSettings settings,
+    string clientName = null)
+        where TClientInterface : class
+        where TClientImplementation : class, TClientInterface
+```
 
 There are also available `HttpClientSettings`, `IRetrySettings` and `ICircuitBreakerSettings` to tune-in the default policies. See the corresponding sections of the README.
 
@@ -45,22 +45,22 @@ You have two options how to add HttpClient in your code.
 
 1. Just use default client provided by the library and add it to the `ServiceCollection` in the Startup like this:
 
-        ```csharp
-        service                     // IServiceCollection
-            .AddJsonClient(...)     // Default client with policies
-        ```
+    ```csharp
+    service                     // IServiceCollection
+        .AddJsonClient(...)     // Default client with policies
+    ```
 
 2. You may add your own HttpClient and then add default policies. In this case it is important to configure Timeout property in the client:
 
-        ```csharp
-        service                     // IServiceCollection
-            .AddHttpClient("named-client",
-                client =>
-                {
-                    client.Timeout = TimeSpan.FromMilliseconds(Defaults.Timeout.HttpClientTimeoutInMilliseconds); // Constant provided by the library
-                }))
-            .AddDefaultPolicies()   // Default policies provided by the library
-        ```
+    ```csharp
+    service                     // IServiceCollection
+        .AddHttpClient("named-client",
+            client =>
+            {
+                client.Timeout = TimeSpan.FromMilliseconds(Defaults.Timeout.HttpClientTimeoutInMilliseconds); // Constant provided by the library
+            }))
+        .AddDefaultPolicies()   // Default policies provided by the library
+    ```
 
 Or if you use custom HttpClientSettings you may get client timeout value from the `HttpClientSettings.HttpClientTimeout` property instead of constant.
 
@@ -147,9 +147,9 @@ Here is [drone](https://drone.dodois.ru/dodopizza/httpclientextensions) build of
 
 To publish the library you should use Drone-CLI promote command:
 
-    ```bash
-    drone build promote dodopizza/httpclientextensions <build_number> myget
-    ```
+```bash
+drone build promote dodopizza/httpclientextensions <build_number> myget
+```
 
 The last argument stands for the environment name. In case of library you may provide any value there because it is not used.
 
