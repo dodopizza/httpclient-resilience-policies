@@ -1,4 +1,4 @@
-name: Compare version on PR
+name: Compare versions on PR
 
 on:
   pull_request:
