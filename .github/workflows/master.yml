@@ -1,9 +1,9 @@
-name: Draft Release on master
+name: master
 
 on:
   push:
     branches:
-      - github-actions
+      - master
 
 jobs:
   build-and-pack:

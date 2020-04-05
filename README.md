@@ -1,5 +1,7 @@
 # Dodo.HttpClientExtensions library
 
+![master](https://github.com/dodopizza/httpclientextensions/workflows/Draft%20Release%20on%20master/badge.svg)
+
 The main goal of this library is to provide unified http request retrying policies for the HttpClient that just works.
 
 Actually this library wraps awesome [Polly](https://github.com/App-vNext/Polly) liberary with the predifined settings to allow developers to use it as is without a deep dive to Polly.
