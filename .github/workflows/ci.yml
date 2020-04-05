@@ -6,7 +6,7 @@ on:
       - '!master'
 
 jobs:
-  build-and-pack:
+  build-and-test:
     name: Build and test library
     runs-on: ubuntu-latest
 
