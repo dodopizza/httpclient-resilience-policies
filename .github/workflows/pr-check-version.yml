@@ -20,6 +20,7 @@ jobs:
         run: |
           version=$(cat ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj | grep "<VersionPrefix>" | sed -e "s/ *<\/*VersionPrefix>//g")
           echo "Source version: $version"
+          if [ -z "${version// }" ]; then exit 1; fi
           echo "::set-output name=version::$version"
 
       - uses: actions/checkout@master
@@ -31,13 +32,14 @@ jobs:
         run: |
           version=$(cat ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj | grep "<VersionPrefix>" | sed -e "s/ *<\/*VersionPrefix>//g")
           echo "Source version: $version"
+          if [ -z "${version// }" ]; then exit 1; fi
           echo "::set-output name=version::$version"
 
       - name: Compare versions
         run: |
           versions=(${{ env.source_version }} ${{ env.target_version }})
           IFS=$'\n' sorted_versions=($(sort -V <<<"${versions[*]}")); unset IFS
-          if [ $sorted_versions == ${{ env.target_version }} ]; then exit 1; fi
+          if [ $sorted_versions == ${{ env.source_version }} ]; then exit 1; fi
         env:
           source_version: ${{ steps.source-version.outputs.version }}
           target_version: ${{ steps.target-version.outputs.version }}
