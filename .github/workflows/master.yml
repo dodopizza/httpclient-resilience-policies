@@ -3,7 +3,7 @@ name: master
 on:
   push:
     branches:
-      - github-actions
+      - master
 
 jobs:
   build-and-pack:
@@ -47,7 +47,7 @@ jobs:
       - name: Extract version
         id: extract-version
         run: |
-          package_version=$(ls out/ | sed -e 's/Dodo.HttpClientExtensions.//' -e 's/.nupkg//')
+          package_version=$(ls out/ | sed -e "s/Dodo.HttpClientExtensions.//" -e "s/.nupkg//")
           echo "Current package version: $package_version"
           echo "::set-output name=package_version::$package_version"
 

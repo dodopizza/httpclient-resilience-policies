@@ -1,0 +1,43 @@
+name: Compare version on PR
+
+on:
+  pull_request:
+    branches:
+      - github-actions
+
+jobs:
+  compare-version:
+    name: Compare versions in current branch and master
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Get source version
+        id: source-version
+        run: |
+          version=$(cat ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj | grep "<VersionPrefix>" | sed -e "s/ *<\/*VersionPrefix>//g")
+          echo "Source version: $version"
+          echo "::set-output name=version::$version"
+
+      - uses: actions/checkout@master
+        with:
+          ref: ${{ github.base_ref }}
+
+      - name: Get target version
+        id: target-version
+        run: |
+          version=$(cat ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj | grep "<VersionPrefix>" | sed -e "s/ *<\/*VersionPrefix>//g")
+          echo "Source version: $version"
+          echo "::set-output name=version::$version"
+
+      - name: Compare versions
+        run: |
+          versions=(${{ env.source_version }} ${{ env.target_version }})
+          IFS=$'\n' sorted_versions=($(sort -V <<<"${versions[*]}")); unset IFS
+          if [ $sorted_versions == ${{ steps.target-version.outputs.version }} ]; then exit 1; fi
+        env:
+          source_version: ${{ steps.source-version.outputs.version }}
+          target_version: ${{ steps.target-version.outputs.version }}
