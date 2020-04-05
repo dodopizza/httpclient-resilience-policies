@@ -3,7 +3,7 @@ name: Compare versions on PR
 on:
   pull_request:
     branches:
-      - github-actions
+      - master
 
 jobs:
   compare-version:
