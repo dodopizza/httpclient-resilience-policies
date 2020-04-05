@@ -20,6 +20,7 @@ jobs:
         run: |
           version=$(cat ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj | grep "<VersionPrefix>" | sed -e "s/ *<\/*VersionPrefix>//g")
           echo "Source version: $version"
+          if [ -z "${version// }" ]; then exit 1; fi
           echo "::set-output name=version::$version"
 
       - uses: actions/checkout@master
@@ -31,6 +32,7 @@ jobs:
         run: |
           version=$(cat ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj | grep "<VersionPrefix>" | sed -e "s/ *<\/*VersionPrefix>//g")
           echo "Source version: $version"
+          if [ -z "${version// }" ]; then exit 1; fi
           echo "::set-output name=version::$version"
 
       - name: Compare versions
