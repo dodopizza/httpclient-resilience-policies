@@ -3,7 +3,7 @@ name: master
 on:
   push:
     branches:
-      - master
+      - github_actions
 
 jobs:
   build-and-pack:
@@ -22,7 +22,6 @@ jobs:
         run: |
           dotnet build --configuration Release ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
           dotnet test --configuration Release ./src/Dodo.HttpClientExtensions.Tests/Dodo.HttpClientExtensions.Tests.csproj
-          dotnet pack --no-restore --no-build --configuration Release --output out/ ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
 
       - uses: actions/upload-artifact@master
         with:
@@ -47,9 +46,10 @@ jobs:
       - name: Extract version
         id: extract-version
         run: |
-          package_version=$(ls out/ | sed -e "s/Dodo.HttpClientExtensions.//" -e "s/.nupkg//")
-          echo "Current package version: $package_version"
-          echo "::set-output name=package_version::$package_version"
+          version=$(cat ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj | grep "<VersionPrefix>" | sed -e "s/ *<\/*VersionPrefix>//g")
+          echo "Package version: $version"
+          if [ -z "${version// }" ]; then exit 1; fi
+          echo "::set-output name=package_version::$version"
 
       - name: Extract latest commit message
         id: latest-commit
@@ -72,14 +72,3 @@ jobs:
           body: ${{ steps.find-pr.outputs.body || steps.latest-commit.outputs.message }}
           draft: true
           prerelease: false
-
-      - name: Upload release asset
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./out/Dodo.HttpClientExtensions.${{ steps.extract-version.outputs.package_version }}.nupkg
-          asset_name: Dodo.HttpClientExtensions.${{ steps.extract-version.outputs.package_version }}.nupkg
-          asset_content_type: application/zip
