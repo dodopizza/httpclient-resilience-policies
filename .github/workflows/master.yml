@@ -6,7 +6,7 @@ on:
       - github-actions
 
 jobs:
-  build-and-pack:
+  build-and-test:
     name: Build and test library
     runs-on: ubuntu-latest
 
@@ -23,17 +23,12 @@ jobs:
           dotnet build --configuration Release ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
           dotnet test --configuration Release ./src/Dodo.HttpClientExtensions.Tests/Dodo.HttpClientExtensions.Tests.csproj
 
-      - uses: actions/upload-artifact@master
-        with:
-          name: NuGet package
-          path: out/
-
 
   release:
     name: Create release
     runs-on: ubuntu-latest
 
-    needs: build-and-pack
+    needs: build-and-test
 
     steps:
       - uses: actions/checkout@v1
