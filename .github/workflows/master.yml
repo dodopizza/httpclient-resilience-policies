@@ -33,11 +33,6 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      - uses: actions/download-artifact@master
-        with:
-          name: NuGet package
-          path: out
-
       - name: Extract version
         id: extract-version
         run: |
