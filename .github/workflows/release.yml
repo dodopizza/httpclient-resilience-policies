@@ -41,7 +41,8 @@ jobs:
           name: NuGet package
           path: out
 
-      - id: get-package
+      - name: Get package
+        id: get-package
         run: |
           echo "::set-output name=package::$(ls out/)"
 
