@@ -18,6 +18,7 @@ jobs:
       - name: Get source version
         id: source-version
         run: |
+          echo "Head: ${{ github.head_ref }}"
           version=$(cat ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj | grep "<VersionPrefix>" | sed -e "s/ *<\/*VersionPrefix>//g")
           echo "Source version: $version"
           if [ -z "${version// }" ]; then exit 1; fi
@@ -30,6 +31,7 @@ jobs:
       - name: Get target version
         id: target-version
         run: |
+          echo "Base: ${{ github.base_ref }}"
           version=$(cat ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj | grep "<VersionPrefix>" | sed -e "s/ *<\/*VersionPrefix>//g")
           echo "Source version: $version"
           if [ -z "${version// }" ]; then exit 1; fi
