@@ -1,7 +1,7 @@
 # Dodo.HttpClientExtensions library
 
 ![master](https://github.com/dodopizza/httpclientextensions/workflows/master/badge.svg)
-![release latest](https://github.com/dodopizza/httpclientextensions/workflows/release/badge.svg)
+![release](https://github.com/dodopizza/httpclientextensions/workflows/release/badge.svg)
 
 The main goal of this library is to provide unified http request retrying policies for the HttpClient that just works.
 
