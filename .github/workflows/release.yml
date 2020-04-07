@@ -19,11 +19,6 @@ jobs:
 
       - name: Build and publish library to NuGet
         run: |
-          echo "Current branch: ${{ github.ref }}"
-          echo "Upload url: ${{ github.event.release.upload_url }}"
-          echo "Event: ${{ github.event }}"
-          echo "Path: ${{ github.event_path }}"
-          cat "${{ github.event_path }}"
           dotnet build --configuration Release ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
           dotnet test --configuration Release ./src/Dodo.HttpClientExtensions.Tests/Dodo.HttpClientExtensions.Tests.csproj
           dotnet pack --no-restore --no-build --configuration Release --output out/ ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
