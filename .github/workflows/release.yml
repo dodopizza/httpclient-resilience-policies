@@ -5,7 +5,7 @@ on:
     types: [published]
 
 jobs:
-  build-test-pack-publish:
+  build-and-publish:
     name: Build and publish library to NuGet
     runs-on: ubuntu-latest
 
@@ -17,10 +17,10 @@ jobs:
         with:
           dotnet-version: "3.1.100"
 
-      - name: Build and tests library
+      - name: Build and publish library to NuGet
         run: |
           echo "Current branch: ${{ github.ref }}"
-          echo "Upload url: ${{ github.event.upload_url }}"
+          echo "Upload url: ${{ github.event.release.upload_url }}"
           echo "Event: ${{ github.event }}"
           echo "Path: ${{ github.event_path }}"
           cat "${{ github.event_path }}"
@@ -55,7 +55,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ github.event.upload_url }}
+          upload_url: ${{ github.event.release.upload_url }}
           asset_path: ./out/${{ steps.get-package.outputs.package }}
           asset_name: ${{ steps.get-package.outputs.package }}
           asset_content_type: application/zip
