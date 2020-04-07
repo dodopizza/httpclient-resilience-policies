@@ -18,7 +18,7 @@ jobs:
         with:
           dotnet-version: "3.1.100"
 
-      - name: Build and tests library
+      - name: Build and test library
         run: |
           dotnet build --configuration Release ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
           dotnet test --configuration Release ./src/Dodo.HttpClientExtensions.Tests/Dodo.HttpClientExtensions.Tests.csproj
@@ -44,6 +44,7 @@ jobs:
       - name: Extract latest commit message
         id: latest-commit
         run: |
+          echo "${{ github.ref }}"
           echo "::set-output name=message::$(git log --format=%B -n 1 ${{ github.event.after }})"
 
       - uses: jwalton/gh-find-current-pr@v1
