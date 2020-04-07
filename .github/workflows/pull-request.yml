@@ -9,7 +9,6 @@ jobs:
   compare-version:
     name: Compare versions in current branch and master
     runs-on: ubuntu-latest
-    if: github.base_ref == 'refs/heads/master'
 
     steps:
       - uses: actions/checkout@master
