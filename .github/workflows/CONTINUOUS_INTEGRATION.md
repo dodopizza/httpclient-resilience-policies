@@ -1,4 +1,4 @@
-# Continuous Integration
+# Continuous Integration and Releases
 
 This project has adopted [GitHub Flow](https://guides.github.com/introduction/flow/index.html) for development lifecycle.
 
@@ -32,7 +32,16 @@ There are several workflows to react on different GitHub events:
 4. You have to check release notes in the release draft. It is good practices to describe all changes in the release and add links to the issues for each change.
 5. Publish the release. `release workflow` will publish new release to NuGet and add NuGet package asset to the release.
 
-## How to publish new pre-release
+> NuGet package version is extracted from the release tag. It means that it is important to create tags with proper version prefixed with `v` and without trailing dot.  
+Example:  
+Package version in csproj file: `4.0.1`  
+Proper release tag for this version: `v4.0.1`
 
-Process nearly the same as for new release, but you should create releasse draft manually and check `prerelease` checkbox.
-NuGet package will be prefixed with the branch name.
+## How to publish new prerelease
+
+Process nearly the same as for the new release, but you should create releasse draft manually and check `prerelease` checkbox.
+
+> NuGet package version is extracted from the prerelease tag. It is important to create proper suffix for the prerelease version. For example it could be name of the branch or `beta`.
+Example:  
+Package version in csproj file: `4.0.1`  
+Valid prerelease tags for this version: `v4.0.1-mybranch`, `v4.0.1-beta`

@@ -140,6 +140,6 @@ Version change policy (from the SemVer):
 > - `MINOR` version when you add functionality in a backwards compatible manner.
 > - `PATCH` version when you make backwards compatible bug fixes.
 
-## NuGet package releases
+## NuGet package releases for repository owners and collaborators
 
-You can find latest releases on the [releases pane](https://github.com/dodopizza/httpclientextensions/releases) or NuGet repository. The full CI and release process described [here](./.github/workflows/CONTINUOUS_INTEGRATION.md).
+You can find latest releases on the [releases pane](https://github.com/dodopizza/httpclientextensions/releases) or NuGet repository. Description of the CI  workflows and release process described [here](./.github/workflows/CONTINUOUS_INTEGRATION.md). **Must read** if you plan to publish new release or prerelease version of the package.
