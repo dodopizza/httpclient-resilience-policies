@@ -23,9 +23,10 @@ jobs:
       - name: Extract package suffix from tag
         id: extract-version-suffix
         run: |
+          ref=${{ github.ref }}
           version=${{ steps.extract-version.outputs.package_version }}
           shopt -s extglob
-          suffix=${{github.ref##*/v"${version}"?(-)}}
+          suffix=${ref##*/v"${version}"?(-)}
           echo "Version suffix: $suffix"
           echo "::set-output name=version_suffix::$suffix"
 
