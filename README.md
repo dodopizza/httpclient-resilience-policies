@@ -142,4 +142,4 @@ Version change policy (from the SemVer):
 
 ## NuGet package releases
 
-You can find latest releases on the Release pane or NuGet repository. The full CI and release process described [here](./.github/workflows/CONTINUOUS_INTEGRATION.md).
+You can find latest releases on the [releases pane](https://github.com/dodopizza/httpclientextensions/releases) or NuGet repository. The full CI and release process described [here](./.github/workflows/CONTINUOUS_INTEGRATION.md).
