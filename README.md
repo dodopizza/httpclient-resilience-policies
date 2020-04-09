@@ -140,24 +140,6 @@ Version change policy (from the SemVer):
 > - `MINOR` version when you add functionality in a backwards compatible manner.
 > - `PATCH` version when you make backwards compatible bug fixes.
 
-## Build
+## NuGet package releases
 
-Here is [drone](https://drone.dodois.ru/dodopizza/httpclientextensions) build of the library. Build occurs for each commit to any branch.
-
-## Publish the NuGet package
-
-To publish the library you should use Drone-CLI promote command:
-
-```bash
-drone build promote dodopizza/httpclientextensions <build_number> myget
-```
-
-The last argument stands for the environment name. In case of library you may provide any value there because it is not used.
-
-You may publish library as the stable or as pre-release NuGet package.
-
-Publishing from the `master` branch considered as stable and will have version equals to the version in the `VersionPrefix` tag from the csproj.
-Publishing from other branches considered as pre-release and will have a postfix with the branch name.
-
-For example, if the value of the `VersionPrefix` equals to `4.0.0`. Publish from `master` branch will publish the NuGet package with version `4.0.0`.
-If we have a branch from current `master` with the name `my-branch` and publish package from this branch you will have the pre-release package with version `4.0.0-my-branch`.
+You can find latest releases on the Release pane or NuGet repository. The full CI and release process described [here](./.github/workflows/CONTINUOUS_INTEGRATION.md).
