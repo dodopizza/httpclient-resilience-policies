@@ -24,10 +24,12 @@ jobs:
         id: extract-version-suffix
         run: |
           ref=${{ github.ref }}
+          prerelease=${{ github.event.release.prerelease }}
           version=${{ steps.extract-version.outputs.package_version }}
           shopt -s extglob
           suffix=${ref##*/v"${version}"?(-)}
           echo "Version suffix: $suffix"
+          if [ -z "${suffix// }"] && [ $prerelease == "true" ]; exit 1; fi
           echo "::set-output name=version_suffix::$suffix"
 
       - name: Setup dotnet
@@ -37,10 +39,6 @@ jobs:
 
       - name: Build and publish library to NuGet
         run: |
-          echo ${{ github.ref }}
-          echo ${{ steps.extract-version.outputs.package_version }}
-          echo ${{ steps.extract-version-suffix.outputs.version_suffix }}
-          cat ${{ github.event_path }}
           dotnet build --configuration Release ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
           dotnet test --configuration Release ./src/Dodo.HttpClientExtensions.Tests/Dodo.HttpClientExtensions.Tests.csproj
           dotnet pack --no-restore --no-build --configuration Release --version-suffix "${{ steps.extract-version-suffix.outputs.version_suffix }}" --output out/ ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
