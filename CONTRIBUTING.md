@@ -34,3 +34,7 @@ By contributing, you agree that your contributions will be licensed under its [A
 ## Code of Conduct
 
 This project has adopted the [Code of Conduct](./CODE_OF_CONDUCT.md).
+
+## NuGet package release process for repository owners and collaborators
+
+You can find latest releases on the [releases pane](https://github.com/dodopizza/httpclientextensions/releases) or NuGet repository. Description of the CI workflows and release process described [here](./.github/workflows/CI_AND_RELEASE.md). **Must read** if you plan to publish new release or prerelease version of the package.
