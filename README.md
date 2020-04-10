@@ -5,7 +5,7 @@
 
 The main goal of this library is to provide unified http request retrying policies for the HttpClient that just works.
 
-Actually this library wraps awesome [Polly](https://github.com/App-vNext/Polly) liberary with the predifined settings to allow developers to use it as is without a deep dive to Polly.
+Actually this library wraps awesome [Polly](https://github.com/App-vNext/Polly) library with the predefined settings to allow developers to use it as is without a deep dive to Polly.
 
 The `DefaultPolicy` provided by this library combines `RetryPolicy`, `CircuitBreakerPolicy` and `TimeoutPolicy` under the hood. See the corresponding sections of the README.
 
@@ -80,7 +80,7 @@ In the other hand in multi host environment we suppose that we use single client
 
 ## Retry policy
 
-The retry policy handles the situation when the http request fails because of transient error and reties the attempt to complete the request.
+The retry policy handles the situation when the http request fails because of transient error and retries the attempt to complete the request.
 
 The library provides interface `IRetrySettings` to setup retry policy. There are two predefined implementations provided:
 
@@ -95,7 +95,7 @@ You also may implement your own policy settings by implement the `IRetrySettings
 
 Circuit breaker's goal is to prevent requests to the server if it doesn't answer for a while to mostly of the requests. In practice the reason to have a circuit breaker is to prevent requests when server is down or overloaded.
 
-CircuitBreaker has several importatnt parameters:
+CircuitBreaker has several important parameters:
 
 - `FailureThreshold` means what percentage of failed requests should be for the CircuitBreaker to open.
 - `MinimumThroughput` the minimum amount of the requests should be for the CircuitBreaker to open.
@@ -125,6 +125,6 @@ Understanding of the difference between this two parameters is very important to
 
 Notice that the `HttpClientTimeout` should be **greater** than `TimeoutPerRetry` otherwise you requests will never be retried.
 
-One more important thing is the order of the policies. `TimeoutPolicy` should always be **after** the RetryPolicy otherwise the `TimeoutPerRetry` paramater will play the same role as a `HttpClientTimeout`. [Clarification from the Polly documentation](https://github.com/App-vNext/Polly/wiki/Polly-and-HttpClientFactory#use-case-applying-timeouts).
+One more important thing is the order of the policies. `TimeoutPolicy` should always be **after** the RetryPolicy otherwise the `TimeoutPerRetry` parameter will play the same role as a `HttpClientTimeout`. [Clarification from the Polly documentation](https://github.com/App-vNext/Polly/wiki/Polly-and-HttpClientFactory#use-case-applying-timeouts).
 
 You may setup your own timeout parameters by providing it to the `HttpClientSettings` constructor. Also you may check the default values in the `Defaults` class.
