@@ -15,7 +15,7 @@ jobs:
       - name: Extract version
         id: extract-version
         run: |
-          version=$(cat ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj | grep "<VersionPrefix>" | sed -e "s/ *<\/*VersionPrefix>//g")
+          version=$(cat ./src/Dodo.HttpClient.ResiliencePolicies/Dodo.HttpClient.ResiliencePolicies.csproj | grep "<VersionPrefix>" | sed -e "s/ *<\/*VersionPrefix>//g")
           echo "Package version: $version"
           if [ -z "${version// }" ]; then exit 1; fi
           echo "::set-output name=package_version::$version"
@@ -39,9 +39,9 @@ jobs:
 
       - name: Build and publish library to NuGet
         run: |
-          dotnet build --configuration Release ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
-          dotnet test --configuration Release ./src/Dodo.HttpClientExtensions.Tests/Dodo.HttpClientExtensions.Tests.csproj
-          dotnet pack --no-restore --no-build --configuration Release --version-suffix "${{ steps.extract-version-suffix.outputs.version_suffix }}" --output out/ ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
+          dotnet build --configuration Release ./src/Dodo.HttpClient.ResiliencePolicies/Dodo.HttpClient.ResiliencePolicies.csproj
+          dotnet test --configuration Release ./src/Dodo.HttpClient.ResiliencePolicies.Tests/Dodo.HttpClient.ResiliencePolicies.Tests.csproj
+          dotnet pack --no-restore --no-build --configuration Release --version-suffix "${{ steps.extract-version-suffix.outputs.version_suffix }}" --output out/ ./src/Dodo.HttpClient.ResiliencePolicies/Dodo.HttpClient.ResiliencePolicies.csproj
           echo "dotnet publish ..."
       - uses: actions/upload-artifact@master
         with:

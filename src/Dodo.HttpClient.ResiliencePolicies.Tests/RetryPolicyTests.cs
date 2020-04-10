@@ -4,10 +4,12 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Dodo.HttpClient.ResiliencePolicies.RetrySettings;
+using Dodo.HttpClient.ResiliencePolicies.Tests.DSL;
 using NUnit.Framework;
 using Polly;
 
-namespace Dodo.HttpClientExtensions.Tests
+namespace Dodo.HttpClient.ResiliencePolicies.Tests
 {
 	[TestFixture]
 	public class RetryPolicyTests

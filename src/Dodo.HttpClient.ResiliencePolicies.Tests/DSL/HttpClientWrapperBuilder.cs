@@ -2,9 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using Dodo.HttpClient.ResiliencePolicies.CircuitBreakerSettings;
+using Dodo.HttpClient.ResiliencePolicies.RetrySettings;
+using Dodo.HttpClient.ResiliencePolicies.Tests.Fakes;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dodo.HttpClientExtensions.Tests
+namespace Dodo.HttpClient.ResiliencePolicies.Tests.DSL
 {
 	public sealed class HttpClientWrapperBuilder
 	{
@@ -90,7 +93,7 @@ namespace Dodo.HttpClientExtensions.Tests
 
 		private HttpClientSettings BuildClientSettings()
 		{
-			var defaultCircuitBreakerSettings = _circuitBreakerSettings ?? new CircuitBreakerSettings(
+			var defaultCircuitBreakerSettings = _circuitBreakerSettings ?? new CircuitBreakerSettings.CircuitBreakerSettings(
 				failureThreshold: 0.5,
 				minimumThroughput: int.MaxValue,
 				durationOfBreak: TimeSpan.FromMilliseconds(1),

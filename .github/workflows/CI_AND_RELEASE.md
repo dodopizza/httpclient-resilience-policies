@@ -27,7 +27,7 @@ There are several workflows to react on different GitHub events:
 ## How to publish new release
 
 1. On every `push` event to `master` branch there is created draft for the future release (automated with `master` workflow).
-2. Double check library version in the `VersionPrefix` field in [HttpClientExtensions.csproj](/src/HttpClientExtensions/HttpClientExtensions.csproj). It should be higher than latest release.
+2. Double check library version in the `VersionPrefix` field in [HttpClient.ResiliencePolicies.csproj](/src/HttpClient.ResiliencePolicies/HttpClient.ResiliencePolicies.csproj). It should be higher than latest release.
 3. Double check release tag. It should be the same as library version with `v` prefix.
 4. You have to check release notes in the release draft. It is good practices to describe all changes in the release and add links to the issues for each change.
 5. Publish the release. `release workflow` will publish new release to NuGet and add NuGet package asset to the release.

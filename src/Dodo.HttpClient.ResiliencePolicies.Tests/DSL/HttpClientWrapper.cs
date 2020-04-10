@@ -1,7 +1,9 @@
-using System.Net.Http;
+using Dodo.HttpClient.ResiliencePolicies.Tests.Fakes;
 
-namespace Dodo.HttpClientExtensions.Tests
+namespace Dodo.HttpClient.ResiliencePolicies.Tests.DSL
 {
+	using HttpClient = System.Net.Http.HttpClient;
+
 	public class HttpClientWrapper
 	{
 		private readonly HttpClient _client;
