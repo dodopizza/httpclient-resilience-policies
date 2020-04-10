@@ -1,0 +1,25 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - "*"
+      - "!master"
+
+jobs:
+  build-and-test:
+    name: Build and test library
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "3.1.100"
+
+      - name: Build and tests library
+        run: |
+          dotnet build --configuration Release ./src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj
+          dotnet test --configuration Release ./src/Dodo.HttpClientExtensions.Tests/Dodo.HttpClientExtensions.Tests.csproj

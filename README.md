@@ -1,6 +1,7 @@
 # Dodo.HttpClientExtensions library
 
-[![Build Status](https://drone.dodois.ru/api/badges/dodopizza/httpclientextensions/status.svg)](https://drone.dodois.ru/dodopizza/httpclientextensions)
+![master](https://github.com/dodopizza/httpclientextensions/workflows/master/badge.svg)
+![release](https://github.com/dodopizza/httpclientextensions/workflows/release/badge.svg)
 
 The main goal of this library is to provide unified http request retrying policies for the HttpClient that just works.
 
@@ -45,22 +46,22 @@ You have two options how to add HttpClient in your code.
 
 1. Just use default client provided by the library and add it to the `ServiceCollection` in the Startup like this:
 
-```csharp
-service                     // IServiceCollection
-    .AddJsonClient(...)     // Default client with policies
-```
+    ```csharp
+    service                     // IServiceCollection
+        .AddJsonClient(...)     // Default client with policies
+    ```
 
 2. You may add your own HttpClient and then add default policies. In this case it is important to configure Timeout property in the client:
 
-```csharp
-service                     // IServiceCollection
-    .AddHttpClient("named-client",
-        client =>
-        {
-            client.Timeout = TimeSpan.FromMilliseconds(Defaults.Timeout.HttpClientTimeoutInMilliseconds); // Constant provided by the library
-        }))
-    .AddDefaultPolicies()   // Default policies provided by the library
-```
+    ```csharp
+    service                     // IServiceCollection
+        .AddHttpClient("named-client",
+            client =>
+            {
+                client.Timeout = TimeSpan.FromMilliseconds(Defaults.Timeout.HttpClientTimeoutInMilliseconds); // Constant provided by the library
+            }))
+        .AddDefaultPolicies()   // Default policies provided by the library
+    ```
 
 Or if you use custom HttpClientSettings you may get client timeout value from the `HttpClientSettings.HttpClientTimeout` property instead of constant.
 
@@ -82,6 +83,7 @@ In the other hand in multi host environment we suppose that we use single client
 The retry policy handles the situation when the http request fails because of transient error and reties the attempt to complete the request.
 
 The library provides interface `IRetrySettings` to setup retry policy. There are two predefined implementations provided:
+
 - `SimpleRetrySettings` which by default using [Exponential backoff](https://github.com/App-vNext/Polly/wiki/Retry#exponential-backoff) exponentially increase retry times for each attempt.
 - `JitterRetrySettings` _(used by default)_ which is exponential too but used [JitterBackoff](https://github.com/App-vNext/Polly/wiki/Retry-with-jitter) to slightly modify retry times to prevent the situation when all of the requests will be attempt in the same time.
 
@@ -101,7 +103,6 @@ CircuitBreaker has several importatnt parameters:
 - `SamplingDuration` during this amount of time CircuitBreaker will count success/failed requests and check two parameters above to make a decision should it opens or not.
 
 [More information about Circuit Breakers in the Polly documentation](https://github.com/App-vNext/Polly/wiki/Advanced-Circuit-Breaker).
-
 
 The library provides interface `ICircuitBreakerSettings` to setup circuit breaker policy and default implementation `CircuitBreakerSettings` which has a several constructors to tune-in parameters above.
 
@@ -127,36 +128,3 @@ Notice that the `HttpClientTimeout` should be **greater** than `TimeoutPerRetry`
 One more important thing is the order of the policies. `TimeoutPolicy` should always be **after** the RetryPolicy otherwise the `TimeoutPerRetry` paramater will play the same role as a `HttpClientTimeout`. [Clarification from the Polly documentation](https://github.com/App-vNext/Polly/wiki/Polly-and-HttpClientFactory#use-case-applying-timeouts).
 
 You may setup your own timeout parameters by providing it to the `HttpClientSettings` constructor. Also you may check the default values in the `Defaults` class.
-
-## Library versions
-
-Library using [SemVer](https://semver.org/) for versioning. If you are working on the new version of library you should update the value of the `VersionPrefix` tag in the `Dodo.HttpClientExtensions.csproj`.
-
-Version change policy (from the SemVer):
-> Given a version number `MAJOR.MINOR.PATCH`, increment the:
->
-> - `MAJOR` version when you make incompatible API changes.
-> - `MINOR` version when you add functionality in a backwards compatible manner.
-> - `PATCH` version when you make backwards compatible bug fixes.
-
-## Build
-
-Here is [drone](https://drone.dodois.ru/dodopizza/httpclientextensions) build of the library. Build occurs for each commit to any branch.
-
-## Publish the NuGet package
-
-To publish the library you should use Drone-CLI promote command:
-
-```bash
-drone build promote dodopizza/httpclientextensions <build_number> myget
-```
-
-The last argument stands for the environment name. In case of library you may provide any value there because it is not used.
-
-You may publish library as the stable or as pre-release NuGet package.
-
-Publishing from the `master` branch considered as stable and will have version equals to the version in the `VersionPrefix` tag from the csproj.
-Publishing from other branches considered as pre-release and will have a postfix with the branch name.
-
-For example, if the value of the `VersionPrefix` equals to `4.0.0`. Publish from `master` branch will publish the NuGet package with version `4.0.0`.
-If we have a branch from current `master` with the name `my-branch` and publish package from this branch you will have the pre-release package with version `4.0.0-my-branch`.

@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dodo.HttpClientExtensions", "Dodo.HttpClientExtensions\Dodo.HttpClientExtensions.csproj", "{558A02C8-BC81-4ED0-8C10-E9F5C2DF9351}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dodo.HttpClientExtensions", "src\Dodo.HttpClientExtensions\Dodo.HttpClientExtensions.csproj", "{558A02C8-BC81-4ED0-8C10-E9F5C2DF9351}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{876566FC-C860-4142-B19D-8EEE4F3AEF81}"
 ProjectSection(SolutionItems) = preProject
@@ -8,7 +8,9 @@ ProjectSection(SolutionItems) = preProject
 	Dockerfile = Dockerfile
 EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dodo.HttpClientExtensions.Tests", "Dodo.HttpClientExtensions.Tests\Dodo.HttpClientExtensions.Tests.csproj", "{F9AA2D51-3A10-4323-BDFF-D3568C065DA2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dodo.HttpClientExtensions.Tests", "src\Dodo.HttpClientExtensions.Tests\Dodo.HttpClientExtensions.Tests.csproj", "{F9AA2D51-3A10-4323-BDFF-D3568C065DA2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CC80AD77-02C9-4CDF-A5FC-A7A12DC06A6B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,5 +30,9 @@ Global
 		{F9AA2D51-3A10-4323-BDFF-D3568C065DA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9AA2D51-3A10-4323-BDFF-D3568C065DA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9AA2D51-3A10-4323-BDFF-D3568C065DA2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F9AA2D51-3A10-4323-BDFF-D3568C065DA2} = {CC80AD77-02C9-4CDF-A5FC-A7A12DC06A6B}
+		{558A02C8-BC81-4ED0-8C10-E9F5C2DF9351} = {CC80AD77-02C9-4CDF-A5FC-A7A12DC06A6B}
 	EndGlobalSection
 EndGlobal
