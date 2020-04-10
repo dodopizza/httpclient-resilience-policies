@@ -1,10 +1,13 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using Dodo.HttpClient.ResiliencePolicies.CircuitBreakerSettings;
+using Dodo.HttpClient.ResiliencePolicies.RetrySettings;
+using Dodo.HttpClient.ResiliencePolicies.Tests.DSL;
 using NUnit.Framework;
 using Polly.CircuitBreaker;
 
-namespace Dodo.HttpClientExtensions.Tests
+namespace Dodo.HttpClient.ResiliencePolicies.Tests
 {
 	[TestFixture]
 	public class CircuitBreakerTests
@@ -58,7 +61,7 @@ namespace Dodo.HttpClientExtensions.Tests
 
 		private static ICircuitBreakerSettings BuildCircuitBreakerSettings(int throughput)
 		{
-			return new CircuitBreakerSettings(
+			return new CircuitBreakerSettings.CircuitBreakerSettings(
 				failureThreshold: 0.5,
 				minimumThroughput: throughput,
 				durationOfBreak: TimeSpan.FromMinutes(1),

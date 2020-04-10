@@ -2,6 +2,8 @@
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using Dodo.HttpClient.ResiliencePolicies.CircuitBreakerSettings;
+using Dodo.HttpClient.ResiliencePolicies.RetrySettings;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.CircuitBreaker;
@@ -9,7 +11,7 @@ using Polly.Extensions.Http;
 using Polly.Registry;
 using Polly.Timeout;
 
-namespace Dodo.HttpClientExtensions
+namespace Dodo.HttpClient.ResiliencePolicies
 {
 	/// <summary>
 	/// Extension methods for configuring <see cref="IHttpClientBuilder"/> with Polly retry, timeout, circuit breaker policies.
