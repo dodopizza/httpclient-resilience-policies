@@ -13,7 +13,8 @@ Pull requests are the best way to propose changes to the codebase (we use [Githu
 3. If you've changed APIs, update the documentation.
 4. Increase the `VersionPrefix` in [Dodo.HttpClientExtensions.csproj](src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj). The versioning scheme we use is [SemVer](https://semver.org/).
 5. Ensure the test suite passes.
-6. Issue that pull request!
+6. Issue that pull request.
+7. Properly fill pull request body section. Best practice here is to describe your changes as a list of changes and add link to the according issue for each change.
 
 ## Report bugs and feature suggestions using Github's issues
 
