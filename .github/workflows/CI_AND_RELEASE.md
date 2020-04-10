@@ -1,4 +1,4 @@
-# Continuous Integration and Releases
+# Continuous Integration and Release Process
 
 This project has adopted [GitHub Flow](https://guides.github.com/introduction/flow/index.html) for development lifecycle.
 
