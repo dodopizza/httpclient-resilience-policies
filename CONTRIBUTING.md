@@ -11,7 +11,7 @@ Pull requests are the best way to propose changes to the codebase (we use [Githu
 1. Fork the repo and create your branch from master.
 2. If you've added code that should be tested, add tests.
 3. If you've changed APIs, update the documentation.
-4. Increase the `VersionPrefix` in [Dodo.HttpClientExtensions.csproj](src/Dodo.HttpClientExtensions/Dodo.HttpClientExtensions.csproj). The versioning scheme we use is [SemVer](https://semver.org/).
+4. Increase the `VersionPrefix` in [Dodo.HttpClient.ResiliencePolicies.csproj](src/Dodo.HttpClient.ResiliencePolicies/Dodo.HttpClient.ResiliencePolicies.csproj). The versioning scheme we use is [SemVer](https://semver.org/).
 5. Ensure the test suite passes.
 6. Issue that pull request.
 7. Properly fill pull request body section. Best practice here is to describe your changes as a list of changes and add link to the according issue for each change.
@@ -38,4 +38,4 @@ This project has adopted the [Code of Conduct](./CODE_OF_CONDUCT.md).
 
 ## NuGet package release process for repository owners and collaborators
 
-You can find latest releases on the [releases pane](https://github.com/dodopizza/httpclientextensions/releases) or NuGet repository. Description of the CI workflows and release process described [here](./.github/workflows/CI_AND_RELEASE.md). **Must read** if you plan to publish new release or prerelease version of the package.
+You can find latest releases on the [releases pane](https://github.com/dodopizza/httpclient-resilience-policies/releases) or NuGet repository. Description of the CI workflows and release process described [here](./.github/workflows/CI_AND_RELEASE.md). **Must read** if you plan to publish new release or prerelease version of the package.
