@@ -142,4 +142,4 @@ Version change policy (from the SemVer):
 
 ## NuGet package releases for repository owners and collaborators
 
-You can find latest releases on the [releases pane](https://github.com/dodopizza/httpclientextensions/releases) or NuGet repository. Description of the CI workflows and release process described [here](./.github/workflows/CONTINUOUS_INTEGRATION.md). **Must read** if you plan to publish new release or prerelease version of the package.
+You can find latest releases on the [releases pane](https://github.com/dodopizza/httpclientextensions/releases) or NuGet repository. Description of the CI workflows and release process described [here](./.github/workflows/CI_AND_RELEASE.md). **Must read** if you plan to publish new release or prerelease version of the package.
