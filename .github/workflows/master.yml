@@ -10,6 +10,8 @@ jobs:
     name: Build and test library
     runs-on: ubuntu-latest
 
+    if: ${{ !contains(github.event.commits[0].message, '[skip ci]') }}
+
     steps:
       - uses: actions/checkout@master
 
