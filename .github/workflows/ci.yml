@@ -8,10 +8,18 @@ on:
 
 jobs:
   build-and-test:
-    name: Build and test library
     runs-on: ubuntu-latest
 
     if: ${{ !contains(github.event.commits[0].message, '[skip ci]') }}
+
+    strategy:
+      matrix:
+        dotnet: [
+          { framework: netcoreapp2.1, version: 2.1.806 },
+          { framework: netcoreapp3.1, version: 3.1.202 }
+        ]
+
+    name: Build and test with dotnet framework ${{ matrix.dotnet.framework }}
 
     steps:
       - uses: actions/checkout@master
@@ -19,9 +27,9 @@ jobs:
       - name: Setup dotnet
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "3.1.100"
+          dotnet-version:  ${{ matrix.dotnet.version }}
 
       - name: Build and tests library
         run: |
-          dotnet build --configuration Release ./src/Dodo.HttpClient.ResiliencePolicies/Dodo.HttpClient.ResiliencePolicies.csproj
-          dotnet test --configuration Release ./src/Dodo.HttpClient.ResiliencePolicies.Tests/Dodo.HttpClient.ResiliencePolicies.Tests.csproj
+          dotnet build --configuration Release --framework ${{ matrix.dotnet.version }} ./src/Dodo.HttpClient.ResiliencePolicies/Dodo.HttpClient.ResiliencePolicies.csproj
+          dotnet test --configuration Release --framework ${{ matrix.dotnet.version }} ./src/Dodo.HttpClient.ResiliencePolicies.Tests/Dodo.HttpClient.ResiliencePolicies.Tests.csproj
