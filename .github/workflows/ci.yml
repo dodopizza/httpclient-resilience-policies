@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         dotnet: [
-          { framework: netstandard2.0, version: 2.1.806 },
+          { framework: netcoreapp2.1, version: 2.1.806 },
           { framework: netcoreapp3.1, version: 3.1.202 }
         ]
 
@@ -31,5 +31,5 @@ jobs:
 
       - name: Build and tests library
         run: |
-          dotnet build --configuration Release ./src/Dodo.HttpClient.ResiliencePolicies/Dodo.HttpClient.ResiliencePolicies.csproj
+          dotnet build --configuration Release --framework netstandard2.0 ./src/Dodo.HttpClient.ResiliencePolicies/Dodo.HttpClient.ResiliencePolicies.csproj
           dotnet test --configuration Release --framework ${{ matrix.dotnet.framework }} ./src/Dodo.HttpClient.ResiliencePolicies.Tests/Dodo.HttpClient.ResiliencePolicies.Tests.csproj
