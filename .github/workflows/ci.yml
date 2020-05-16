@@ -19,10 +19,14 @@ jobs:
           { framework: netcoreapp3.1, version: 3.1.104 }
         ]
 
-    name: Build and test with dotnet framework ${{ matrix.dotnet.framework }}
+    name: ${{ matrix.dotnet.framework }} – build and test
 
     steps:
       - uses: actions/checkout@master
+
+      - run: |
+          echo ${{ matrix.dotnet.framework }}
+          echo ${{ matrix.dotnet.version }}
 
       - name: Setup dotnet
         uses: actions/setup-dotnet@v1
