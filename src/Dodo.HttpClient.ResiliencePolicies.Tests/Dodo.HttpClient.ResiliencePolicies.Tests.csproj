@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks Condition="'$(FrameworkForTest)' != 'netcoreapp2.1'">netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
-    <TargetFramework Condition="'$(FrameworkForTest)' == 'netcoreapp2.1'">netcoreapp2.1</TargetFramework>
+    <TargetFrameworks Condition="'$(FrameworkForTest)' != 'true'">netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
+    <TargetFramework Condition="'$(FrameworkForTest)' == 'true'">netcoreapp2.1</TargetFramework>
     <LangVersion>8.0</LangVersion>
     <IsPackable>false</IsPackable>
   </PropertyGroup>

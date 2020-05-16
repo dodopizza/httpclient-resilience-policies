@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks Condition="'$(FrameworkForTest)' != 'netcoreapp2.1'">netstandard2.0;netcoreapp3.1</TargetFrameworks>
-    <TargetFramework Condition="'$(FrameworkForTest)' == 'netcoreapp2.1'">netstandard2.0</TargetFramework>
+    <TargetFrameworks Condition="'$(FrameworkForTest)' != 'true'">netstandard2.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFramework Condition="'$(FrameworkForTest)' == 'true'">netstandard2.0</TargetFramework>
     <LangVersion>8.0</LangVersion>
     <VersionPrefix>1.0.1</VersionPrefix>
     <Version Condition=" '$(VersionSuffix)' != '' ">$(VersionPrefix)-$(VersionSuffix)</Version>
