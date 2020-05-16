@@ -16,17 +16,13 @@ jobs:
       matrix:
         dotnet: [
           { framework: netcoreapp2.1, version: 2.1.806 },
-          { framework: netcoreapp3.1, version: 3.1.104 }
+          { framework: netcoreapp3.1, version: 3.1.100 }
         ]
 
     name: ${{ matrix.dotnet.framework }} – build and test
 
     steps:
       - uses: actions/checkout@master
-
-      - run: |
-          echo ${{ matrix.dotnet.framework }}
-          echo ${{ matrix.dotnet.version }}
 
       - name: Setup dotnet
         uses: actions/setup-dotnet@v1
