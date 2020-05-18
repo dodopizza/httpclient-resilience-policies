@@ -5,9 +5,38 @@ on:
     types: [published]
 
 jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+
+    if: ${{ !contains(github.event.commits[0].message, '[skip ci]') }}
+
+    strategy:
+      matrix:
+        dotnet: [
+        { framework: netcoreapp2.1, version: 2.1.806 },
+        { framework: netcoreapp3.1, version: 3.1.202 }
+        ]
+
+    name: ${{ matrix.dotnet.framework }} – run tests
+
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version:  ${{ matrix.dotnet.version }}
+
+      - name: Run tests
+        run: |
+          dotnet test --configuration Release --framework ${{ matrix.dotnet.framework }} ./src/Dodo.HttpClient.ResiliencePolicies.Tests/Dodo.HttpClient.ResiliencePolicies.Tests.csproj /p:Framework=${{ matrix.dotnet.framework }}
+
+
   build-and-publish:
     name: Build and publish library to NuGet
     runs-on: ubuntu-latest
+
+    needs: run-tests
 
     steps:
       - uses: actions/checkout@master
@@ -35,14 +64,14 @@ jobs:
       - name: Setup dotnet
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "3.1.100"
+          dotnet-version: 3.1.202
 
       - name: Build and publish library to NuGet
         run: |
           dotnet build --configuration Release ./src/Dodo.HttpClient.ResiliencePolicies/Dodo.HttpClient.ResiliencePolicies.csproj
-          dotnet test --configuration Release ./src/Dodo.HttpClient.ResiliencePolicies.Tests/Dodo.HttpClient.ResiliencePolicies.Tests.csproj
           dotnet pack --no-restore --no-build --configuration Release --version-suffix "${{ steps.extract-version-suffix.outputs.version_suffix }}" --output out/ ./src/Dodo.HttpClient.ResiliencePolicies/Dodo.HttpClient.ResiliencePolicies.csproj
           dotnet nuget push out/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
+
       - uses: actions/upload-artifact@master
         with:
           name: NuGet package
