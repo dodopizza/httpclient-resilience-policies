@@ -1,11 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks Condition="'$(TargetFramework)' != 'netcoreapp2.1'">netstandard2.0;netcoreapp3.1</TargetFrameworks>
-    <TargetFramework Condition="'$(TargetFramework)' == 'netcoreapp2.1'">netstandard2.0</TargetFramework>
+    <TargetFrameworks Condition="'$(Framework)' != 'netcoreapp2.1'">netstandard2.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFramework Condition="'$(Framework)' == 'netcoreapp2.1'">netstandard2.0</TargetFramework>
     <LangVersion>8.0</LangVersion>
     <VersionPrefix>1.0.1</VersionPrefix>
-    <Version Condition=" '$(VersionSuffix)' != '' ">$(VersionPrefix)-$(VersionSuffix)</Version>
-    <Version Condition=" '$(Version)' == '' ">$(VersionPrefix)</Version>
     <PackageId>Dodo.HttpClient.ResiliencePolicies</PackageId>
     <Authors>Dodo Pizza</Authors>
     <Company>Dodo Pizza</Company>
@@ -14,6 +12,10 @@
     <RepositoryType>git</RepositoryType>
     <Copyright>Copyright 2020 Dodo Pizza</Copyright>
     <PackageLicenseUrl>https://raw.githubusercontent.com/dodopizza/httpclient-resilience-policies/master/LICENSE</PackageLicenseUrl>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />

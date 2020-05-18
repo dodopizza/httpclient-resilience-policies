@@ -93,9 +93,10 @@ jobs:
       - name: Get package
         id: get-package
         run: |
-          echo "::set-output name=package::$(ls out/)"
+          echo "::set-output name=package::$(ls out/*.nupkg)"
+          echo "::set-output name=symbols::$(ls out/*.snupkg)"
 
-      - name: Upload release assets
+      - name: Upload package asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -103,4 +104,14 @@ jobs:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: ./out/${{ steps.get-package.outputs.package }}
           asset_name: ${{ steps.get-package.outputs.package }}
+          asset_content_type: application/zip
+
+      - name: Upload symbols asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./out/${{ steps.get-package.outputs.symbols }}
+          asset_name: ${{ steps.get-package.outputs.symbols }}
           asset_content_type: application/zip
