@@ -4,18 +4,6 @@
     <TargetFramework Condition="'$(Framework)' == 'netcoreapp2.1'">netstandard2.0</TargetFramework>
     <LangVersion>8.0</LangVersion>
     <VersionPrefix>1.0.1</VersionPrefix>
-    <PackageId>Dodo.HttpClient.ResiliencePolicies</PackageId>
-    <Authors>Dodo Pizza</Authors>
-    <Company>Dodo Pizza</Company>
-    <Description>The main goal of this library is to provide unified http request retrying policies for the HttpClient that just works. Actually this library wraps awesome Polly library with the predefined settings to allow developers to use it as is without a deep dive to Polly.</Description>
-    <RepositoryUrl>https://github.com/dodopizza/httpclient-resilience-policies</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <Copyright>Copyright 2020 Dodo Pizza</Copyright>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/dodopizza/httpclient-resilience-policies/master/LICENSE</PackageLicenseUrl>
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
@@ -24,10 +12,34 @@
     <PackageReference Include="Polly" Version="7.2.0" />
     <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.0" />
   </ItemGroup>
-  <PropertyGroup Label="NuspecProperties">
-    <NeutralLanguage>en-US</NeutralLanguage>
+  <ItemGroup>
+    <None Include="..\..\dodopizza-logo.png">
+      <PackagePath>\</PackagePath>
+      <Pack>true</Pack>
+      <Link>dodopizza-logo.png</Link>
+    </None>
+    <None Include="..\..\LICENSE">
+      <PackagePath>\</PackagePath>
+      <Pack>true</Pack>
+      <Link>LICENSE</Link>
+    </None>
+  </ItemGroup>
+  <PropertyGroup Label="nuspec">
+    <PackageId>Dodo.HttpClient.ResiliencePolicies</PackageId>
     <AssemblyTitle>Dodo.HttpClient.ResiliencePolicies</AssemblyTitle>
-    <PackageIconUrl>https://raw.github.com/dodopizza/httpclient-resilience-policies/master/dodopizza-logo.png</PackageIconUrl>
+    <Authors>Dodo Pizza</Authors>
+    <Company>Dodo Pizza</Company>
+    <Description>The main goal of this library is to provide unified http request retrying policies for the HttpClient that just works. Actually this library wraps awesome Polly library with the predefined settings to allow developers to use it as is without a deep dive to Polly.</Description>
+    <RepositoryUrl>https://github.com/dodopizza/httpclient-resilience-policies</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Copyright>Copyright 2020 Dodo Pizza</Copyright>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageIcon>dodopizza-logo.png</PackageIcon>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageTags>HttpClient Resilience Policy CircuitBreaker Retry Timeout</PackageTags>
+    <NeutralLanguage>en-US</NeutralLanguage>
   </PropertyGroup>
 </Project>
