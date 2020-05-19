@@ -23,6 +23,11 @@
       <Pack>true</Pack>
       <Link>LICENSE</Link>
     </None>
+    <None Include="..\..\README.md">
+      <PackagePath>\</PackagePath>
+      <Pack>true</Pack>
+      <Link>README.md</Link>
+    </None>
   </ItemGroup>
   <PropertyGroup Label="nuspec">
     <PackageId>Dodo.HttpClient.ResiliencePolicies</PackageId>
@@ -39,6 +44,7 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageIcon>dodopizza-logo.png</PackageIcon>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>HttpClient Resilience Policy CircuitBreaker Retry Timeout</PackageTags>
     <NeutralLanguage>en-US</NeutralLanguage>
   </PropertyGroup>
