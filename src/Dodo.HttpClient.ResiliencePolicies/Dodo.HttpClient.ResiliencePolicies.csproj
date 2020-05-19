@@ -36,6 +36,7 @@
     <Company>Dodo Pizza</Company>
     <Description>The main goal of this library is to provide unified http request retrying policies for the HttpClient that just works. Actually this library wraps awesome Polly library with the predefined settings to allow developers to use it as is without a deep dive to Polly.</Description>
     <RepositoryUrl>https://github.com/dodopizza/httpclient-resilience-policies</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/dodopizza/httpclient-resilience-policies</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <Copyright>Copyright 2020 Dodo Pizza</Copyright>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
