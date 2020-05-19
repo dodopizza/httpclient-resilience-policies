@@ -10,8 +10,6 @@ jobs:
   run-tests:
     runs-on: ubuntu-latest
 
-    if: ${{ !contains(github.event.commits[0].message, '[skip ci]') }}
-
     strategy:
       matrix:
         dotnet: [
