@@ -91,8 +91,8 @@ jobs:
       - name: Get package
         id: get-package
         run: |
-          echo "::set-output name=package::$(ls out/*.nupkg)"
-          echo "::set-output name=symbols::$(ls out/*.snupkg)"
+          echo "::set-output name=package::$(ls out/ | grep '\.nupkg')"
+          echo "::set-output name=symbols::$(ls out/ | grep '\.snupkg')"
 
       - name: Upload package asset
         uses: actions/upload-release-asset@v1
