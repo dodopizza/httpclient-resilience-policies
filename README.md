@@ -59,7 +59,7 @@ You have two options how to add HttpClient in your code.
             client =>
             {
                 client.Timeout = TimeSpan.FromMilliseconds(Defaults.Timeout.HttpClientTimeoutInMilliseconds); // Constant provided by the library
-            }))
+            })
         .AddDefaultPolicies()   // Default policies provided by the library
     ```
 
