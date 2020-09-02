@@ -1,6 +1,6 @@
 # Dodo.HttpClientResiliencePolicies library
 
-[![nuget](https://img.shields.io/nuget/v/Dodo.HttpClientResiliencePolicies?label=NuGet)](https://www.nuget.org/packages/Dodo.HttpClient.ResiliencePolicies)
+[![nuget](https://img.shields.io/nuget/v/Dodo.HttpClientResiliencePolicies?label=NuGet)](https://www.nuget.org/packages/Dodo.HttpClientResiliencePolicies)
 ![master](https://github.com/dodopizza/httpclient-resilience-policies/workflows/master/badge.svg)
 
 The main goal of this library is to provide unified http request retrying policies for the HttpClient that just works.

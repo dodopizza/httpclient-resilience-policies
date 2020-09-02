@@ -27,7 +27,7 @@ jobs:
 
       - name: Run tests
         run: |
-          dotnet test --configuration Release --framework ${{ matrix.dotnet.framework }} ./src/Dodo.HttpClient.ResiliencePolicies.Tests/Dodo.HttpClient.ResiliencePolicies.Tests.csproj /p:Framework=${{ matrix.dotnet.framework }}
+          dotnet test --configuration Release --framework ${{ matrix.dotnet.framework }} ./src/Dodo.HttpClientResiliencePolicies.Tests/Dodo.HttpClientResiliencePolicies.Tests.csproj /p:Framework=${{ matrix.dotnet.framework }}
 
 
   build-and-publish:
@@ -42,7 +42,7 @@ jobs:
       - name: Extract version
         id: extract-version
         run: |
-          version=$(cat ./src/Dodo.HttpClient.ResiliencePolicies/Dodo.HttpClient.ResiliencePolicies.csproj | grep "<VersionPrefix>" | sed -e "s/ *<\/*VersionPrefix>//g")
+          version=$(cat ./src/Dodo.HttpClientResiliencePolicies/Dodo.HttpClientResiliencePolicies.csproj | grep "<VersionPrefix>" | sed -e "s/ *<\/*VersionPrefix>//g")
           echo "Package version: $version"
           if [ -z "${version// }" ]; then exit 1; fi
           echo "::set-output name=package_version::$version"
@@ -66,8 +66,8 @@ jobs:
 
       - name: Build and publish library to NuGet
         run: |
-          dotnet build --configuration Release ./src/Dodo.HttpClient.ResiliencePolicies/Dodo.HttpClient.ResiliencePolicies.csproj
-          dotnet pack --no-restore --no-build --configuration Release --version-suffix "${{ steps.extract-version-suffix.outputs.version_suffix }}" --output out/ ./src/Dodo.HttpClient.ResiliencePolicies/Dodo.HttpClient.ResiliencePolicies.csproj
+          dotnet build --configuration Release ./src/Dodo.HttpClientResiliencePolicies/Dodo.HttpClientResiliencePolicies.csproj
+          dotnet pack --no-restore --no-build --configuration Release --version-suffix "${{ steps.extract-version-suffix.outputs.version_suffix }}" --output out/ ./src/Dodo.HttpClientResiliencePolicies/Dodo.HttpClientResiliencePolicies.csproj
           dotnet nuget push out/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
 
       - uses: actions/upload-artifact@master

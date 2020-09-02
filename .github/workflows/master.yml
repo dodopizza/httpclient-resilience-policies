@@ -28,7 +28,7 @@ jobs:
 
       - name: Run tests
         run: |
-          dotnet test --configuration Release --framework ${{ matrix.dotnet.framework }} ./src/Dodo.HttpClient.ResiliencePolicies.Tests/Dodo.HttpClient.ResiliencePolicies.Tests.csproj /p:Framework=${{ matrix.dotnet.framework }}
+          dotnet test --configuration Release --framework ${{ matrix.dotnet.framework }} ./src/Dodo.HttpClientResiliencePolicies.Tests/Dodo.HttpClientResiliencePolicies.Tests.csproj /p:Framework=${{ matrix.dotnet.framework }}
 
 
   release:
@@ -43,7 +43,7 @@ jobs:
       - name: Extract version
         id: extract-version
         run: |
-          version=$(cat ./src/Dodo.HttpClient.ResiliencePolicies/Dodo.HttpClient.ResiliencePolicies.csproj | grep "<VersionPrefix>" | sed -e "s/ *<\/*VersionPrefix>//g")
+          version=$(cat ./src/Dodo.HttpClientResiliencePolicies/Dodo.HttpClientResiliencePolicies.csproj | grep "<VersionPrefix>" | sed -e "s/ *<\/*VersionPrefix>//g")
           echo "Package version: $version"
           if [ -z "${version// }" ]; then exit 1; fi
           echo "::set-output name=package_version::$version"
