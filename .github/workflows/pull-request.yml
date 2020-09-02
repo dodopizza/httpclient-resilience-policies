@@ -34,7 +34,7 @@ jobs:
           echo "Target branch: ${{ github.base_ref }}"
           version=$(cat ./src/Dodo.HttpClientResiliencePolicies/Dodo.HttpClientResiliencePolicies.csproj | grep "<VersionPrefix>" | sed -e "s/ *<\/*VersionPrefix>//g")
           echo "Source version: $version"
-          if [ -z "${version// }" ]; then exit 1; fi
+          if [ -z "${version// }" ]; then version="0.0.0"; fi
           echo "::set-output name=version::$version"
 
       - name: Compare versions
