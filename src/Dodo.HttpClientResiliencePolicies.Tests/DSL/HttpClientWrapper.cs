@@ -1,6 +1,6 @@
-using Dodo.HttpClient.ResiliencePolicies.Tests.Fakes;
+using Dodo.HttpClientResiliencePolicies.Tests.Fakes;
 
-namespace Dodo.HttpClient.ResiliencePolicies.Tests.DSL
+namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 {
 	using HttpClient = System.Net.Http.HttpClient;
 

@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Dodo.HttpClient.ResiliencePolicies\Dodo.HttpClient.ResiliencePolicies.csproj" />
+    <ProjectReference Include="..\Dodo.HttpClientResiliencePolicies\Dodo.HttpClientResiliencePolicies.csproj" />
   </ItemGroup>
 
 </Project>
