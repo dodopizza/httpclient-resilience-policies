@@ -3,7 +3,7 @@
     <TargetFrameworks Condition="'$(Framework)' != 'netcoreapp2.1'">netstandard2.0;netcoreapp3.1</TargetFrameworks>
     <TargetFramework Condition="'$(Framework)' == 'netcoreapp2.1'">netstandard2.0</TargetFramework>
     <LangVersion>8.0</LangVersion>
-    <VersionPrefix>1.0.2</VersionPrefix>
+    <VersionPrefix>2.0.0</VersionPrefix>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
