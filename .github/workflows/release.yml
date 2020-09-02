@@ -37,7 +37,7 @@ jobs:
     needs: run-tests
 
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@namespace-fix
 
       - name: Extract version
         id: extract-version
