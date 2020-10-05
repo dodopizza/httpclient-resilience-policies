@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -30,13 +30,20 @@ namespace Dodo.HttpClient.ResiliencePolicies
 			string clientName = null) where TClientInterface : class
 			where TClientImplementation : class, TClientInterface
 		{
-			var httpClientBuilder = sc.AddHttpClient<TClientInterface, TClientImplementation>(client =>
-				{
-					client.BaseAddress = baseAddress;
-					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-					client.Timeout = settings.HttpClientTimeout;
-				})
-				.AddDefaultPolicies(settings);
+			Action<System.Net.Http.HttpClient> defaultClient = (client) => 
+			{
+				client.BaseAddress = baseAddress;
+				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+				client.Timeout = settings.HttpClientTimeout;
+			};
+
+			IHttpClientBuilder httpClientBuilder;
+			if (!string.IsNullOrEmpty(clientName))
+				httpClientBuilder = sc.AddHttpClient<TClientInterface, TClientImplementation>(clientName, defaultClient);
+			else
+				httpClientBuilder = sc.AddHttpClient<TClientInterface, TClientImplementation>(defaultClient);
+
+			httpClientBuilder.AddDefaultPolicies(settings);
 
 			return httpClientBuilder;
 		}
