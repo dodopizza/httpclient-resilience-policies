@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
         with:
           ref: ${{ github.head_ref }}
 
@@ -24,7 +24,7 @@ jobs:
           if [ -z "${version// }" ]; then exit 1; fi
           echo "::set-output name=version::$version"
 
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
         with:
           ref: ${{ github.base_ref }}
 
