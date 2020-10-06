@@ -17,7 +17,7 @@ namespace Dodo.HttpClient.ResiliencePolicies
 			TimeSpan httpClientTimeout,
 			TimeSpan timeoutPerTry,
 			int retryCount) : this(httpClientTimeout, timeoutPerTry,
-			ResiliencePolicies.FallbackSettings.FallbackSettings.Default(),
+			null,
 			new JitterRetrySettings(retryCount),
 			ResiliencePolicies.CircuitBreakerSettings.CircuitBreakerSettings.Default())
 		{
@@ -51,7 +51,7 @@ namespace Dodo.HttpClient.ResiliencePolicies
 
 		public static HttpClientSettings Default() =>
 			new HttpClientSettings(
-				ResiliencePolicies.FallbackSettings.FallbackSettings.Default(),
+				null,
 				JitterRetrySettings.Default(),
 				ResiliencePolicies.CircuitBreakerSettings.CircuitBreakerSettings.Default()
 			);

@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Dodo.HttpClient.ResiliencePolicies.CircuitBreakerSettings;
+using Dodo.HttpClient.ResiliencePolicies.FallbackSettings;
 using Dodo.HttpClient.ResiliencePolicies.RetrySettings;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
@@ -69,6 +70,7 @@ namespace Dodo.HttpClient.ResiliencePolicies
 			HttpClientSettings settings)
 		{
 			return clientBuilder
+				.AddFallbackPolicy(settings.FallbackSettings)
 				.AddRetryPolicy(settings.RetrySettings)
 				.AddCircuitBreakerPolicy(settings.CircuitBreakerSettings)
 				.AddTimeoutPolicy(settings.TimeoutPerTry);
@@ -97,9 +99,26 @@ namespace Dodo.HttpClient.ResiliencePolicies
 			HttpClientSettings settings)
 		{
 			return clientBuilder
+				.AddFallbackPolicy(settings.FallbackSettings)
 				.AddRetryPolicy(settings.RetrySettings)
 				.AddHostSpecificCircuitBreakerPolicy(settings.CircuitBreakerSettings)
 				.AddTimeoutPolicy(settings.TimeoutPerTry);
+		}
+
+		private static IHttpClientBuilder AddFallbackPolicy(
+			this IHttpClientBuilder clientBuilder,
+			IFallbackSettings settings)
+		{
+			return settings == null
+				? clientBuilder
+				: clientBuilder
+					.AddPolicyHandler(
+						Policy<HttpResponseMessage>
+						.Handle<Exception>()
+						.OrTransientHttpStatusCode()
+						.FallbackAsync(
+							settings.FallbackActionAsync,
+							settings.OnFallbackAsync));
 		}
 
 		private static IHttpClientBuilder AddRetryPolicy(
