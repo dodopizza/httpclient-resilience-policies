@@ -37,11 +37,9 @@ namespace Dodo.HttpClient.ResiliencePolicies
 				client.Timeout = settings.HttpClientTimeout;
 			};
 
-			IHttpClientBuilder httpClientBuilder;
-			if (!string.IsNullOrEmpty(clientName))
-				httpClientBuilder = sc.AddHttpClient<TClientInterface, TClientImplementation>(clientName, defaultClient);
-			else
-				httpClientBuilder = sc.AddHttpClient<TClientInterface, TClientImplementation>(defaultClient);
+			IHttpClientBuilder httpClientBuilder = string.IsNullOrEmpty(clientName)
+				? httpClientBuilder = sc.AddHttpClient<TClientInterface, TClientImplementation>(defaultClient)
+				: httpClientBuilder = sc.AddHttpClient<TClientInterface, TClientImplementation>(clientName, defaultClient);
 
 			httpClientBuilder.AddDefaultPolicies(settings);
 
