@@ -11,9 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@master
-        with:
-          ref: ${{ github.head_ref }}
+      - uses: actions/checkout@v2
 
       - name: Get source version
         id: source-version
@@ -24,16 +22,16 @@ jobs:
           if [ -z "${version// }" ]; then exit 1; fi
           echo "::set-output name=version::$version"
 
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
         with:
-          ref: ${{ github.base_ref }}
+          ref: master
 
       - name: Get target version
         id: target-version
         run: |
           echo "Target branch: ${{ github.base_ref }}"
           version=$(cat ./src/Dodo.HttpClient.ResiliencePolicies/Dodo.HttpClient.ResiliencePolicies.csproj | grep "<VersionPrefix>" | sed -e "s/ *<\/*VersionPrefix>//g")
-          echo "Source version: $version"
+          echo "Target version: $version"
           if [ -z "${version// }" ]; then exit 1; fi
           echo "::set-output name=version::$version"
 
