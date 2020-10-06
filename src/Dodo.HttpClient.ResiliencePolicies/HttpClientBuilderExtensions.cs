@@ -38,8 +38,8 @@ namespace Dodo.HttpClient.ResiliencePolicies
 			};
 
 			IHttpClientBuilder httpClientBuilder = string.IsNullOrEmpty(clientName)
-				? httpClientBuilder = sc.AddHttpClient<TClientInterface, TClientImplementation>(defaultClient)
-				: httpClientBuilder = sc.AddHttpClient<TClientInterface, TClientImplementation>(clientName, defaultClient);
+				? sc.AddHttpClient<TClientInterface, TClientImplementation>(defaultClient)
+				: sc.AddHttpClient<TClientInterface, TClientImplementation>(clientName, defaultClient);
 
 			httpClientBuilder.AddDefaultPolicies(settings);
 
