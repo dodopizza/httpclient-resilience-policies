@@ -18,7 +18,7 @@ jobs:
     name: ${{ matrix.dotnet.framework }} – run tests
 
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
 
       - name: Setup dotnet
         uses: actions/setup-dotnet@v1
@@ -37,7 +37,7 @@ jobs:
     needs: run-tests
 
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
 
       - name: Extract version
         id: extract-version
