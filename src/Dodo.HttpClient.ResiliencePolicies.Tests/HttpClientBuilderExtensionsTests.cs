@@ -13,7 +13,7 @@ namespace Dodo.HttpClient.ResiliencePolicies.Tests
 	public class HttpClientBuilderExtensionsTests
 	{
 		[Test]
-		public async Task AddJsonClient_WithNullClientName_ConfiguresDefaultJsonClient()
+		public void AddJsonClient_WithNullClientName_ConfiguresDefaultJsonClient()
 		{
 			// Arrange
 			var serviceCollection = new ServiceCollection();
@@ -36,7 +36,7 @@ namespace Dodo.HttpClient.ResiliencePolicies.Tests
 		}
 
 		[Test]
-		public async Task AddJsonClient_WithSpecificClientName_ConfiguresSpecificJsonClient()
+		public void AddJsonClient_WithSpecificClientName_ConfiguresSpecificJsonClient()
 		{
 			// Arrange
 			var serviceCollection = new ServiceCollection();
