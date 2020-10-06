@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using Dodo.HttpClient.ResiliencePolicies.CircuitBreakerSettings;
+using Dodo.HttpClient.ResiliencePolicies.FallbackSettings;
 using Dodo.HttpClient.ResiliencePolicies.RetrySettings;
 using Dodo.HttpClient.ResiliencePolicies.Tests.Fakes;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +14,7 @@ namespace Dodo.HttpClient.ResiliencePolicies.Tests.DSL
 	{
 		private const string ClientName = "TestClient";
 		private readonly Dictionary<string, HttpStatusCode> _hostsResponseCodes = new Dictionary<string, HttpStatusCode>();
+		private IFallbackSettings _fallbackSettings;
 		private IRetrySettings _retrySettings;
 		private ICircuitBreakerSettings _circuitBreakerSettings;
 		private TimeSpan _httpClientTimeout = TimeSpan.FromDays(1);
@@ -40,6 +42,12 @@ namespace Dodo.HttpClient.ResiliencePolicies.Tests.DSL
 		public HttpClientWrapperBuilder WithTimeoutPerTry(TimeSpan timeoutPerTry)
 		{
 			_timeoutPerTry = timeoutPerTry;
+			return this;
+		}
+
+		public HttpClientWrapperBuilder WithFallbackSettings(IFallbackSettings fallbackSettings)
+		{
+			_fallbackSettings = fallbackSettings;
 			return this;
 		}
 
@@ -103,6 +111,7 @@ namespace Dodo.HttpClient.ResiliencePolicies.Tests.DSL
 			return new HttpClientSettings(
 				_httpClientTimeout,
 				_timeoutPerTry,
+				_fallbackSettings,
 				_retrySettings ?? JitterRetrySettings.Default(),
 				defaultCircuitBreakerSettings);
 		}
