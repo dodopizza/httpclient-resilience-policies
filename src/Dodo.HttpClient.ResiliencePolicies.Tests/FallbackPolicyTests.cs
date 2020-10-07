@@ -111,5 +111,35 @@ namespace Dodo.HttpClient.ResiliencePolicies.Tests
 
 			Assert.Catch<ArgumentNullException>(() => new FallbackSettings(fallbackActionAsync, onFallbackAsync));
 		}
+
+		[Test]
+		public async Task When_fallback_combine_with_retry_3_times_then_onFallback_single_execute()
+		{
+			StringBuilder logContainer = new StringBuilder();
+			var fallbackSettings = new FallbackSettings(new HttpResponseMessage()
+			{
+				StatusCode = HttpStatusCode.BadRequest
+			},
+			(result) =>
+			{
+				logContainer.Append($"Fallback: Origin StatusCode = {result.Result.StatusCode}");
+				return Task.CompletedTask;
+			});
+
+			const int retryCount = 3;
+			var retrySettings = new RetrySettings.SimpleRetrySettings(retryCount);
+
+			var wrapper = Create.HttpClientWrapperWrapperBuilder
+				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
+				.WithRetrySettings(new RetrySettings.SimpleRetrySettings(retryCount))
+				.WithFallbackSettings(fallbackSettings)
+				.Please();
+
+			var result = await wrapper.Client.GetAsync("http://localhost");
+
+			Assert.AreEqual(HttpStatusCode.BadRequest, result.StatusCode);
+			Assert.AreEqual($"Fallback: Origin StatusCode = {HttpStatusCode.ServiceUnavailable}", logContainer.ToString());
+			Assert.AreEqual(retryCount + 1, wrapper.NumberOfCalls);
+		}
 	}
 }
