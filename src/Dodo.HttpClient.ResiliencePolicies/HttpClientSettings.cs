@@ -17,30 +17,39 @@ namespace Dodo.HttpClient.ResiliencePolicies
 			TimeSpan httpClientTimeout,
 			TimeSpan timeoutPerTry,
 			int retryCount) : this(httpClientTimeout, timeoutPerTry,
-			null,
 			new JitterRetrySettings(retryCount),
 			ResiliencePolicies.CircuitBreakerSettings.CircuitBreakerSettings.Default())
 		{
 		}
 
 		public HttpClientSettings(
-			IFallbackSettings fallbackSettings,
 			IRetrySettings retrySettings,
 			ICircuitBreakerSettings circuitBreakerSettings) : this(
 			TimeSpan.FromMilliseconds(Defaults.Timeout.HttpClientTimeoutInMilliseconds),
 			TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutPerTryInMilliseconds),
-			fallbackSettings,
 			retrySettings,
 			circuitBreakerSettings)
 		{
 		}
 
 		public HttpClientSettings(
+			IRetrySettings retrySettings,
+			ICircuitBreakerSettings circuitBreakerSettings,
+			IFallbackSettings fallbackSettings = null) : this(
+			TimeSpan.FromMilliseconds(Defaults.Timeout.HttpClientTimeoutInMilliseconds),
+			TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutPerTryInMilliseconds),
+			retrySettings,
+			circuitBreakerSettings,
+			fallbackSettings)
+		{
+		}
+
+		public HttpClientSettings(
 			TimeSpan httpClientTimeout,
 			TimeSpan timeoutPerTry,
-			IFallbackSettings fallbackSettings,
 			IRetrySettings retrySettings,
-			ICircuitBreakerSettings circuitBreakerSettings)
+			ICircuitBreakerSettings circuitBreakerSettings,
+			IFallbackSettings fallbackSettings = null)
 		{
 			HttpClientTimeout = httpClientTimeout;
 			TimeoutPerTry = timeoutPerTry;
@@ -51,7 +60,6 @@ namespace Dodo.HttpClient.ResiliencePolicies
 
 		public static HttpClientSettings Default() =>
 			new HttpClientSettings(
-				null,
 				JitterRetrySettings.Default(),
 				ResiliencePolicies.CircuitBreakerSettings.CircuitBreakerSettings.Default()
 			);

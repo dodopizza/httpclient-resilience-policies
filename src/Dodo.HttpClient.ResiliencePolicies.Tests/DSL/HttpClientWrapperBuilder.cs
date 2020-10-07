@@ -111,9 +111,9 @@ namespace Dodo.HttpClient.ResiliencePolicies.Tests.DSL
 			return new HttpClientSettings(
 				_httpClientTimeout,
 				_timeoutPerTry,
-				_fallbackSettings,
 				_retrySettings ?? JitterRetrySettings.Default(),
-				defaultCircuitBreakerSettings);
+				defaultCircuitBreakerSettings,
+				_fallbackSettings);
 		}
 	}
 }
