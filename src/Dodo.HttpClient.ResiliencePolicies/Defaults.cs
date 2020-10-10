@@ -6,6 +6,7 @@ namespace Dodo.HttpClient.ResiliencePolicies
 		{
 			public const int HttpClientTimeoutInMilliseconds = 10000;
 			public const int TimeoutPerTryInMilliseconds = 2000;
+			public const int TimeoutOverallInMillicesons = 100000;
 		}
 
 		public static class Retry

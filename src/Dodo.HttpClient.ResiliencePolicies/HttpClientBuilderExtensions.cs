@@ -68,6 +68,12 @@ namespace Dodo.HttpClient.ResiliencePolicies
 			this IHttpClientBuilder clientBuilder,
 			HttpClientSettings settings)
 		{
+			if (settings.TimeoutOverall != null)
+			{
+				clientBuilder = clientBuilder
+					.AddTimeoutPolicy(settings.TimeoutOverall.Value);
+			};
+
 			return clientBuilder
 				.AddRetryPolicy(settings.RetrySettings)
 				.AddCircuitBreakerPolicy(settings.CircuitBreakerSettings)
@@ -96,6 +102,12 @@ namespace Dodo.HttpClient.ResiliencePolicies
 			this IHttpClientBuilder clientBuilder,
 			HttpClientSettings settings)
 		{
+			if (settings.TimeoutOverall != null)
+			{
+				clientBuilder = clientBuilder
+					.AddTimeoutPolicy(settings.TimeoutOverall.Value);
+			};
+
 			return clientBuilder
 				.AddRetryPolicy(settings.RetrySettings)
 				.AddHostSpecificCircuitBreakerPolicy(settings.CircuitBreakerSettings)
