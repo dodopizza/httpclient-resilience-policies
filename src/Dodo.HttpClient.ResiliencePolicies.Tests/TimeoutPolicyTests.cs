@@ -36,10 +36,10 @@ namespace Dodo.HttpClient.ResiliencePolicies.Tests
 		{
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithResponseLatency(TimeSpan.FromMilliseconds(200))
-				.WithHttpClientTimeout(TimeSpan.FromMilliseconds(100))
+				.WithTimeoutOverall(TimeSpan.FromMilliseconds(100))
 				.Please();
 
-			Assert.CatchAsync<TaskCanceledException>(async () =>
+			Assert.CatchAsync<TimeoutRejectedException>(async () =>
 				await wrapper.Client.GetAsync("http://localhost"));
 
 			Assert.AreEqual(1, wrapper.NumberOfCalls);
@@ -56,46 +56,14 @@ namespace Dodo.HttpClient.ResiliencePolicies.Tests
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
 				.WithResponseLatency(TimeSpan.FromMilliseconds(50))
-				.WithHttpClientTimeout(TimeSpan.FromMilliseconds(100))
+				.WithTimeoutOverall(TimeSpan.FromMilliseconds(100))
 				.WithRetrySettings(retrySettings)
 				.Please();
 
-			Assert.CatchAsync<TaskCanceledException>(async () =>
+			Assert.CatchAsync<TimeoutRejectedException>(async () =>
 				await wrapper.Client.GetAsync("http://localhost"));
 
 			Assert.AreEqual(2, wrapper.NumberOfCalls);
-		}
-
-		[Test]
-		public void When_timeoutOverall_greater_httpClientTimeout_Then_httpClientTimeout_equal_timeoutOverall()
-		{
-			var overallTimeout = TimeSpan.FromMilliseconds(300);
-			var httpClientTimeout = TimeSpan.FromMilliseconds(200);
-
-			var wrapper = Create.HttpClientWrapperWrapperBuilder
-				.WithStatusCode(HttpStatusCode.OK)
-				.WithResponseLatency(TimeSpan.FromMilliseconds(100))
-				.WithHttpClientTimeout(httpClientTimeout)
-				.WithTimeoutOverall(overallTimeout)
-				.Please();
-
-			Assert.AreEqual(overallTimeout, wrapper.Client.Timeout);
-		}
-
-		[Test]
-		public void When_timeoutOverall_less_httpClientTimeout_Then_httpClientTimeout_not_changed()
-		{
-			var overallTimeout = TimeSpan.FromMilliseconds(200);
-			var httpClientTimeout = TimeSpan.FromMilliseconds(300);
-
-			var wrapper = Create.HttpClientWrapperWrapperBuilder
-				.WithStatusCode(HttpStatusCode.OK)
-				.WithResponseLatency(TimeSpan.FromMilliseconds(100))
-				.WithHttpClientTimeout(httpClientTimeout)
-				.WithTimeoutOverall(overallTimeout)
-				.Please();
-
-			Assert.AreEqual(httpClientTimeout, wrapper.Client.Timeout);
 		}
 
 		[Test]
@@ -156,6 +124,18 @@ namespace Dodo.HttpClient.ResiliencePolicies.Tests
 				await wrapper.Client.GetAsync("http://localhost"));
 
 			Assert.AreEqual(retryCount + 1, wrapper.NumberOfCalls);
+		}
+
+		[Test]
+		public void Should_httpClientTimeout_is_overallTimeout_with_delta_1000ms()
+		{
+			var overallTimeout = TimeSpan.FromMilliseconds(200);
+
+			var wrapper = Create.HttpClientWrapperWrapperBuilder
+				.WithTimeoutOverall(overallTimeout)
+				.Please();
+
+			Assert.AreEqual(200 + 1000, wrapper.Client.Timeout.TotalMilliseconds);
 		}
 	}
 }

@@ -8,15 +8,14 @@ namespace Dodo.HttpClient.ResiliencePolicies
 	{
 		public TimeSpan HttpClientTimeout { get; }
 		public TimeSpan TimeoutPerTry { get; }
-		public TimeSpan? TimeoutOverall { get; }
+		public TimeSpan TimeoutOverall { get; }
 		public IRetrySettings RetrySettings { get; }
 		public ICircuitBreakerSettings CircuitBreakerSettings { get; }
 
 		public HttpClientSettings(
-			TimeSpan httpClientTimeout,
 			TimeSpan timeoutPerTry,
 			int retryCount,
-			TimeSpan? timeoutOverall = null) : this(httpClientTimeout, timeoutPerTry,
+			TimeSpan timeoutOverall) : this(timeoutPerTry,
 			new JitterRetrySettings(retryCount),
 			ResiliencePolicies.CircuitBreakerSettings.CircuitBreakerSettings.Default(),
 			timeoutOverall)
@@ -26,7 +25,6 @@ namespace Dodo.HttpClient.ResiliencePolicies
 		public HttpClientSettings(
 			IRetrySettings retrySettings,
 			ICircuitBreakerSettings circuitBreakerSettings) : this(
-			TimeSpan.FromMilliseconds(Defaults.Timeout.HttpClientTimeoutInMilliseconds),
 			TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutPerTryInMilliseconds),
 			retrySettings,
 			circuitBreakerSettings,
@@ -35,17 +33,15 @@ namespace Dodo.HttpClient.ResiliencePolicies
 		}
 
 		public HttpClientSettings(
-			TimeSpan httpClientTimeout,
 			TimeSpan timeoutPerTry,
 			IRetrySettings retrySettings,
 			ICircuitBreakerSettings circuitBreakerSettings,
-			TimeSpan? timeoutOverall = null)
+			TimeSpan timeoutOverall)
 		{
-			TimeoutOverall = timeoutOverall;
+			var delta = TimeSpan.FromMilliseconds(1000);
 
-			HttpClientTimeout = (timeoutOverall == null || httpClientTimeout > timeoutOverall.Value)
-				? httpClientTimeout
-				: timeoutOverall.Value;
+			TimeoutOverall = timeoutOverall;
+			HttpClientTimeout = timeoutOverall + delta;
 
 			TimeoutPerTry = timeoutPerTry;
 			RetrySettings = retrySettings;

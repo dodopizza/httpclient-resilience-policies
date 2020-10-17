@@ -16,9 +16,8 @@ namespace Dodo.HttpClient.ResiliencePolicies.Tests.DSL
 		private readonly Dictionary<string, HttpStatusCode> _hostsResponseCodes = new Dictionary<string, HttpStatusCode>();
 		private IRetrySettings _retrySettings;
 		private ICircuitBreakerSettings _circuitBreakerSettings;
-		private TimeSpan _httpClientTimeout = TimeSpan.FromDays(1);
 		private TimeSpan _timeoutPerTry = TimeSpan.FromDays(1);
-		private TimeSpan? _timeoutOverall = null;
+		private TimeSpan _timeoutOverall = TimeSpan.FromDays(1);
 		private TimeSpan _responseLatency = TimeSpan.Zero;
 
 		public HttpClientWrapperBuilder WithStatusCode(HttpStatusCode statusCode)
@@ -30,12 +29,6 @@ namespace Dodo.HttpClient.ResiliencePolicies.Tests.DSL
 		public HttpClientWrapperBuilder WithHostAndStatusCode(string host, HttpStatusCode statusCode)
 		{
 			_hostsResponseCodes.Add(host, statusCode);
-			return this;
-		}
-
-		public HttpClientWrapperBuilder WithHttpClientTimeout(TimeSpan httpClientTimeout)
-		{
-			_httpClientTimeout = httpClientTimeout;
 			return this;
 		}
 
@@ -110,7 +103,6 @@ namespace Dodo.HttpClient.ResiliencePolicies.Tests.DSL
 				);
 
 			return new HttpClientSettings(
-				httpClientTimeout: _httpClientTimeout,
 				timeoutPerTry: _timeoutPerTry,
 				timeoutOverall: _timeoutOverall,
 				retrySettings: _retrySettings ?? JitterRetrySettings.Default(),
