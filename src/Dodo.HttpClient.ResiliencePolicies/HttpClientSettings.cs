@@ -17,7 +17,7 @@ namespace Dodo.HttpClientResiliencePolicies
 			int retryCount,
 			TimeSpan timeoutOverall) : this(timeoutPerTry,
 			new JitterRetrySettings(retryCount),
-			HttpClientResiliencePolicies.CircuitBreakerSettings.CircuitBreakerSettings.Default())
+			HttpClientResiliencePolicies.CircuitBreakerSettings.CircuitBreakerSettings.Default(),
 			timeoutOverall)
 		{
 		}
