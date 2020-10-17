@@ -4,7 +4,7 @@ using Dodo.HttpClientResiliencePolicies.RetrySettings;
 
 namespace Dodo.HttpClientResiliencePolicies
 {
-	public class HttpClientSettings
+	public class ResiliencePoliciesSettings
 	{
 		public TimeSpan HttpClientTimeout { get; }
 		public TimeSpan TimeoutPerTry { get; }
@@ -12,7 +12,7 @@ namespace Dodo.HttpClientResiliencePolicies
 		public ICircuitBreakerSettings CircuitBreakerSettings { get; }
 
 
-		public HttpClientSettings(
+		public ResiliencePoliciesSettings(
 			TimeSpan httpClientTimeout,
 			TimeSpan timeoutPerTry,
 			int retryCount) : this(httpClientTimeout, timeoutPerTry,
@@ -21,7 +21,7 @@ namespace Dodo.HttpClientResiliencePolicies
 		{
 		}
 
-		public HttpClientSettings(
+		public ResiliencePoliciesSettings(
 			IRetrySettings retrySettings,
 			ICircuitBreakerSettings circuitBreakerSettings) : this(
 			TimeSpan.FromMilliseconds(Defaults.Timeout.HttpClientTimeoutInMilliseconds),
@@ -31,7 +31,7 @@ namespace Dodo.HttpClientResiliencePolicies
 		{
 		}
 
-		public HttpClientSettings(
+		public ResiliencePoliciesSettings(
 			TimeSpan httpClientTimeout,
 			TimeSpan timeoutPerTry,
 			IRetrySettings retrySettings,
@@ -43,8 +43,8 @@ namespace Dodo.HttpClientResiliencePolicies
 			CircuitBreakerSettings = circuitBreakerSettings;
 		}
 
-		public static HttpClientSettings Default() =>
-			new HttpClientSettings(
+		public static ResiliencePoliciesSettings Default() =>
+			new ResiliencePoliciesSettings(
 				JitterRetrySettings.Default(),
 				HttpClientResiliencePolicies.CircuitBreakerSettings.CircuitBreakerSettings.Default()
 			);

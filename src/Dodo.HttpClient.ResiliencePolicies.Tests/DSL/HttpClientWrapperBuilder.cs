@@ -91,7 +91,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 			return new HttpClientWrapper(client, handler);
 		}
 
-		private HttpClientSettings BuildClientSettings()
+		private ResiliencePoliciesSettings BuildClientSettings()
 		{
 			var defaultCircuitBreakerSettings = _circuitBreakerSettings ?? new CircuitBreakerSettings.CircuitBreakerSettings(
 				failureThreshold: 0.5,
@@ -100,7 +100,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 				samplingDuration: TimeSpan.FromMilliseconds(20)
 				);
 
-			return new HttpClientSettings(
+			return new ResiliencePoliciesSettings(
 				_httpClientTimeout,
 				_timeoutPerTry,
 				_retrySettings ?? JitterRetrySettings.Default(),

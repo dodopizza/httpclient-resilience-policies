@@ -18,7 +18,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			// Act1
 			serviceCollection.AddJsonClient<IMockJsonClient, MockJsonClient>(
 				new Uri("http://example.com/"),
-				HttpClientSettings.Default());
+				ResiliencePoliciesSettings.Default());
 
 			var services = serviceCollection.BuildServiceProvider();
 
@@ -41,7 +41,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			// Act1
 			serviceCollection.AddJsonClient<IMockJsonClient, MockJsonClient>(
 				new Uri("http://example.com/"),
-				HttpClientSettings.Default(),
+				ResiliencePoliciesSettings.Default(),
 				"specificName");
 
 			var services = serviceCollection.BuildServiceProvider();

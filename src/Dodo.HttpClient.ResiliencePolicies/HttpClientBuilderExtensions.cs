@@ -26,7 +26,7 @@ namespace Dodo.HttpClientResiliencePolicies
 		public static IHttpClientBuilder AddJsonClient<TClientInterface, TClientImplementation>(
 			this IServiceCollection sc,
 			Uri baseAddress,
-			HttpClientSettings settings,
+			ResiliencePoliciesSettings settings,
 			string clientName = null) where TClientInterface : class
 			where TClientImplementation : class, TClientInterface
 		{
@@ -55,7 +55,7 @@ namespace Dodo.HttpClientResiliencePolicies
 			this IHttpClientBuilder clientBuilder)
 		{
 			return clientBuilder
-				.AddDefaultPolicies(HttpClientSettings.Default());
+				.AddDefaultPolicies(ResiliencePoliciesSettings.Default());
 		}
 
 		/// <summary>
@@ -66,7 +66,7 @@ namespace Dodo.HttpClientResiliencePolicies
 		/// <returns>An <see cref="IHttpClientBuilder"/> that can be used to configure the client.</returns>
 		public static IHttpClientBuilder AddDefaultPolicies(
 			this IHttpClientBuilder clientBuilder,
-			HttpClientSettings settings)
+			ResiliencePoliciesSettings settings)
 		{
 			return clientBuilder
 				.AddRetryPolicy(settings.RetrySettings)
@@ -83,7 +83,7 @@ namespace Dodo.HttpClientResiliencePolicies
 			this IHttpClientBuilder clientBuilder)
 		{
 			return clientBuilder
-				.AddDefaultHostSpecificPolicies(HttpClientSettings.Default());
+				.AddDefaultHostSpecificPolicies(ResiliencePoliciesSettings.Default());
 		}
 
 		/// <summary>
@@ -94,7 +94,7 @@ namespace Dodo.HttpClientResiliencePolicies
 		/// <returns>An <see cref="IHttpClientBuilder"/> that can be used to configure the client.</returns>
 		public static IHttpClientBuilder AddDefaultHostSpecificPolicies(
 			this IHttpClientBuilder clientBuilder,
-			HttpClientSettings settings)
+			ResiliencePoliciesSettings settings)
 		{
 			return clientBuilder
 				.AddRetryPolicy(settings.RetrySettings)
