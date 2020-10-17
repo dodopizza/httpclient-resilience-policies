@@ -6,47 +6,22 @@ namespace Dodo.HttpClientResiliencePolicies
 {
 	public class ResiliencePoliciesSettings
 	{
-		public TimeSpan HttpClientTimeout { get; }
-		public TimeSpan TimeoutPerTry { get; }
-		public IRetrySettings RetrySettings { get; }
-		public ICircuitBreakerSettings CircuitBreakerSettings { get; }
+		public TimeSpan HttpClientTimeout { get; set; }
+		public TimeSpan TimeoutPerTry { get; set; }
 
+		public IRetrySettings RetrySettings { get; set; }
+		public ICircuitBreakerSettings CircuitBreakerSettings { get; set; }
 
-		public ResiliencePoliciesSettings(
-			TimeSpan httpClientTimeout,
-			TimeSpan timeoutPerTry,
-			int retryCount) : this(httpClientTimeout, timeoutPerTry,
-			new JitterRetrySettings(retryCount),
-			HttpClientResiliencePolicies.CircuitBreakerSettings.CircuitBreakerSettings.Default())
-		{
-		}
-
-		public ResiliencePoliciesSettings(
-			IRetrySettings retrySettings,
-			ICircuitBreakerSettings circuitBreakerSettings) : this(
-			TimeSpan.FromMilliseconds(Defaults.Timeout.HttpClientTimeoutInMilliseconds),
-			TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutPerTryInMilliseconds),
-			retrySettings,
-			circuitBreakerSettings)
-		{
-		}
-
-		public ResiliencePoliciesSettings(
-			TimeSpan httpClientTimeout,
-			TimeSpan timeoutPerTry,
-			IRetrySettings retrySettings,
-			ICircuitBreakerSettings circuitBreakerSettings)
-		{
-			HttpClientTimeout = httpClientTimeout;
-			TimeoutPerTry = timeoutPerTry;
-			RetrySettings = retrySettings;
-			CircuitBreakerSettings = circuitBreakerSettings;
-		}
 
 		public static ResiliencePoliciesSettings Default() =>
-			new ResiliencePoliciesSettings(
-				JitterRetrySettings.Default(),
-				HttpClientResiliencePolicies.CircuitBreakerSettings.CircuitBreakerSettings.Default()
-			);
+			new ResiliencePoliciesSettings
+		{
+			HttpClientTimeout = TimeSpan.FromMilliseconds(Defaults.Timeout.HttpClientTimeoutInMilliseconds),
+			TimeoutPerTry = TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutPerTryInMilliseconds),
+			RetrySettings = JitterRetrySettings.Default(),
+			CircuitBreakerSettings =
+			HttpClientResiliencePolicies.CircuitBreakerSettings.CircuitBreakerSettings.Default()
+		};
+
 	}
 }

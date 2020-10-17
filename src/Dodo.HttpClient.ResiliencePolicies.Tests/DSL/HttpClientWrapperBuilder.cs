@@ -100,11 +100,13 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 				samplingDuration: TimeSpan.FromMilliseconds(20)
 				);
 
-			return new ResiliencePoliciesSettings(
-				_httpClientTimeout,
-				_timeoutPerTry,
-				_retrySettings ?? JitterRetrySettings.Default(),
-				defaultCircuitBreakerSettings);
+			return new ResiliencePoliciesSettings
+			{
+				HttpClientTimeout = _httpClientTimeout,
+				TimeoutPerTry = _timeoutPerTry,
+				RetrySettings = _retrySettings ?? JitterRetrySettings.Default(),
+				CircuitBreakerSettings = defaultCircuitBreakerSettings
+			};
 		}
 	}
 }
