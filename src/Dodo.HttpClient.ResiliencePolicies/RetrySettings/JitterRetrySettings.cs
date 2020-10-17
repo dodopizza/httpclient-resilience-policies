@@ -4,7 +4,7 @@ using System.Net.Http;
 using Polly;
 using Polly.Contrib.WaitAndRetry;
 
-namespace Dodo.HttpClient.ResiliencePolicies.RetrySettings
+namespace Dodo.HttpClientResiliencePolicies.RetrySettings
 {
 	public class JitterRetrySettings : IRetrySettings
 	{

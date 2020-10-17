@@ -1,13 +1,10 @@
-using Dodo.HttpClient.ResiliencePolicies.Tests.Fakes;
+using System;
+using System.Net.Http;
+using Dodo.HttpClientResiliencePolicies.Tests.Fakes;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Dodo.HttpClient.ResiliencePolicies.Tests
+namespace Dodo.HttpClientResiliencePolicies.Tests
 {
 	[TestFixture]
 	public class HttpClientBuilderExtensionsTests
