@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Dodo.HttpClient.ResiliencePolicies.Tests.Fakes
+namespace Dodo.HttpClientResiliencePolicies.Tests.Fakes
 {
 	public class MockHttpMessageHandler : HttpMessageHandler
 	{
