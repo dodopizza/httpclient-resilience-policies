@@ -1,9 +1,9 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Dodo.HttpClient.ResiliencePolicies.Tests
+namespace Dodo.HttpClientResiliencePolicies.Tests
 {
-	using HttpClient = System.Net.Http.HttpClient;
+	using HttpClient = HttpClient;
 
 	public static class Helper
 	{

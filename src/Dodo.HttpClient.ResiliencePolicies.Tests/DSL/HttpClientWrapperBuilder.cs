@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using Dodo.HttpClient.ResiliencePolicies.CircuitBreakerSettings;
-using Dodo.HttpClient.ResiliencePolicies.RetrySettings;
-using Dodo.HttpClient.ResiliencePolicies.Tests.Fakes;
+using Dodo.HttpClientResiliencePolicies.CircuitBreakerSettings;
+using Dodo.HttpClientResiliencePolicies.RetrySettings;
+using Dodo.HttpClientResiliencePolicies.Tests.Fakes;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dodo.HttpClient.ResiliencePolicies.Tests.DSL
+namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 {
 	public sealed class HttpClientWrapperBuilder
 	{

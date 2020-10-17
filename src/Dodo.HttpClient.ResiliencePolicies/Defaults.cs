@@ -1,4 +1,4 @@
-namespace Dodo.HttpClient.ResiliencePolicies
+namespace Dodo.HttpClientResiliencePolicies
 {
 	public static class Defaults
 	{

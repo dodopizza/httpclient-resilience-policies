@@ -1,13 +1,13 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
-using Dodo.HttpClient.ResiliencePolicies.CircuitBreakerSettings;
-using Dodo.HttpClient.ResiliencePolicies.RetrySettings;
-using Dodo.HttpClient.ResiliencePolicies.Tests.DSL;
+using Dodo.HttpClientResiliencePolicies.CircuitBreakerSettings;
+using Dodo.HttpClientResiliencePolicies.RetrySettings;
+using Dodo.HttpClientResiliencePolicies.Tests.DSL;
 using NUnit.Framework;
 using Polly.CircuitBreaker;
 
-namespace Dodo.HttpClient.ResiliencePolicies.Tests
+namespace Dodo.HttpClientResiliencePolicies.Tests
 {
 	[TestFixture]
 	public class CircuitBreakerTests
