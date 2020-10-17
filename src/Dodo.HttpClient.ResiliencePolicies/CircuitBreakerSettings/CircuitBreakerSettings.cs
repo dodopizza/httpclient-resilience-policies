@@ -2,7 +2,7 @@ using System;
 using System.Net.Http;
 using Polly;
 
-namespace Dodo.HttpClient.ResiliencePolicies.CircuitBreakerSettings
+namespace Dodo.HttpClientResiliencePolicies.CircuitBreakerSettings
 {
 	public class CircuitBreakerSettings : ICircuitBreakerSettings
 	{

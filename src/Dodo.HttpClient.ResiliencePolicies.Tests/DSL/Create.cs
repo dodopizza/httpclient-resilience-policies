@@ -1,4 +1,4 @@
-namespace Dodo.HttpClient.ResiliencePolicies.Tests.DSL
+namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 {
 	public static class Create
 	{

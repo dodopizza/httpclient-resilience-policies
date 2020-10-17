@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - "*"
+      - "*/*"
       - "!master"
   pull_request:
     branches:
       - master
+      - milestone/v2.0.0
 
 jobs:
   run-tests:
