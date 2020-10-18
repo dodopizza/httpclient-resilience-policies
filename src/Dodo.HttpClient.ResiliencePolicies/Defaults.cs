@@ -4,9 +4,8 @@ namespace Dodo.HttpClientResiliencePolicies
 	{
 		public static class Timeout
 		{
-			public const int HttpClientTimeoutInMilliseconds = 10000;
+			public const int TimeoutOverallInMilliseconds = 50000;
 			public const int TimeoutPerTryInMilliseconds = 2000;
-			public const int TimeoutOverallInMillicesons = 100000;
 		}
 
 		public static class Retry

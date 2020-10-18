@@ -12,7 +12,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 	public sealed class HttpClientWrapperBuilder
 	{
 		private const string ClientName = "TestClient";
-		private Uri _uri = new Uri("http://localhost");
+		private readonly Uri _uri = new Uri("http://localhost");
 		private readonly Dictionary<string, HttpStatusCode> _hostsResponseCodes = new Dictionary<string, HttpStatusCode>();
 		private IRetrySettings _retrySettings;
 		private ICircuitBreakerSettings _circuitBreakerSettings;
@@ -103,8 +103,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 				);
 
 			return new HttpClientSettings(
-				timeoutPerTry: _timeoutPerTry,
 				timeoutOverall: _timeoutOverall,
+				timeoutPerTry: _timeoutPerTry,
 				retrySettings: _retrySettings ?? JitterRetrySettings.Default(),
 				circuitBreakerSettings: defaultCircuitBreakerSettings);
 		}

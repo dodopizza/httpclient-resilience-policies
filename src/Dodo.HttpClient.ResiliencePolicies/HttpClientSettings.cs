@@ -12,35 +12,40 @@ namespace Dodo.HttpClientResiliencePolicies
 		public ICircuitBreakerSettings CircuitBreakerSettings { get; }
 
 		public HttpClientSettings(
+			TimeSpan timeoutOverall,
 			TimeSpan timeoutPerTry,
-			int retryCount,
-			TimeSpan timeoutOverall) : this(timeoutPerTry,
-			new JitterRetrySettings(retryCount),
-			HttpClientResiliencePolicies.CircuitBreakerSettings.CircuitBreakerSettings.Default(),
-			timeoutOverall)
+			int retryCount
+			) : this(
+				timeoutOverall,
+				timeoutPerTry,
+				new JitterRetrySettings(retryCount),
+				HttpClientResiliencePolicies.CircuitBreakerSettings.CircuitBreakerSettings.Default()
+			)
 		{
 		}
 
 		public HttpClientSettings(
 			IRetrySettings retrySettings,
 			ICircuitBreakerSettings circuitBreakerSettings) : this(
-			TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutPerTryInMilliseconds),
-			retrySettings,
-			circuitBreakerSettings,
-			TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutOverallInMillicesons))
+				TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutOverallInMilliseconds),
+				TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutPerTryInMilliseconds),
+				retrySettings,
+				circuitBreakerSettings
+			)
 		{
 		}
 
 		public HttpClientSettings(
+			TimeSpan timeoutOverall,
 			TimeSpan timeoutPerTry,
 			IRetrySettings retrySettings,
-			ICircuitBreakerSettings circuitBreakerSettings,
-			TimeSpan timeoutOverall)
+			ICircuitBreakerSettings circuitBreakerSettings
+			)
 		{
+			TimeoutOverall = timeoutOverall;
 			TimeoutPerTry = timeoutPerTry;
 			RetrySettings = retrySettings;
 			CircuitBreakerSettings = circuitBreakerSettings;
-			TimeoutOverall = timeoutOverall;
 		}
 
 		public static HttpClientSettings Default() =>
