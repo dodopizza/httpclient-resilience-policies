@@ -5,6 +5,7 @@ using System.Net.Http;
 using Dodo.HttpClientResiliencePolicies.CircuitBreakerSettings;
 using Dodo.HttpClientResiliencePolicies.RetrySettings;
 using Dodo.HttpClientResiliencePolicies.Tests.Fakes;
+using Dodo.HttpClientResiliencePolicies.TimeoutPolicySettings;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
@@ -104,8 +105,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 
 			return new ResiliencePoliciesSettings
 			{
-				TimeoutOverall = _timeoutOverall,
-				TimeoutPerTry = _timeoutPerTry,
+				OverallTimeoutPolicySettings = new OverallTimeoutPolicySettings{Timeout = _timeoutOverall},
+				TimeoutPerTryPolicySettings = new TimeoutPerTryPolicySettings{Timeout = _timeoutPerTry},
 				RetrySettings = _retrySettings ?? JitterRetrySettings.Default(),
 				CircuitBreakerSettings = defaultCircuitBreakerSettings
 			};

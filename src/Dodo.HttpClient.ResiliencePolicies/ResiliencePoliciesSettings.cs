@@ -1,26 +1,23 @@
-﻿using System;
-using Dodo.HttpClientResiliencePolicies.CircuitBreakerSettings;
+﻿using Dodo.HttpClientResiliencePolicies.CircuitBreakerSettings;
 using Dodo.HttpClientResiliencePolicies.RetrySettings;
+using Dodo.HttpClientResiliencePolicies.TimeoutPolicySettings;
 
 namespace Dodo.HttpClientResiliencePolicies
 {
 	public class ResiliencePoliciesSettings
 	{
-		public TimeSpan TimeoutOverall { get; set; }
-		public TimeSpan TimeoutPerTry { get; set; }
-
+		public ITimeoutPolicySettings OverallTimeoutPolicySettings { get; set; }
+		public ITimeoutPolicySettings TimeoutPerTryPolicySettings { get; set; }
 		public IRetrySettings RetrySettings { get; set; }
 		public ICircuitBreakerSettings CircuitBreakerSettings { get; set; }
-
 
 		public static ResiliencePoliciesSettings Default() =>
 			new ResiliencePoliciesSettings
 		{
-			TimeoutOverall = TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutOverallInMilliseconds),
-			TimeoutPerTry = TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutPerTryInMilliseconds),
+			OverallTimeoutPolicySettings = TimeoutPolicySettings.OverallTimeoutPolicySettings.Default(),
+			TimeoutPerTryPolicySettings = TimeoutPolicySettings.TimeoutPerTryPolicySettings.Default(),
 			RetrySettings = JitterRetrySettings.Default(),
-			CircuitBreakerSettings =
-			HttpClientResiliencePolicies.CircuitBreakerSettings.CircuitBreakerSettings.Default()
+			CircuitBreakerSettings = HttpClientResiliencePolicies.CircuitBreakerSettings.CircuitBreakerSettings.Default()
 		};
 
 	}
