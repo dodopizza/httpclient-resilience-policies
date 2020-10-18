@@ -30,11 +30,12 @@ namespace Dodo.HttpClientResiliencePolicies
 			string clientName = null) where TClientInterface : class
 			where TClientImplementation : class, TClientInterface
 		{
+			var delta = TimeSpan.FromMilliseconds(1000);
 			Action<HttpClient> defaultClient = (client) =>
 			{
 				client.BaseAddress = baseAddress;
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-				client.Timeout = settings.HttpClientTimeout;
+				client.Timeout = settings.TimeoutOverall + delta;
 			};
 
 			var httpClientBuilder = string.IsNullOrEmpty(clientName)
@@ -69,6 +70,7 @@ namespace Dodo.HttpClientResiliencePolicies
 			ResiliencePoliciesSettings settings)
 		{
 			return clientBuilder
+				.AddTimeoutPolicy(settings.TimeoutOverall)
 				.AddRetryPolicy(settings.RetrySettings)
 				.AddCircuitBreakerPolicy(settings.CircuitBreakerSettings)
 				.AddTimeoutPolicy(settings.TimeoutPerTry);
@@ -97,6 +99,7 @@ namespace Dodo.HttpClientResiliencePolicies
 			ResiliencePoliciesSettings settings)
 		{
 			return clientBuilder
+				.AddTimeoutPolicy(settings.TimeoutOverall)
 				.AddRetryPolicy(settings.RetrySettings)
 				.AddHostSpecificCircuitBreakerPolicy(settings.CircuitBreakerSettings)
 				.AddTimeoutPolicy(settings.TimeoutPerTry);

@@ -6,7 +6,7 @@ namespace Dodo.HttpClientResiliencePolicies
 {
 	public class ResiliencePoliciesSettings
 	{
-		public TimeSpan HttpClientTimeout { get; set; }
+		public TimeSpan TimeoutOverall { get; set; }
 		public TimeSpan TimeoutPerTry { get; set; }
 
 		public IRetrySettings RetrySettings { get; set; }
@@ -16,7 +16,7 @@ namespace Dodo.HttpClientResiliencePolicies
 		public static ResiliencePoliciesSettings Default() =>
 			new ResiliencePoliciesSettings
 		{
-			HttpClientTimeout = TimeSpan.FromMilliseconds(Defaults.Timeout.HttpClientTimeoutInMilliseconds),
+			TimeoutOverall = TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutOverallInMilliseconds),
 			TimeoutPerTry = TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutPerTryInMilliseconds),
 			RetrySettings = JitterRetrySettings.Default(),
 			CircuitBreakerSettings =

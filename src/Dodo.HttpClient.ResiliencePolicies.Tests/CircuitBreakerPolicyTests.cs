@@ -21,7 +21,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 				sleepDurationProvider: i => TimeSpan.FromMilliseconds(50));
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
-				.WithHttpClientTimeout(TimeSpan.FromSeconds(5))
+				.WithTimeoutOverall(TimeSpan.FromSeconds(5))
 				.WithCircuitBreakerSettings(BuildCircuitBreakerSettings(minimumThroughput))
 				.WithRetrySettings(retrySettings)
 				.Please();
@@ -43,7 +43,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithHostAndStatusCode("ru-prod.com", HttpStatusCode.ServiceUnavailable)
 				.WithHostAndStatusCode("ee-prod.com", HttpStatusCode.OK)
-				.WithHttpClientTimeout(TimeSpan.FromSeconds(5))
+				.WithTimeoutOverall(TimeSpan.FromSeconds(5))
 				.WithCircuitBreakerSettings(BuildCircuitBreakerSettings(minimumThroughput))
 				.WithRetrySettings(retrySettings)
 				.PleaseHostSpecific();
