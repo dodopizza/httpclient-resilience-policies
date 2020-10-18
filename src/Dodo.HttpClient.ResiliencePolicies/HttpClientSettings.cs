@@ -6,8 +6,8 @@ namespace Dodo.HttpClientResiliencePolicies
 {
 	public class HttpClientSettings
 	{
-		public TimeSpan TimeoutPerTry { get; }
 		public TimeSpan TimeoutOverall { get; }
+		public TimeSpan TimeoutPerTry { get; }
 		public IRetrySettings RetrySettings { get; }
 		public ICircuitBreakerSettings CircuitBreakerSettings { get; }
 
