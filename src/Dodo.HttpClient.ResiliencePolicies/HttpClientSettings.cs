@@ -6,7 +6,6 @@ namespace Dodo.HttpClientResiliencePolicies
 {
 	public class HttpClientSettings
 	{
-		public TimeSpan HttpClientTimeout { get; }
 		public TimeSpan TimeoutPerTry { get; }
 		public TimeSpan TimeoutOverall { get; }
 		public IRetrySettings RetrySettings { get; }
@@ -38,14 +37,10 @@ namespace Dodo.HttpClientResiliencePolicies
 			ICircuitBreakerSettings circuitBreakerSettings,
 			TimeSpan timeoutOverall)
 		{
-			var delta = TimeSpan.FromMilliseconds(1000);
-
-			TimeoutOverall = timeoutOverall;
-			HttpClientTimeout = timeoutOverall + delta;
-
 			TimeoutPerTry = timeoutPerTry;
 			RetrySettings = retrySettings;
 			CircuitBreakerSettings = circuitBreakerSettings;
+			TimeoutOverall = timeoutOverall;
 		}
 
 		public static HttpClientSettings Default() =>
