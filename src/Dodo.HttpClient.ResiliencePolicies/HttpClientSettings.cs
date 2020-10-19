@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Dodo.HttpClientResiliencePolicies.CircuitBreakerSettings;
 using Dodo.HttpClientResiliencePolicies.RetrySettings;
 
@@ -6,38 +6,43 @@ namespace Dodo.HttpClientResiliencePolicies
 {
 	public class HttpClientSettings
 	{
-		public TimeSpan HttpClientTimeout { get; }
+		public TimeSpan TimeoutOverall { get; }
 		public TimeSpan TimeoutPerTry { get; }
 		public IRetrySettings RetrySettings { get; }
 		public ICircuitBreakerSettings CircuitBreakerSettings { get; }
 
-
 		public HttpClientSettings(
-			TimeSpan httpClientTimeout,
+			TimeSpan timeoutOverall,
 			TimeSpan timeoutPerTry,
-			int retryCount) : this(httpClientTimeout, timeoutPerTry,
-			new JitterRetrySettings(retryCount),
-			HttpClientResiliencePolicies.CircuitBreakerSettings.CircuitBreakerSettings.Default())
+			int retryCount
+			) : this(
+				timeoutOverall,
+				timeoutPerTry,
+				new JitterRetrySettings(retryCount),
+				HttpClientResiliencePolicies.CircuitBreakerSettings.CircuitBreakerSettings.Default()
+			)
 		{
 		}
 
 		public HttpClientSettings(
 			IRetrySettings retrySettings,
 			ICircuitBreakerSettings circuitBreakerSettings) : this(
-			TimeSpan.FromMilliseconds(Defaults.Timeout.HttpClientTimeoutInMilliseconds),
-			TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutPerTryInMilliseconds),
-			retrySettings,
-			circuitBreakerSettings)
+				TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutOverallInMilliseconds),
+				TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutPerTryInMilliseconds),
+				retrySettings,
+				circuitBreakerSettings
+			)
 		{
 		}
 
 		public HttpClientSettings(
-			TimeSpan httpClientTimeout,
+			TimeSpan timeoutOverall,
 			TimeSpan timeoutPerTry,
 			IRetrySettings retrySettings,
-			ICircuitBreakerSettings circuitBreakerSettings)
+			ICircuitBreakerSettings circuitBreakerSettings
+			)
 		{
-			HttpClientTimeout = httpClientTimeout;
+			TimeoutOverall = timeoutOverall;
 			TimeoutPerTry = timeoutPerTry;
 			RetrySettings = retrySettings;
 			CircuitBreakerSettings = circuitBreakerSettings;
