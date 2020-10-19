@@ -113,7 +113,8 @@ namespace Dodo.HttpClientResiliencePolicies
 					.WaitAndRetryAsync(
 						settings.RetryCount,
 						settings.SleepDurationProvider,
-						settings.OnRetry));
+						settings.OnRetry)
+					);
 		}
 
 		private static IHttpClientBuilder AddCircuitBreakerPolicy(

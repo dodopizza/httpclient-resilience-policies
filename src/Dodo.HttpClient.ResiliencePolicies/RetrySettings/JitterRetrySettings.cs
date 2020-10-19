@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Polly;
 using Polly.Contrib.WaitAndRetry;
 
@@ -10,14 +11,14 @@ namespace Dodo.HttpClientResiliencePolicies.RetrySettings
 	{
 		public int RetryCount { get; }
 		public TimeSpan MedianFirstRetryDelay { get; }
-		public Func<int, TimeSpan> SleepDurationProvider { get; }
-		public Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnRetry { get; set; }
+		public Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> SleepDurationProvider { get; }
+		public Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> OnRetry { get; set; }
 
 		public JitterRetrySettings(int retryCount) : this(retryCount, _defaultMedianFirstRetryDelay)
 		{
 		}
 
-		public JitterRetrySettings(int retryCount, Action<DelegateResult<HttpResponseMessage>, TimeSpan> onRetry) :
+		public JitterRetrySettings(int retryCount, Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> onRetry) :
 			this(retryCount, _defaultMedianFirstRetryDelay, onRetry)
 		{
 		}
@@ -30,7 +31,7 @@ namespace Dodo.HttpClientResiliencePolicies.RetrySettings
 		public JitterRetrySettings(
 			int retryCount,
 			TimeSpan medianFirstRetryDelay,
-			Action<DelegateResult<HttpResponseMessage>, TimeSpan> onRetry)
+			Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> onRetry)
 		{
 			RetryCount = retryCount;
 			SleepDurationProvider = _defaultSleepDurationProvider(retryCount, medianFirstRetryDelay);
@@ -43,10 +44,10 @@ namespace Dodo.HttpClientResiliencePolicies.RetrySettings
 			TimeSpan.FromMilliseconds(Defaults.Retry.MedianFirstRetryDelayInMilliseconds);
 
 		// i - retry attempt
-		private static readonly Func<int, TimeSpan, Func<int, TimeSpan>> _defaultSleepDurationProvider =
-			(retryCount, medianFirstRetryDelay) => i =>
+		private static readonly Func<int, TimeSpan, Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan>> _defaultSleepDurationProvider =
+			(retryCount, medianFirstRetryDelay) => (i,r,c) =>
 				Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay, retryCount).ToArray()[i - 1];
 
-		private static readonly Action<DelegateResult<HttpResponseMessage>, TimeSpan> _defaultOnRetry = (_, __) => { };
+		private static readonly Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> _defaultOnRetry = (_, __, ___, ____) => Task.CompletedTask;
 	}
 }

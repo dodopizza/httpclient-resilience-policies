@@ -18,6 +18,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 		private TimeSpan _httpClientTimeout = TimeSpan.FromDays(1);
 		private TimeSpan _timeoutPerTry = TimeSpan.FromDays(1);
 		private TimeSpan _responseLatency = TimeSpan.Zero;
+		private int? _retryAfterSeconds = null;
+		private DateTime? _retryAfterDate = null;
 
 		public HttpClientWrapperBuilder WithStatusCode(HttpStatusCode statusCode)
 		{
@@ -55,6 +57,18 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 			return this;
 		}
 
+		public HttpClientWrapperBuilder WithRetryAfterHeader(int delaySeconds)
+		{
+			_retryAfterSeconds = delaySeconds;
+			return this;
+		}
+
+		public HttpClientWrapperBuilder WithRetryAfterHeader(DateTime date)
+		{
+			_retryAfterDate = date;
+			return this;
+		}
+
 		public HttpClientWrapperBuilder WithResponseLatency(TimeSpan responseLatency)
 		{
 			_responseLatency = responseLatency;
@@ -63,7 +77,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 
 		public HttpClientWrapper Please()
 		{
-			var handler = new MockHttpMessageHandler(_hostsResponseCodes, _responseLatency);
+			MockHttpMessageHandler handler = CreateMockHttpmessageHandler();
+
 			var services = new ServiceCollection();
 			services
 				.AddHttpClient(ClientName, c => { c.Timeout = _httpClientTimeout; })
@@ -76,9 +91,22 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 			return new HttpClientWrapper(client, handler);
 		}
 
-		public HttpClientWrapper PleaseHostSpecific()
+		private MockHttpMessageHandler CreateMockHttpmessageHandler()
 		{
 			var handler = new MockHttpMessageHandler(_hostsResponseCodes, _responseLatency);
+
+			if (_retryAfterDate != null)
+				handler.SetRetryAfterResponseHeader(_retryAfterDate.Value);
+
+			if (_retryAfterSeconds != null)
+				handler.SetRetryAfterResponseHeader(_retryAfterSeconds.Value);
+			return handler;
+		}
+
+		public HttpClientWrapper PleaseHostSpecific()
+		{
+			MockHttpMessageHandler handler = CreateMockHttpmessageHandler();
+
 			var services = new ServiceCollection();
 			services
 				.AddHttpClient(ClientName, c => { c.Timeout = _httpClientTimeout; })

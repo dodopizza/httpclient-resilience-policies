@@ -82,10 +82,10 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			Assert.AreEqual(retryCount + 1, wrapper.NumberOfCalls);
 		}
 
-		private Action<DelegateResult<HttpResponseMessage>, TimeSpan> BuildOnRetryAction(
+		private Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> BuildOnRetryAction(
 			IDictionary<string, List<TimeSpan>> retryAttempts)
 		{
-			return (result, span) =>
+			return (result, span, i, context) =>
 			{
 				var taskId = result.Result.RequestMessage.Headers.GetValues("TaskId").First();
 				if (retryAttempts.ContainsKey(taskId))
@@ -96,7 +96,27 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 				{
 					retryAttempts[taskId] = new List<TimeSpan> {span};
 				}
+
+				return Task.CompletedTask;
 			};
+		}
+
+		[Test]
+		public async Task Should_retry_sleep_longer_when_RetryAfterDecorator_is_on()
+		{
+			const int retryCount = 3;
+			var retrySettings = new RetryAfterDecorator(new SimpleRetrySettings(retryCount));
+			var wrapper = Create.HttpClientWrapperWrapperBuilder
+				.WithRetryAfterHeader(1)
+				.WithStatusCode(HttpStatusCode.InternalServerError)
+				.WithRetrySettings(retrySettings)
+				.Please();
+
+			var stopWatch = System.Diagnostics.Stopwatch.StartNew();
+			await wrapper.Client.GetAsync("http://localhost");
+			stopWatch.Stop();
+
+			Assert.True(stopWatch.Elapsed >= TimeSpan.FromSeconds(3));
 		}
 	}
 }

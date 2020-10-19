@@ -18,7 +18,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			const int minimumThroughput = 2;
 			var retrySettings = new SimpleRetrySettings(
 				retryCount: 5,
-				sleepDurationProvider: i => TimeSpan.FromMilliseconds(50));
+				sleepDurationProvider: (i, r, c) => TimeSpan.FromMilliseconds(50));
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
 				.WithHttpClientTimeout(TimeSpan.FromSeconds(5))
@@ -39,7 +39,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			const int minimumThroughput = 2;
 			var retrySettings = new SimpleRetrySettings(
 				retryCount: 5,
-				sleepDurationProvider: i => TimeSpan.FromMilliseconds(50));
+				sleepDurationProvider: (i, r, c) => TimeSpan.FromMilliseconds(50));
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithHostAndStatusCode("ru-prod.com", HttpStatusCode.ServiceUnavailable)
 				.WithHostAndStatusCode("ee-prod.com", HttpStatusCode.OK)

@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Polly;
 
 namespace Dodo.HttpClientResiliencePolicies.RetrySettings
@@ -7,8 +8,8 @@ namespace Dodo.HttpClientResiliencePolicies.RetrySettings
 	public class SimpleRetrySettings : IRetrySettings
 	{
 		public int RetryCount { get; }
-		public Func<int, TimeSpan> SleepDurationProvider { get; }
-		public Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnRetry { get; set; }
+		public Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> SleepDurationProvider { get; }
+		public Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> OnRetry { get; set; }
 
 		public SimpleRetrySettings(int retryCount) : this(retryCount, _defaultSleepDurationProvider)
 		{
@@ -16,21 +17,21 @@ namespace Dodo.HttpClientResiliencePolicies.RetrySettings
 
 		public SimpleRetrySettings(
 			int retryCount,
-			Func<int, TimeSpan> sleepDurationProvider) : this(retryCount, sleepDurationProvider, _defaultOnRetry)
+			Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> sleepDurationProvider) : this(retryCount, sleepDurationProvider, _defaultOnRetry)
 		{
 		}
 
 		public SimpleRetrySettings(
 			int retryCount,
-			Action<DelegateResult<HttpResponseMessage>, TimeSpan> onRetry) : this(retryCount,
+			Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> onRetry) : this(retryCount,
 			_defaultSleepDurationProvider, onRetry)
 		{
 		}
 
 		public SimpleRetrySettings(
 			int retryCount,
-			Func<int, TimeSpan> sleepDurationProvider,
-			Action<DelegateResult<HttpResponseMessage>, TimeSpan> onRetry)
+			Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> sleepDurationProvider,
+			Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> onRetry)
 		{
 			RetryCount = retryCount;
 			SleepDurationProvider = sleepDurationProvider;
@@ -39,9 +40,9 @@ namespace Dodo.HttpClientResiliencePolicies.RetrySettings
 
 		public static IRetrySettings Default() => new SimpleRetrySettings(Defaults.Retry.RetryCount);
 
-		private static readonly Func<int, TimeSpan> _defaultSleepDurationProvider =
-			i => TimeSpan.FromMilliseconds(20 * Math.Pow(2, i));
+		private static readonly Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> _defaultSleepDurationProvider =
+			(i,r,c) => TimeSpan.FromMilliseconds(20 * Math.Pow(2, i));
 
-		private static readonly Action<DelegateResult<HttpResponseMessage>, TimeSpan> _defaultOnRetry = (_, __) => { };
+		private static readonly Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> _defaultOnRetry = (_, __, ___, ____) => Task.CompletedTask;
 	}
 }
