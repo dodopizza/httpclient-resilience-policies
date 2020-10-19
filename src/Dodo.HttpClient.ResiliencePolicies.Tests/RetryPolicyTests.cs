@@ -8,6 +8,7 @@ using Dodo.HttpClientResiliencePolicies.RetrySettings;
 using Dodo.HttpClientResiliencePolicies.Tests.DSL;
 using NUnit.Framework;
 using Polly;
+using Polly.Timeout;
 
 namespace Dodo.HttpClientResiliencePolicies.Tests
 {
@@ -117,6 +118,22 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			stopWatch.Stop();
 
 			Assert.True(stopWatch.Elapsed >= TimeSpan.FromSeconds(3));
+		}
+
+		[Test]
+		public void Should_catchTimeout_because_of_overall_less_then_sleepDuration_of_RetryAfterDecorator()
+		{
+			const int retryCount = 3;
+			var retrySettings = new RetryAfterDecorator(new SimpleRetrySettings(retryCount));
+			var wrapper = Create.HttpClientWrapperWrapperBuilder
+				.WithRetryAfterHeader(1)
+				.WithStatusCode(HttpStatusCode.InternalServerError)
+				.WithRetrySettings(retrySettings)
+				.WithTimeoutOverall(TimeSpan.FromSeconds(2)) 
+				.Please();
+
+			Assert.CatchAsync<TimeoutRejectedException>(async () =>
+				await wrapper.Client.GetAsync("http://localhost"));
 		}
 	}
 }
