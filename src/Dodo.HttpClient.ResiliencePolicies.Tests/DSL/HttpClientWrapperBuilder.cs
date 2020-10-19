@@ -80,7 +80,6 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 		{
 			MockHttpMessageHandler handler = CreateMockHttpmessageHandler();
 			var settings = BuildClientSettings();
-			
 
 			var services = new ServiceCollection();
 			services

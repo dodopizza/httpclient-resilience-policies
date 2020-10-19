@@ -87,7 +87,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 
 			var retrySettings = new SimpleRetrySettings(
 				5,
-				sleepDurationProvider: i => TimeSpan.FromMilliseconds(200));
+				sleepDurationProvider: (i, r, c) => TimeSpan.FromMilliseconds(200));
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.OK)
 				.WithResponseLatency(TimeSpan.FromMilliseconds(300))
@@ -111,7 +111,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			 
 			var retrySettings = new SimpleRetrySettings(
 				retryCount,
-				sleepDurationProvider: i => TimeSpan.FromMilliseconds(200));
+				sleepDurationProvider: (i, r, c) => TimeSpan.FromMilliseconds(200));
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.OK)
 				.WithResponseLatency(TimeSpan.FromMilliseconds(200))
