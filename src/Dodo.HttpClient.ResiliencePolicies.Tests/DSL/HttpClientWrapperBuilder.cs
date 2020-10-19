@@ -12,11 +12,12 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 	public sealed class HttpClientWrapperBuilder
 	{
 		private const string ClientName = "TestClient";
+		private readonly Uri _uri = new Uri("http://localhost");
 		private readonly Dictionary<string, HttpStatusCode> _hostsResponseCodes = new Dictionary<string, HttpStatusCode>();
 		private IRetrySettings _retrySettings;
 		private ICircuitBreakerSettings _circuitBreakerSettings;
-		private TimeSpan _httpClientTimeout = TimeSpan.FromDays(1);
 		private TimeSpan _timeoutPerTry = TimeSpan.FromDays(1);
+		private TimeSpan _timeoutOverall = TimeSpan.FromDays(1);
 		private TimeSpan _responseLatency = TimeSpan.Zero;
 		private int? _retryAfterSeconds = null;
 		private DateTime? _retryAfterDate = null;
@@ -33,9 +34,9 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 			return this;
 		}
 
-		public HttpClientWrapperBuilder WithHttpClientTimeout(TimeSpan httpClientTimeout)
+		public HttpClientWrapperBuilder WithTimeoutOverall(TimeSpan timeoutOverall)
 		{
-			_httpClientTimeout = httpClientTimeout;
+			_timeoutOverall = timeoutOverall;
 			return this;
 		}
 
@@ -78,11 +79,12 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 		public HttpClientWrapper Please()
 		{
 			MockHttpMessageHandler handler = CreateMockHttpmessageHandler();
+			var settings = BuildClientSettings();
+			
 
 			var services = new ServiceCollection();
 			services
-				.AddHttpClient(ClientName, c => { c.Timeout = _httpClientTimeout; })
-				.AddDefaultPolicies(BuildClientSettings())
+				.AddJsonClient<IMockJsonClient, MockJsonClient>(_uri, settings, ClientName)
 				.ConfigurePrimaryHttpMessageHandler(() => handler);
 
 			var serviceProvider = services.BuildServiceProvider();
@@ -106,11 +108,12 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 		public HttpClientWrapper PleaseHostSpecific()
 		{
 			MockHttpMessageHandler handler = CreateMockHttpmessageHandler();
+			var settings = BuildClientSettings();
 
 			var services = new ServiceCollection();
 			services
-				.AddHttpClient(ClientName, c => { c.Timeout = _httpClientTimeout; })
-				.AddDefaultHostSpecificPolicies(BuildClientSettings())
+				.AddJsonClient<IMockJsonClient, MockJsonClient>(_uri, settings, ClientName)
+				.AddDefaultHostSpecificPolicies(settings)
 				.ConfigurePrimaryHttpMessageHandler(() => handler);
 
 			var serviceProvider = services.BuildServiceProvider();
@@ -129,10 +132,10 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 				);
 
 			return new HttpClientSettings(
-				_httpClientTimeout,
-				_timeoutPerTry,
-				_retrySettings ?? JitterRetrySettings.Default(),
-				defaultCircuitBreakerSettings);
+				timeoutOverall: _timeoutOverall,
+				timeoutPerTry: _timeoutPerTry,
+				retrySettings: _retrySettings ?? JitterRetrySettings.Default(),
+				circuitBreakerSettings: defaultCircuitBreakerSettings);
 		}
 	}
 }
