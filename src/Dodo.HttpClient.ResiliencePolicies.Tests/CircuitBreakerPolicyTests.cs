@@ -16,9 +16,11 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		public void Should_break_after_4_concurrent_calls()
 		{
 			const int minimumThroughput = 2;
-			var retrySettings = new SimpleRetrySettings(
-				retryCount: 5,
-				sleepDurationProvider: i => TimeSpan.FromMilliseconds(50));
+			var retrySettings = new SimpleRetrySettings
+			{
+				RetryCount = 5,
+				SleepDurationProvider = i => TimeSpan.FromMilliseconds(50)
+			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
 				.WithTimeoutOverall(TimeSpan.FromSeconds(5))
@@ -37,9 +39,11 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		public async Task Should_Open_Circuit_Breaker_for_RU_and_do_not_affect_EE()
 		{
 			const int minimumThroughput = 2;
-			var retrySettings = new SimpleRetrySettings(
-				retryCount: 5,
-				sleepDurationProvider: i => TimeSpan.FromMilliseconds(50));
+			var retrySettings = new SimpleRetrySettings
+			{
+				RetryCount = 5,
+				SleepDurationProvider = i => TimeSpan.FromMilliseconds(50)
+			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithHostAndStatusCode("ru-prod.com", HttpStatusCode.ServiceUnavailable)
 				.WithHostAndStatusCode("ee-prod.com", HttpStatusCode.OK)
@@ -61,11 +65,13 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 
 		private static ICircuitBreakerSettings BuildCircuitBreakerSettings(int throughput)
 		{
-			return new CircuitBreakerSettings.CircuitBreakerSettings(
-				failureThreshold: 0.5,
-				minimumThroughput: throughput,
-				durationOfBreak: TimeSpan.FromMinutes(1),
-				samplingDuration: TimeSpan.FromMilliseconds(20));
+			return new CircuitBreakerSettings.CircuitBreakerSettings
+			{
+				FailureThreshold = 0.5,
+				MinimumThroughput = throughput,
+				DurationOfBreak = TimeSpan.FromMinutes(1),
+				SamplingDuration = TimeSpan.FromMilliseconds(20)
+			};
 		}
 	}
 }

@@ -57,7 +57,7 @@ namespace Dodo.HttpClientResiliencePolicies
 			this IHttpClientBuilder clientBuilder)
 		{
 			return clientBuilder
-				.AddDefaultPolicies(ResiliencePoliciesSettings.Default());
+				.AddDefaultPolicies(new ResiliencePoliciesSettings());
 		}
 
 		/// <summary>
@@ -86,7 +86,7 @@ namespace Dodo.HttpClientResiliencePolicies
 			this IHttpClientBuilder clientBuilder)
 		{
 			return clientBuilder
-				.AddDefaultHostSpecificPolicies(ResiliencePoliciesSettings.Default());
+				.AddDefaultHostSpecificPolicies(new ResiliencePoliciesSettings());
 		}
 
 		/// <summary>

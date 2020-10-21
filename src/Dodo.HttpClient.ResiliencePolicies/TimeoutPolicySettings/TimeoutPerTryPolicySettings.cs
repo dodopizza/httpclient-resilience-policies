@@ -4,11 +4,11 @@ namespace Dodo.HttpClientResiliencePolicies.TimeoutPolicySettings
 {
 	public sealed class TimeoutPerTryPolicySettings : ITimeoutPolicySettings
 	{
-		public TimeSpan Timeout { get; set; }
-
-		public static ITimeoutPolicySettings Default() => new TimeoutPerTryPolicySettings
+		public TimeoutPerTryPolicySettings()
 		{
-			Timeout = TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutPerTryInMilliseconds)
-		};
+			Timeout = TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutPerTryInMilliseconds);
+		}
+
+		public TimeSpan Timeout { get; set; }
 	}
 }

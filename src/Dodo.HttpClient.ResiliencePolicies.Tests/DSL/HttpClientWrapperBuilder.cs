@@ -96,18 +96,20 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 
 		private ResiliencePoliciesSettings BuildClientSettings()
 		{
-			var defaultCircuitBreakerSettings = _circuitBreakerSettings ?? new CircuitBreakerSettings.CircuitBreakerSettings(
-				failureThreshold: 0.5,
-				minimumThroughput: int.MaxValue,
-				durationOfBreak: TimeSpan.FromMilliseconds(1),
-				samplingDuration: TimeSpan.FromMilliseconds(20)
-				);
+			var defaultCircuitBreakerSettings = _circuitBreakerSettings ??
+												new CircuitBreakerSettings.CircuitBreakerSettings
+												{
+													FailureThreshold = 0.5,
+													MinimumThroughput = int.MaxValue,
+													DurationOfBreak = TimeSpan.FromMilliseconds(1),
+													SamplingDuration = TimeSpan.FromMilliseconds(20)
+												};
 
 			return new ResiliencePoliciesSettings
 			{
 				OverallTimeoutPolicySettings = new OverallTimeoutPolicySettings{Timeout = _timeoutOverall},
 				TimeoutPerTryPolicySettings = new TimeoutPerTryPolicySettings{Timeout = _timeoutPerTry},
-				RetrySettings = _retrySettings ?? JitterRetrySettings.Default(),
+				RetrySettings = _retrySettings ?? new JitterRetrySettings(),
 				CircuitBreakerSettings = defaultCircuitBreakerSettings
 			};
 		}
