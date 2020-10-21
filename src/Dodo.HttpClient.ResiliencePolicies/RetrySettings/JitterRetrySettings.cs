@@ -26,7 +26,7 @@ namespace Dodo.HttpClientResiliencePolicies.RetrySettings
 			TimeSpan.FromMilliseconds(Defaults.Retry.MedianFirstRetryDelayInMilliseconds);
 
 		// i - retry attempt
-		//todo bulanova: временно открыла для тестов! после какой-нибудь реализации SleepDurationProvider проверить
+		//todo bulanova: temporarily make accessor public for test purposes. It will change when the next step of refactoring will be implemented
 		public static readonly Func<int, TimeSpan, Func<int, TimeSpan>> _defaultSleepDurationProvider =
 			(retryCount, medianFirstRetryDelay) => i =>
 				Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay, retryCount).ToArray()[i - 1];
