@@ -26,23 +26,26 @@ namespace Dodo.HttpClientResiliencePolicies
 		public static IHttpClientBuilder AddJsonClient<TClientInterface, TClientImplementation>(
 			this IServiceCollection sc,
 			Uri baseAddress,
-			HttpClientSettings settings,
+			Action<HttpClientSettings> settings,
 			string clientName = null) where TClientInterface : class
 			where TClientImplementation : class, TClientInterface
 		{
+			var options = new HttpClientSettings();
+			settings(options);
+
 			var delta = TimeSpan.FromMilliseconds(1000);
 			Action<HttpClient> defaultClient = (client) =>
 			{
 				client.BaseAddress = baseAddress;
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-				client.Timeout = settings.TimeoutOverall + delta;
+				client.Timeout = options.TimeoutOverall + delta;
 			};
 
 			var httpClientBuilder = string.IsNullOrEmpty(clientName)
 				? sc.AddHttpClient<TClientInterface, TClientImplementation>(defaultClient)
 				: sc.AddHttpClient<TClientInterface, TClientImplementation>(clientName, defaultClient);
 
-			httpClientBuilder.AddDefaultPolicies(settings);
+			httpClientBuilder.AddDefaultPolicies(options);
 
 			return httpClientBuilder;
 		}
