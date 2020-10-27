@@ -5,6 +5,7 @@ using System.Net.Http;
 using Dodo.HttpClientResiliencePolicies.CircuitBreakerSettings;
 using Dodo.HttpClientResiliencePolicies.RetrySettings;
 using Dodo.HttpClientResiliencePolicies.Tests.Fakes;
+using Dodo.HttpClientResiliencePolicies.TimeoutPolicySettings;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
@@ -14,8 +15,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 		private const string ClientName = "TestClient";
 		private readonly Uri _uri = new Uri("http://localhost");
 		private readonly Dictionary<string, HttpStatusCode> _hostsResponseCodes = new Dictionary<string, HttpStatusCode>();
-		private IRetrySettings _retrySettings;
-		private ICircuitBreakerSettings _circuitBreakerSettings;
+		private RetrySettings.IRetryPolicySettings _retrySettings;
+		private ICircuitBreakerPolicySettings _circuitBreakerSettings;
 		private TimeSpan _timeoutPerTry = TimeSpan.FromDays(1);
 		private TimeSpan _timeoutOverall = TimeSpan.FromDays(1);
 		private TimeSpan _responseLatency = TimeSpan.Zero;
@@ -44,13 +45,13 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 			return this;
 		}
 
-		public HttpClientWrapperBuilder WithRetrySettings(IRetrySettings retrySettings)
+		public HttpClientWrapperBuilder WithRetrySettings(RetrySettings.IRetryPolicySettings retrySettings)
 		{
 			_retrySettings = retrySettings;
 			return this;
 		}
 
-		public HttpClientWrapperBuilder WithCircuitBreakerSettings(ICircuitBreakerSettings circuitBreakerSettings)
+		public HttpClientWrapperBuilder WithCircuitBreakerSettings(ICircuitBreakerPolicySettings circuitBreakerSettings)
 		{
 			_circuitBreakerSettings = circuitBreakerSettings;
 			return this;
@@ -68,7 +69,13 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 			var settings = BuildClientSettings();
 			var services = new ServiceCollection();
 			services
-				.AddJsonClient<IMockJsonClient, MockJsonClient>(_uri, settings, ClientName)
+				.AddJsonClient<IMockJsonClient, MockJsonClient>(_uri, c =>
+				{
+					c.CircuitBreakerSettings = settings.CircuitBreakerSettings;
+					c.OverallTimeoutPolicySettings = settings.OverallTimeoutPolicySettings;
+					c.RetrySettings = settings.RetrySettings;
+					c.TimeoutPerTryPolicySettings = settings.TimeoutPerTryPolicySettings;
+				}, ClientName)
 				.ConfigurePrimaryHttpMessageHandler(() => handler);
 
 			var serviceProvider = services.BuildServiceProvider();
@@ -77,36 +84,23 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 			return new HttpClientWrapper(client, handler);
 		}
 
-		public HttpClientWrapper PleaseHostSpecific()
+		private ResiliencePoliciesSettings BuildClientSettings()
 		{
-			var handler = new MockHttpMessageHandler(_hostsResponseCodes, _responseLatency);
-			var settings = BuildClientSettings();
-			var services = new ServiceCollection();
-			services
-				.AddJsonClient<IMockJsonClient, MockJsonClient>(_uri, settings, ClientName)
-				.AddDefaultHostSpecificPolicies(settings)
-				.ConfigurePrimaryHttpMessageHandler(() => handler);
+			var defaultCircuitBreakerSettings = _circuitBreakerSettings ?? new CircuitBreakerSettings.CircuitBreakerPolicySettings()
+			{
+				FailureThreshold = 0.5,
+				MinimumThroughput = int.MaxValue,
+				DurationOfBreak = TimeSpan.FromMilliseconds(1),
+				SamplingDuration = TimeSpan.FromMilliseconds(20)
+			};
 
-			var serviceProvider = services.BuildServiceProvider();
-			var factory = serviceProvider.GetService<IHttpClientFactory>();
-			var client = factory.CreateClient(ClientName);
-			return new HttpClientWrapper(client, handler);
-		}
-
-		private HttpClientSettings BuildClientSettings()
-		{
-			var defaultCircuitBreakerSettings = _circuitBreakerSettings ?? new CircuitBreakerSettings.CircuitBreakerSettings(
-				failureThreshold: 0.5,
-				minimumThroughput: int.MaxValue,
-				durationOfBreak: TimeSpan.FromMilliseconds(1),
-				samplingDuration: TimeSpan.FromMilliseconds(20)
-				);
-
-			return new HttpClientSettings(
-				timeoutOverall: _timeoutOverall,
-				timeoutPerTry: _timeoutPerTry,
-				retrySettings: _retrySettings ?? JitterRetrySettings.Default(),
-				circuitBreakerSettings: defaultCircuitBreakerSettings);
+			return new ResiliencePoliciesSettings()
+			{
+				OverallTimeoutPolicySettings = new OverallTimeoutPolicySettings() { Timeout = _timeoutOverall },
+				TimeoutPerTryPolicySettings = new TimeoutPerTryPolicySettings { Timeout = _timeoutPerTry },
+				RetrySettings = _retrySettings ?? new JitterRetryPolicySettings(),
+				CircuitBreakerSettings = defaultCircuitBreakerSettings
+			};
 		}
 	}
 }
