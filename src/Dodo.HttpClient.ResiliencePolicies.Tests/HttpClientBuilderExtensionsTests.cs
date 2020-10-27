@@ -79,5 +79,28 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			Assert.NotNull(client);
 			Assert.AreEqual(overallTimeout.Add(TimeSpan.FromMilliseconds(1000)), client.Timeout);
 		}
+
+		[Test]
+		public void When_AddJsonClient_WithDefaultOverallTimeout_than_DefaultJsonClientTimeout()
+		{
+			// Arrange
+			var serviceCollection = new ServiceCollection();
+
+			// Act1
+			serviceCollection.AddJsonClient<IMockJsonClient, MockJsonClient>(
+				new Uri("http://example.com/"));
+
+			var services = serviceCollection.BuildServiceProvider();
+
+			var factory = services.GetRequiredService<IHttpClientFactory>();
+
+			// Act2
+			var client = factory.CreateClient(nameof(IMockJsonClient));
+
+			// Assert
+			Assert.NotNull(client);
+			var overallTimeout = TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutOverallInMilliseconds);
+			Assert.AreEqual(overallTimeout.Add(TimeSpan.FromMilliseconds(1000)), client.Timeout);
+		}
 	}
 }
