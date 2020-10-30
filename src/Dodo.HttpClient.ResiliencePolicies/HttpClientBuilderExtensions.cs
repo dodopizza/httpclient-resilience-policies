@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using Dodo.HttpClientResiliencePolicies.CircuitBreakerSettings;
 using Dodo.HttpClientResiliencePolicies.RetrySettings;
+using Dodo.HttpClientResiliencePolicies.TimeoutPolicySettings;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.CircuitBreaker;
@@ -26,88 +27,51 @@ namespace Dodo.HttpClientResiliencePolicies
 		public static IHttpClientBuilder AddJsonClient<TClientInterface, TClientImplementation>(
 			this IServiceCollection sc,
 			Uri baseAddress,
-			HttpClientSettings settings,
 			string clientName = null) where TClientInterface : class
 			where TClientImplementation : class, TClientInterface
 		{
+			return AddJsonClient<TClientInterface, TClientImplementation>(sc, baseAddress, (s) => new ResiliencePoliciesSettings(), clientName);
+		}
+
+		/// <summary>
+		/// Adds the <see cref="IHttpClientFactory"/> and related services to the <see cref="IServiceCollection"/>
+		/// with pre-configured JSON headers, client Timeout and default policies.
+		/// </summary>
+		/// <returns>An <see cref="IHttpClientBuilder"/> that can be used to configure the client.</returns>
+		public static IHttpClientBuilder AddJsonClient<TClientInterface, TClientImplementation>(
+			this IServiceCollection sc,
+			Uri baseAddress,
+			Action<ResiliencePoliciesSettings> settings,
+			string clientName = null) where TClientInterface : class
+			where TClientImplementation : class, TClientInterface
+		{
+			var options = new ResiliencePoliciesSettings();
+			settings(options);
+
 			var delta = TimeSpan.FromMilliseconds(1000);
 			Action<HttpClient> defaultClient = (client) =>
 			{
 				client.BaseAddress = baseAddress;
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-				client.Timeout = settings.TimeoutOverall + delta;
+				client.Timeout = options.OverallTimeoutPolicySettings.Timeout + delta;
 			};
 
 			var httpClientBuilder = string.IsNullOrEmpty(clientName)
 				? sc.AddHttpClient<TClientInterface, TClientImplementation>(defaultClient)
 				: sc.AddHttpClient<TClientInterface, TClientImplementation>(clientName, defaultClient);
 
-			httpClientBuilder.AddDefaultPolicies(settings);
+			httpClientBuilder
+				.AddTimeoutPolicy(options.OverallTimeoutPolicySettings)
+				.AddRetryPolicy(options.RetrySettings)
+				.AddCircuitBreakerPolicy(options.CircuitBreakerSettings)
+				.AddTimeoutPolicy(options.TimeoutPerTryPolicySettings);
 
 			return httpClientBuilder;
 		}
 
-		/// <summary>
-		/// Adds pre-configured default policies.
-		/// </summary>
-		/// <param name="clientBuilder">Configured HttpClient builder.</param>
-		/// <returns>An <see cref="IHttpClientBuilder"/> that can be used to configure the client.</returns>
-		public static IHttpClientBuilder AddDefaultPolicies(
-			this IHttpClientBuilder clientBuilder)
-		{
-			return clientBuilder
-				.AddDefaultPolicies(HttpClientSettings.Default());
-		}
-
-		/// <summary>
-		/// Adds and configures custom policies.
-		/// </summary>
-		/// <param name="clientBuilder">Configured HttpClient builder.</param>
-		/// <param name="settings">Custom policy settings.</param>
-		/// <returns>An <see cref="IHttpClientBuilder"/> that can be used to configure the client.</returns>
-		public static IHttpClientBuilder AddDefaultPolicies(
-			this IHttpClientBuilder clientBuilder,
-			HttpClientSettings settings)
-		{
-			return clientBuilder
-				.AddTimeoutPolicy(settings.TimeoutOverall)
-				.AddRetryPolicy(settings.RetrySettings)
-				.AddCircuitBreakerPolicy(settings.CircuitBreakerSettings)
-				.AddTimeoutPolicy(settings.TimeoutPerTry);
-		}
-
-		/// <summary>
-		/// Adds pre-configured default policies to use single HttpClient against multiple hosts.
-		/// </summary>
-		/// <param name="clientBuilder">Configured HttpClient builder.</param>
-		/// <returns>An <see cref="IHttpClientBuilder"/> that can be used to configure the client.</returns>
-		public static IHttpClientBuilder AddDefaultHostSpecificPolicies(
-			this IHttpClientBuilder clientBuilder)
-		{
-			return clientBuilder
-				.AddDefaultHostSpecificPolicies(HttpClientSettings.Default());
-		}
-
-		/// <summary>
-		/// Adds and configures custom policies to use single HttpClient against multiple hosts.
-		/// </summary>
-		/// <param name="clientBuilder">Configured HttpClient builder.</param>
-		/// <param name="settings">Custom policy settings.</param>
-		/// <returns>An <see cref="IHttpClientBuilder"/> that can be used to configure the client.</returns>
-		public static IHttpClientBuilder AddDefaultHostSpecificPolicies(
-			this IHttpClientBuilder clientBuilder,
-			HttpClientSettings settings)
-		{
-			return clientBuilder
-				.AddTimeoutPolicy(settings.TimeoutOverall)
-				.AddRetryPolicy(settings.RetrySettings)
-				.AddHostSpecificCircuitBreakerPolicy(settings.CircuitBreakerSettings)
-				.AddTimeoutPolicy(settings.TimeoutPerTry);
-		}
-
 		private static IHttpClientBuilder AddRetryPolicy(
 			this IHttpClientBuilder clientBuilder,
-			IRetrySettings settings)
+			RetrySettings.IRetryPolicySettings settings)
 		{
 			return clientBuilder
 				.AddPolicyHandler(HttpPolicyExtensions
@@ -122,26 +86,26 @@ namespace Dodo.HttpClientResiliencePolicies
 
 		private static IHttpClientBuilder AddCircuitBreakerPolicy(
 			this IHttpClientBuilder clientBuilder,
-			ICircuitBreakerSettings settings)
+			ICircuitBreakerPolicySettings settings)
 		{
-			return clientBuilder.AddPolicyHandler(BuildCircuitBreakerPolicy(settings));
-		}
-
-		private static IHttpClientBuilder AddHostSpecificCircuitBreakerPolicy(
-			this IHttpClientBuilder clientBuilder,
-			ICircuitBreakerSettings settings)
-		{
-			var registry = new PolicyRegistry();
-			return clientBuilder.AddPolicyHandler(message =>
+			if (settings.IsHostSpecificOn)
 			{
-				var policyKey = message.RequestUri.Host;
-				var policy = registry.GetOrAdd(policyKey, BuildCircuitBreakerPolicy(settings));
-				return policy;
-			});
+				var registry = new PolicyRegistry();
+				return clientBuilder.AddPolicyHandler(message =>
+				{
+					var policyKey = message.RequestUri.Host;
+					var policy = registry.GetOrAdd(policyKey, BuildCircuitBreakerPolicy(settings));
+					return policy;
+				});
+			}
+			else
+			{
+				return clientBuilder.AddPolicyHandler(BuildCircuitBreakerPolicy(settings));
+			}
 		}
 
 		private static AsyncCircuitBreakerPolicy<HttpResponseMessage> BuildCircuitBreakerPolicy(
-			ICircuitBreakerSettings settings)
+			ICircuitBreakerPolicySettings settings)
 		{
 			return HttpPolicyExtensions
 				.HandleTransientHttpError()
@@ -157,9 +121,9 @@ namespace Dodo.HttpClientResiliencePolicies
 					settings.OnHalfOpen);
 		}
 
-		private static IHttpClientBuilder AddTimeoutPolicy(this IHttpClientBuilder httpClientBuilder, TimeSpan timeout)
+		private static IHttpClientBuilder AddTimeoutPolicy(this IHttpClientBuilder httpClientBuilder, ITimeoutPolicySettings settings)
 		{
-			return httpClientBuilder.AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(timeout));
+			return httpClientBuilder.AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(settings.Timeout));
 		}
 	}
 }

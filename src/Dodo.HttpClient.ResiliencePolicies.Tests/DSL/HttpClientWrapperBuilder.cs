@@ -5,6 +5,7 @@ using System.Net.Http;
 using Dodo.HttpClientResiliencePolicies.CircuitBreakerSettings;
 using Dodo.HttpClientResiliencePolicies.RetrySettings;
 using Dodo.HttpClientResiliencePolicies.Tests.Fakes;
+using Dodo.HttpClientResiliencePolicies.TimeoutPolicySettings;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
@@ -14,13 +15,11 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 		private const string ClientName = "TestClient";
 		private readonly Uri _uri = new Uri("http://localhost");
 		private readonly Dictionary<string, HttpStatusCode> _hostsResponseCodes = new Dictionary<string, HttpStatusCode>();
-		private IRetrySettings _retrySettings;
-		private ICircuitBreakerSettings _circuitBreakerSettings;
+		private RetrySettings.IRetryPolicySettings _retrySettings;
+		private ICircuitBreakerPolicySettings _circuitBreakerSettings;
 		private TimeSpan _timeoutPerTry = TimeSpan.FromDays(1);
 		private TimeSpan _timeoutOverall = TimeSpan.FromDays(1);
 		private TimeSpan _responseLatency = TimeSpan.Zero;
-		private int? _retryAfterSeconds = null;
-		private DateTime? _retryAfterDate = null;
 
 		public HttpClientWrapperBuilder WithStatusCode(HttpStatusCode statusCode)
 		{
@@ -46,27 +45,15 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 			return this;
 		}
 
-		public HttpClientWrapperBuilder WithRetrySettings(IRetrySettings retrySettings)
+		public HttpClientWrapperBuilder WithRetrySettings(RetrySettings.IRetryPolicySettings retrySettings)
 		{
 			_retrySettings = retrySettings;
 			return this;
 		}
 
-		public HttpClientWrapperBuilder WithCircuitBreakerSettings(ICircuitBreakerSettings circuitBreakerSettings)
+		public HttpClientWrapperBuilder WithCircuitBreakerSettings(ICircuitBreakerPolicySettings circuitBreakerSettings)
 		{
 			_circuitBreakerSettings = circuitBreakerSettings;
-			return this;
-		}
-
-		public HttpClientWrapperBuilder WithRetryAfterHeader(int delaySeconds)
-		{
-			_retryAfterSeconds = delaySeconds;
-			return this;
-		}
-
-		public HttpClientWrapperBuilder WithRetryAfterHeader(DateTime date)
-		{
-			_retryAfterDate = date;
 			return this;
 		}
 
@@ -78,41 +65,17 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 
 		public HttpClientWrapper Please()
 		{
-			MockHttpMessageHandler handler = CreateMockHttpmessageHandler();
-			var settings = BuildClientSettings();
-
-			var services = new ServiceCollection();
-			services
-				.AddJsonClient<IMockJsonClient, MockJsonClient>(_uri, settings, ClientName)
-				.ConfigurePrimaryHttpMessageHandler(() => handler);
-
-			var serviceProvider = services.BuildServiceProvider();
-			var factory = serviceProvider.GetService<IHttpClientFactory>();
-			var client = factory.CreateClient(ClientName);
-			return new HttpClientWrapper(client, handler);
-		}
-
-		private MockHttpMessageHandler CreateMockHttpmessageHandler()
-		{
 			var handler = new MockHttpMessageHandler(_hostsResponseCodes, _responseLatency);
-
-			if (_retryAfterDate != null)
-				handler.SetRetryAfterResponseHeader(_retryAfterDate.Value);
-
-			if (_retryAfterSeconds != null)
-				handler.SetRetryAfterResponseHeader(_retryAfterSeconds.Value);
-			return handler;
-		}
-
-		public HttpClientWrapper PleaseHostSpecific()
-		{
-			MockHttpMessageHandler handler = CreateMockHttpmessageHandler();
 			var settings = BuildClientSettings();
-
 			var services = new ServiceCollection();
 			services
-				.AddJsonClient<IMockJsonClient, MockJsonClient>(_uri, settings, ClientName)
-				.AddDefaultHostSpecificPolicies(settings)
+				.AddJsonClient<IMockJsonClient, MockJsonClient>(_uri, c =>
+				{
+					c.CircuitBreakerSettings = settings.CircuitBreakerSettings;
+					c.OverallTimeoutPolicySettings = settings.OverallTimeoutPolicySettings;
+					c.RetrySettings = settings.RetrySettings;
+					c.TimeoutPerTryPolicySettings = settings.TimeoutPerTryPolicySettings;
+				}, ClientName)
 				.ConfigurePrimaryHttpMessageHandler(() => handler);
 
 			var serviceProvider = services.BuildServiceProvider();
@@ -121,20 +84,23 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 			return new HttpClientWrapper(client, handler);
 		}
 
-		private HttpClientSettings BuildClientSettings()
+		private ResiliencePoliciesSettings BuildClientSettings()
 		{
-			var defaultCircuitBreakerSettings = _circuitBreakerSettings ?? new CircuitBreakerSettings.CircuitBreakerSettings(
-				failureThreshold: 0.5,
-				minimumThroughput: int.MaxValue,
-				durationOfBreak: TimeSpan.FromMilliseconds(1),
-				samplingDuration: TimeSpan.FromMilliseconds(20)
-				);
+			var defaultCircuitBreakerSettings = _circuitBreakerSettings ?? new CircuitBreakerSettings.CircuitBreakerPolicySettings()
+			{
+				FailureThreshold = 0.5,
+				MinimumThroughput = int.MaxValue,
+				DurationOfBreak = TimeSpan.FromMilliseconds(1),
+				SamplingDuration = TimeSpan.FromMilliseconds(20)
+			};
 
-			return new HttpClientSettings(
-				timeoutOverall: _timeoutOverall,
-				timeoutPerTry: _timeoutPerTry,
-				retrySettings: _retrySettings ?? JitterRetrySettings.Default(),
-				circuitBreakerSettings: defaultCircuitBreakerSettings);
+			return new ResiliencePoliciesSettings()
+			{
+				OverallTimeoutPolicySettings = new OverallTimeoutPolicySettings() { Timeout = _timeoutOverall },
+				TimeoutPerTryPolicySettings = new TimeoutPerTryPolicySettings { Timeout = _timeoutPerTry },
+				RetrySettings = _retrySettings ?? new JitterRetryPolicySettings(),
+				CircuitBreakerSettings = defaultCircuitBreakerSettings
+			};
 		}
 	}
 }
