@@ -60,13 +60,41 @@ namespace Dodo.HttpClientResiliencePolicies
 				? sc.AddHttpClient<TClientInterface, TClientImplementation>(defaultClient)
 				: sc.AddHttpClient<TClientInterface, TClientImplementation>(clientName, defaultClient);
 
-			httpClientBuilder
+			httpClientBuilder.AddDefaultPolicies(settings);
+
+			return httpClientBuilder;
+		}
+
+		/// <summary>
+		/// Adds pre-configured default policies.
+		/// </summary>
+		/// <param name="clientBuilder">Configured HttpClient builder.</param>
+		/// <returns>An <see cref="IHttpClientBuilder"/> that can be used to configure the client.</returns>
+		public static IHttpClientBuilder AddDefaultPolicies(
+			this IHttpClientBuilder clientBuilder)
+		{
+			return clientBuilder
+				.AddDefaultPolicies((c) => new ResiliencePoliciesSettings());
+		}
+
+		/// <summary>
+		/// Adds and configures custom policies.
+		/// </summary>
+		/// <param name="clientBuilder">Configured HttpClient builder.</param>
+		/// <param name="settings">Custom policy settings.</param>
+		/// <returns>An <see cref="IHttpClientBuilder"/> that can be used to configure the client.</returns>
+		public static IHttpClientBuilder AddDefaultPolicies(
+			this IHttpClientBuilder clientBuilder,
+			Action<ResiliencePoliciesSettings> settings)
+		{
+			var options = new ResiliencePoliciesSettings();
+			settings(options);
+
+			return clientBuilder
 				.AddTimeoutPolicy(options.OverallTimeoutPolicySettings)
 				.AddRetryPolicy(options.RetrySettings)
 				.AddCircuitBreakerPolicy(options.CircuitBreakerSettings)
 				.AddTimeoutPolicy(options.TimeoutPerTryPolicySettings);
-
-			return httpClientBuilder;
 		}
 
 		private static IHttpClientBuilder AddRetryPolicy(
