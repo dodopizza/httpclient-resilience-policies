@@ -134,7 +134,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			await wrapper.Client.GetAsync("http://localhost");
 			stopWatch.Stop();
 
-			Assert.True(stopWatch.Elapsed >= TimeSpan.FromSeconds(3));
+			Assert.Less(3.0d, stopWatch.Elapsed.TotalSeconds);
 		}
 
 		[Test]
