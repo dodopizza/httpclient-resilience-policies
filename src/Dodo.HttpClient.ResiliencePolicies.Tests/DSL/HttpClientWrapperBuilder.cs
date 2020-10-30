@@ -15,11 +15,13 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 		private const string ClientName = "TestClient";
 		private readonly Uri _uri = new Uri("http://localhost");
 		private readonly Dictionary<string, HttpStatusCode> _hostsResponseCodes = new Dictionary<string, HttpStatusCode>();
-		private RetrySettings.IRetryPolicySettings _retrySettings;
+		private RetrySettings.RetryPolicySettings _retrySettings;
 		private ICircuitBreakerPolicySettings _circuitBreakerSettings;
 		private TimeSpan _timeoutPerTry = TimeSpan.FromDays(1);
 		private TimeSpan _timeoutOverall = TimeSpan.FromDays(1);
 		private TimeSpan _responseLatency = TimeSpan.Zero;
+		private int? _retryAfterSeconds = null;
+		private DateTime? _retryAfterDate = null;
 
 		public HttpClientWrapperBuilder WithStatusCode(HttpStatusCode statusCode)
 		{
@@ -45,7 +47,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 			return this;
 		}
 
-		public HttpClientWrapperBuilder WithRetrySettings(RetrySettings.IRetryPolicySettings retrySettings)
+		public HttpClientWrapperBuilder WithRetrySettings(RetryPolicySettings retrySettings)
 		{
 			_retrySettings = retrySettings;
 			return this;
@@ -63,9 +65,28 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 			return this;
 		}
 
+		public HttpClientWrapperBuilder WithRetryAfterHeader(int delaySeconds)
+		{
+			_retryAfterSeconds = delaySeconds;
+			return this;
+		}
+
+		public HttpClientWrapperBuilder WithRetryAfterHeader(DateTime date)
+		{
+			_retryAfterDate = date;
+			return this;
+		}
+
 		public HttpClientWrapper Please()
 		{
 			var handler = new MockHttpMessageHandler(_hostsResponseCodes, _responseLatency);
+
+			if (_retryAfterDate != null)
+				handler.SetRetryAfterResponseHeader(_retryAfterDate.Value);
+
+			if (_retryAfterSeconds != null)
+				handler.SetRetryAfterResponseHeader(_retryAfterSeconds.Value);
+
 			var settings = BuildClientSettings();
 			var services = new ServiceCollection();
 			services
@@ -94,11 +115,14 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 				SamplingDuration = TimeSpan.FromMilliseconds(20)
 			};
 
+			var retrySettings = new RetryPolicySettings();
+			retrySettings.UseJitterStrategy();
+
 			return new ResiliencePoliciesSettings()
 			{
 				OverallTimeoutPolicySettings = new OverallTimeoutPolicySettings() { Timeout = _timeoutOverall },
 				TimeoutPerTryPolicySettings = new TimeoutPerTryPolicySettings { Timeout = _timeoutPerTry },
-				RetrySettings = _retrySettings ?? new JitterRetryPolicySettings(),
+				RetrySettings = _retrySettings ?? retrySettings,
 				CircuitBreakerSettings = defaultCircuitBreakerSettings
 			};
 		}

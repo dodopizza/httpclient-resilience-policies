@@ -19,7 +19,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		public async Task Should_retry_3_times_when_client_returns_503()
 		{
 			const int retryCount = 3;
-			var retrySettings = new SimpleRetryPolicySettings()
+			var retrySettings = new RetryPolicySettings()
 			{
 				RetryCount = retryCount
 			};
@@ -39,11 +39,11 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		{
 			const int retryCount = 3;
 			var retrySettings =
-				new JitterRetryPolicySettings()
+				new RetryPolicySettings()
 				{
-					RetryCount = retryCount,
-					MedianFirstRetryDelay = TimeSpan.FromMilliseconds(50)
+					RetryCount = retryCount
 				};
+			retrySettings.UseJitterStrategy(TimeSpan.FromMilliseconds(50));
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
 				.WithRetrySettings(retrySettings)
@@ -60,12 +60,13 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		{
 			const int retryCount = 3;
 			var retryAttempts = new Dictionary<string, List<TimeSpan>>();
-			var retrySettings = new JitterRetryPolicySettings()
+			var retrySettings = new RetryPolicySettings()
 			{
 				RetryCount = retryCount,
-				MedianFirstRetryDelay = TimeSpan.FromMilliseconds(50),
+				//MedianFirstRetryDelay = ,
 				OnRetry = BuildOnRetryAction(retryAttempts)
 			};
+			retrySettings.UseJitterStrategy(TimeSpan.FromMilliseconds(50));
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
 				.WithRetrySettings(retrySettings)
@@ -81,7 +82,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		public async Task Should_retry_when_client_returns_500()
 		{
 			const int retryCount = 3;
-			var retrySettings = new SimpleRetryPolicySettings()
+			var retrySettings = new RetryPolicySettings()
 			{
 				RetryCount = retryCount
 			};
@@ -98,7 +99,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		private Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> BuildOnRetryAction(
 			IDictionary<string, List<TimeSpan>> retryAttempts)
 		{
-			return (result, span, i, context) =>
+			return (result, span, i, c) =>
 			{
 				var taskId = result.Result.RequestMessage.Headers.GetValues("TaskId").First();
 				if (retryAttempts.ContainsKey(taskId))
@@ -118,7 +119,11 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		public async Task Should_retry_sleep_longer_when_RetryAfterDecorator_is_on()
 		{
 			const int retryCount = 3;
-			var retrySettings = new RetryAfterDecorator(new SimpleRetrySettings(retryCount));
+			var retrySettings = new RetryPolicySettings()
+			{
+				RetryCount = retryCount
+			};
+			retrySettings.EnableRetryAfterFeature();
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithRetryAfterHeader(1)
 				.WithStatusCode(HttpStatusCode.InternalServerError)
@@ -136,12 +141,16 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		public void Should_catchTimeout_because_of_overall_less_then_sleepDuration_of_RetryAfterDecorator()
 		{
 			const int retryCount = 3;
-			var retrySettings = new RetryAfterDecorator(new SimpleRetrySettings(retryCount));
+			var retrySettings = new RetryPolicySettings()
+			{
+				RetryCount = retryCount
+			};
+			retrySettings.EnableRetryAfterFeature();
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithRetryAfterHeader(1)
 				.WithStatusCode(HttpStatusCode.InternalServerError)
 				.WithRetrySettings(retrySettings)
-				.WithTimeoutOverall(TimeSpan.FromSeconds(2)) 
+				.WithTimeoutOverall(TimeSpan.FromSeconds(2))
 				.Please();
 
 			Assert.CatchAsync<TimeoutRejectedException>(async () =>

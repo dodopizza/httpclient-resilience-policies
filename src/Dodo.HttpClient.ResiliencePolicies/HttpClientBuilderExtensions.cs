@@ -71,7 +71,7 @@ namespace Dodo.HttpClientResiliencePolicies
 
 		private static IHttpClientBuilder AddRetryPolicy(
 			this IHttpClientBuilder clientBuilder,
-			RetrySettings.IRetryPolicySettings settings)
+			RetrySettings.RetryPolicySettings settings)
 		{
 			return clientBuilder
 				.AddPolicyHandler(HttpPolicyExtensions
