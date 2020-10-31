@@ -5,6 +5,7 @@
     <LangVersion>8.0</LangVersion>
     <VersionPrefix>2.0.0</VersionPrefix>
     <RootNamespace>Dodo.HttpClientResiliencePolicies</RootNamespace>
+    <Title>Dodo.HttpClient.ResiliencePolicies</Title>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
@@ -14,7 +15,7 @@
     <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\dodopizza-logo.png">
+    <None Include="..\..\images\dodopizza-logo.png">
       <PackagePath>\</PackagePath>
       <Pack>true</Pack>
       <Link>dodopizza-logo.png</Link>
