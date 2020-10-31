@@ -6,26 +6,40 @@ namespace Dodo.HttpClientResiliencePolicies.CircuitBreakerSettings
 {
 	public class CircuitBreakerPolicySettings : ICircuitBreakerPolicySettings
 	{
-		public double FailureThreshold { get; set; }
-		public int MinimumThroughput { get; set; }
-		public TimeSpan DurationOfBreak { get; set; }
-		public TimeSpan SamplingDuration { get; set; }
+		public double FailureThreshold { get; }
+		public int MinimumThroughput { get; }
+		public TimeSpan DurationOfBreak { get; }
+		public TimeSpan SamplingDuration { get; }
+
 		public Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnBreak { get; set; }
 		public Action OnReset { get; set; }
 		public Action OnHalfOpen { get; set; }
+
 		public bool IsHostSpecificOn { get; set; }
 
 		public CircuitBreakerPolicySettings()
+			: this(
+				Defaults.CircuitBreaker.FailureThreshold,
+				Defaults.CircuitBreaker.MinimumThroughput,
+				TimeSpan.FromMilliseconds(Defaults.CircuitBreaker.DurationOfBreakInMilliseconds),
+				TimeSpan.FromMilliseconds(Defaults.CircuitBreaker.SamplingDurationInMilliseconds))
 		{
-			FailureThreshold = Defaults.CircuitBreaker.FailureThreshold;
-			MinimumThroughput = Defaults.CircuitBreaker.MinimumThroughput;
-			DurationOfBreak = TimeSpan.FromMilliseconds(Defaults.CircuitBreaker.DurationOfBreakInMilliseconds);
-			SamplingDuration = TimeSpan.FromMilliseconds(Defaults.CircuitBreaker.SamplingDurationInMilliseconds);
+		}
+
+		public CircuitBreakerPolicySettings(
+			double failureThreshold,
+			int minimumThroughput,
+			TimeSpan durationOfBreak,
+			TimeSpan samplingDuration)
+		{
+			FailureThreshold = failureThreshold;
+			MinimumThroughput = minimumThroughput;
+			DurationOfBreak = durationOfBreak;
+			SamplingDuration = samplingDuration;
 
 			OnBreak = _doNothingOnBreak;
 			OnReset = _doNothingOnReset;
 			OnHalfOpen = _doNothingOnHalfOpen;
-			IsHostSpecificOn = false;
 		}
 
 		private static readonly Action<DelegateResult<HttpResponseMessage>, TimeSpan> _doNothingOnBreak = (_, __) => { };

@@ -8,27 +8,29 @@ namespace Dodo.HttpClientResiliencePolicies.RetrySettings
 {
 	public class JitterRetryPolicySettings : IRetryPolicySettings
 	{
-		public int RetryCount { get; set; }
-		public Func<int, TimeSpan> SleepDurationProvider { get; set; }
+		public int RetryCount { get; }
+		public Func<int, TimeSpan> SleepDurationProvider { get; }
 		public Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnRetry { get; set; }
 
-		public TimeSpan MedianFirstRetryDelay {
-			get => _defaultMedianFirstRetryDelay;
-			set {
-				_defaultMedianFirstRetryDelay = value;
-				SleepDurationProvider = _defaultSleepDurationProvider(RetryCount, value);
-			}
+		public JitterRetryPolicySettings()
+		: this(Defaults.Retry.RetryCount)
+		{
 		}
 
-		public JitterRetryPolicySettings()
+		public JitterRetryPolicySettings(int retryCount)
+		: this(retryCount,
+			TimeSpan.FromMilliseconds(Defaults.Retry.MedianFirstRetryDelayInMilliseconds))
 		{
-			RetryCount = Defaults.Retry.RetryCount;
-			SleepDurationProvider = _defaultSleepDurationProvider(RetryCount, _defaultMedianFirstRetryDelay);
+		}
+
+		public JitterRetryPolicySettings(
+			int retryCount,
+			TimeSpan medianFirstRetryDelay)
+		{
+			RetryCount = retryCount;
+			SleepDurationProvider = _defaultSleepDurationProvider(RetryCount, medianFirstRetryDelay);
 			OnRetry = _doNothingOnRetry;
 		}
-
-		private TimeSpan _defaultMedianFirstRetryDelay =
-			TimeSpan.FromMilliseconds(Defaults.Retry.MedianFirstRetryDelayInMilliseconds);
 
 		// i - retry attempt
 		private static readonly Func<int, TimeSpan, Func<int, TimeSpan>> _defaultSleepDurationProvider =

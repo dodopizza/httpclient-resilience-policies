@@ -6,13 +6,21 @@ namespace Dodo.HttpClientResiliencePolicies.RetrySettings
 {
 	public class SimpleRetryPolicySettings : IRetryPolicySettings
 	{
-		public int RetryCount { get; set; }
+		public int RetryCount { get; }
 		public Func<int, TimeSpan> SleepDurationProvider { get; set; }
 		public Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnRetry { get; set; }
 
 		public SimpleRetryPolicySettings()
+		: this(Defaults.Retry.RetryCount)
 		{
 			RetryCount = Defaults.Retry.RetryCount;
+			SleepDurationProvider = _defaultSleepDurationProvider;
+			OnRetry = _doNothingOnRetry;
+		}
+
+		public SimpleRetryPolicySettings(int retryCount)
+		{
+			RetryCount = retryCount;
 			SleepDurationProvider = _defaultSleepDurationProvider;
 			OnRetry = _doNothingOnRetry;
 		}
