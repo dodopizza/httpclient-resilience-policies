@@ -18,10 +18,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		public async Task Should_retry_3_times_when_client_returns_503()
 		{
 			const int retryCount = 3;
-			var retrySettings = new SimpleRetryPolicySettings()
-			{
-				RetryCount = retryCount
-			};
+			var retrySettings = new SimpleRetryPolicySettings(retryCount);
+
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
 				.WithRetrySettings(retrySettings)
@@ -38,9 +36,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		{
 			const int retryCount = 3;
 			var retrySettings =
-				new JitterRetryPolicySettings()
+				new JitterRetryPolicySettings(retryCount)
 				{
-					RetryCount = retryCount,
 					MedianFirstRetryDelay = TimeSpan.FromMilliseconds(50)
 				};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
@@ -59,9 +56,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		{
 			const int retryCount = 3;
 			var retryAttempts = new Dictionary<string, List<TimeSpan>>();
-			var retrySettings = new JitterRetryPolicySettings()
+			var retrySettings = new JitterRetryPolicySettings(retryCount)
 			{
-				RetryCount = retryCount,
 				MedianFirstRetryDelay = TimeSpan.FromMilliseconds(50),
 				OnRetry = BuildOnRetryAction(retryAttempts)
 			};
@@ -80,10 +76,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		public async Task Should_retry_when_client_returns_500()
 		{
 			const int retryCount = 3;
-			var retrySettings = new SimpleRetryPolicySettings()
-			{
-				RetryCount = retryCount
-			};
+			var retrySettings = new SimpleRetryPolicySettings(retryCount);
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.InternalServerError)
 				.WithRetrySettings(retrySettings)

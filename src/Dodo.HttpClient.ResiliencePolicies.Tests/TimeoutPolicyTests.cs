@@ -15,9 +15,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		public void Should_retry_5_times_200_status_code_because_of_per_try_timeout()
 		{
 			const int retryCount = 5;
-			var retrySettings = new SimpleRetryPolicySettings()
+			var retrySettings = new SimpleRetryPolicySettings(retryCount)
 			{
-				RetryCount = retryCount,
 				SleepDurationProvider = i => TimeSpan.FromMilliseconds(200)
 			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
@@ -52,9 +51,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		public void Should_fail_on_HttpClient_timeout_with_retry()
 		{
 			const int retryCount = 5;
-			var retrySettings = new SimpleRetryPolicySettings()
+			var retrySettings = new SimpleRetryPolicySettings(retryCount)
 			{
-				RetryCount = retryCount,
 				SleepDurationProvider = i => TimeSpan.FromMilliseconds(1)
 			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
@@ -90,9 +88,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			var overallTimeout = TimeSpan.FromMilliseconds(100);
 			var perTryTimeout = TimeSpan.FromMilliseconds(200);
 
-			var retrySettings = new SimpleRetryPolicySettings()
+			var retrySettings = new SimpleRetryPolicySettings(retryCount)
 			{
-				RetryCount = retryCount,
 				SleepDurationProvider = i => TimeSpan.FromMilliseconds(200)
 			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
@@ -116,9 +113,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			var perTryTimeout = TimeSpan.FromMilliseconds(100);
 			var overallTimeout = TimeSpan.FromSeconds(2);
 
-			var retrySettings = new SimpleRetryPolicySettings()
+			var retrySettings = new SimpleRetryPolicySettings(retryCount)
 			{
-				RetryCount = retryCount,
 				SleepDurationProvider = i => TimeSpan.FromMilliseconds(200)
 			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder

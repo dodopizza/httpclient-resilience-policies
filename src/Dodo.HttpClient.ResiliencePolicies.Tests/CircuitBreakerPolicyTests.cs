@@ -17,9 +17,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		{
 			const int retryCount = 5;
 			const int minimumThroughput = 2;
-			var retrySettings = new SimpleRetryPolicySettings()
+			var retrySettings = new SimpleRetryPolicySettings(retryCount)
 			{
-				RetryCount = retryCount,
 				SleepDurationProvider = i => TimeSpan.FromMilliseconds(50)
 			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
@@ -41,9 +40,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		{
 			const int retryCount = 5;
 			const int minimumThroughput = 2;
-			var retrySettings = new SimpleRetryPolicySettings()
+			var retrySettings = new SimpleRetryPolicySettings(retryCount)
 			{
-				RetryCount = retryCount,
 				SleepDurationProvider = i => TimeSpan.FromMilliseconds(50)
 			};
 			var circuitBreakerSettings = BuildCircuitBreakerSettings(minimumThroughput);
@@ -69,13 +67,12 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 
 		private static ICircuitBreakerPolicySettings BuildCircuitBreakerSettings(int throughput)
 		{
-			return new CircuitBreakerSettings.CircuitBreakerPolicySettings()
-			{
-				FailureThreshold = 0.5,
-				MinimumThroughput = throughput,
-				DurationOfBreak = TimeSpan.FromMinutes(1),
-				SamplingDuration = TimeSpan.FromMilliseconds(20)
-			};
+			return new CircuitBreakerPolicySettings(
+				failureThreshold: 0.5,
+				minimumThroughput: throughput,
+				durationOfBreak: TimeSpan.FromMinutes(1),
+				samplingDuration: TimeSpan.FromMilliseconds(20)
+			);
 		}
 	}
 }
