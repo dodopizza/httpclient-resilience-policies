@@ -36,10 +36,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		{
 			const int retryCount = 3;
 			var retrySettings =
-				new JitterRetryPolicySettings(retryCount)
-				{
-					MedianFirstRetryDelay = TimeSpan.FromMilliseconds(50)
-				};
+				new JitterRetryPolicySettings(retryCount,
+					medianFirstRetryDelay: TimeSpan.FromMilliseconds(50));
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
 				.WithRetrySettings(retrySettings)
@@ -56,9 +54,9 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		{
 			const int retryCount = 3;
 			var retryAttempts = new Dictionary<string, List<TimeSpan>>();
-			var retrySettings = new JitterRetryPolicySettings(retryCount)
+			var retrySettings = new JitterRetryPolicySettings(retryCount,
+				medianFirstRetryDelay: TimeSpan.FromMilliseconds(50) )
 			{
-				MedianFirstRetryDelay = TimeSpan.FromMilliseconds(50),
 				OnRetry = BuildOnRetryAction(retryAttempts)
 			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
