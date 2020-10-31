@@ -71,15 +71,14 @@ namespace Dodo.HttpClientResiliencePolicies
 
 		private static IHttpClientBuilder AddRetryPolicy(
 			this IHttpClientBuilder clientBuilder,
-			RetrySettings.IRetryPolicySettings settings)
+			IRetryPolicySettings settings)
 		{
 			return clientBuilder
 				.AddPolicyHandler(HttpPolicyExtensions
 					.HandleTransientHttpError()
 					.Or<TimeoutRejectedException>()
 					.WaitAndRetryAsync(
-						settings.RetryCount,
-						settings.SleepDurationProvider,
+						settings.SleepDurationProvider.SleepFunction,
 						settings.OnRetry));
 		}
 
