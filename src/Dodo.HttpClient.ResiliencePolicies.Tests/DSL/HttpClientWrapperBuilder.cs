@@ -69,13 +69,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 			var settings = BuildClientSettings();
 			var services = new ServiceCollection();
 			services
-				.AddJsonClient<IMockJsonClient, MockJsonClient>(_uri, c =>
-				{
-					c.CircuitBreakerSettings = settings.CircuitBreakerSettings;
-					c.OverallTimeoutPolicySettings = settings.OverallTimeoutPolicySettings;
-					c.RetrySettings = settings.RetrySettings;
-					c.TimeoutPerTryPolicySettings = settings.TimeoutPerTryPolicySettings;
-				}, ClientName)
+				.AddJsonClient<IMockJsonClient, MockJsonClient>(_uri, settings, ClientName)
 				.ConfigurePrimaryHttpMessageHandler(() => handler);
 
 			var serviceProvider = services.BuildServiceProvider();

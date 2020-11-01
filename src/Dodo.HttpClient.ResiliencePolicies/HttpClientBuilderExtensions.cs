@@ -30,7 +30,8 @@ namespace Dodo.HttpClientResiliencePolicies
 			string clientName = null) where TClientInterface : class
 			where TClientImplementation : class, TClientInterface
 		{
-			return AddJsonClient<TClientInterface, TClientImplementation>(sc, baseAddress, (s) => new ResiliencePoliciesSettings(), clientName);
+			return AddJsonClient<TClientInterface, TClientImplementation>(
+				sc, baseAddress, new ResiliencePoliciesSettings(), clientName);
 		}
 
 		/// <summary>
@@ -41,32 +42,59 @@ namespace Dodo.HttpClientResiliencePolicies
 		public static IHttpClientBuilder AddJsonClient<TClientInterface, TClientImplementation>(
 			this IServiceCollection sc,
 			Uri baseAddress,
-			Action<ResiliencePoliciesSettings> settings,
+			ResiliencePoliciesSettings settings,
 			string clientName = null) where TClientInterface : class
 			where TClientImplementation : class, TClientInterface
 		{
-			var options = new ResiliencePoliciesSettings();
-			settings(options);
-
 			var delta = TimeSpan.FromMilliseconds(1000);
-			Action<HttpClient> defaultClient = (client) =>
+
+			void DefaultClient(HttpClient client)
 			{
 				client.BaseAddress = baseAddress;
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-				client.Timeout = options.OverallTimeoutPolicySettings.Timeout + delta;
-			};
+				client.Timeout = settings.OverallTimeoutPolicySettings.Timeout + delta;
+			}
 
 			var httpClientBuilder = string.IsNullOrEmpty(clientName)
-				? sc.AddHttpClient<TClientInterface, TClientImplementation>(defaultClient)
-				: sc.AddHttpClient<TClientInterface, TClientImplementation>(clientName, defaultClient);
+				? sc.AddHttpClient<TClientInterface, TClientImplementation>(DefaultClient)
+				: sc.AddHttpClient<TClientInterface, TClientImplementation>(clientName, DefaultClient);
 
 			httpClientBuilder
-				.AddTimeoutPolicy(options.OverallTimeoutPolicySettings)
-				.AddRetryPolicy(options.RetrySettings)
-				.AddCircuitBreakerPolicy(options.CircuitBreakerSettings)
-				.AddTimeoutPolicy(options.TimeoutPerTryPolicySettings);
+				.AddTimeoutPolicy(settings.OverallTimeoutPolicySettings)
+				.AddRetryPolicy(settings.RetrySettings)
+				.AddCircuitBreakerPolicy(settings.CircuitBreakerSettings)
+				.AddTimeoutPolicy(settings.TimeoutPerTryPolicySettings);
 
 			return httpClientBuilder;
+		}
+
+		/// <summary>
+		/// Adds pre-configured resilience policies.
+		/// </summary>
+		/// <param name="clientBuilder">Configured HttpClient builder.</param>
+		/// <returns>An <see cref="IHttpClientBuilder"/> that can be used to configure the client.</returns>
+		public static IHttpClientBuilder AddResiliencePolicies(
+			this IHttpClientBuilder clientBuilder)
+		{
+			return clientBuilder
+				.AddResiliencePolicies(new ResiliencePoliciesSettings());
+		}
+
+		/// <summary>
+		/// Adds and configures custom resilience policies.
+		/// </summary>
+		/// <param name="clientBuilder">Configured HttpClient builder.</param>
+		/// <param name="settings">Custom resilience policy settings.</param>
+		/// <returns>An <see cref="IHttpClientBuilder"/> that can be used to configure the client.</returns>
+		public static IHttpClientBuilder AddResiliencePolicies(
+			this IHttpClientBuilder clientBuilder,
+			ResiliencePoliciesSettings settings)
+		{
+			return clientBuilder
+				.AddTimeoutPolicy(settings.OverallTimeoutPolicySettings)
+				.AddRetryPolicy(settings.RetrySettings)
+				.AddCircuitBreakerPolicy(settings.CircuitBreakerSettings)
+				.AddTimeoutPolicy(settings.TimeoutPerTryPolicySettings);
 		}
 
 		private static IHttpClientBuilder AddRetryPolicy(
@@ -119,7 +147,9 @@ namespace Dodo.HttpClientResiliencePolicies
 					settings.OnHalfOpen);
 		}
 
-		private static IHttpClientBuilder AddTimeoutPolicy(this IHttpClientBuilder httpClientBuilder, ITimeoutPolicySettings settings)
+		private static IHttpClientBuilder AddTimeoutPolicy(
+			this IHttpClientBuilder httpClientBuilder,
+			ITimeoutPolicySettings settings)
 		{
 			return httpClientBuilder.AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(settings.Timeout));
 		}

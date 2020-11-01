@@ -65,8 +65,9 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			// Act1
 			serviceCollection.AddJsonClient<IMockJsonClient, MockJsonClient>(
 				new Uri("http://example.com/"),
-				c => {
-					c.OverallTimeoutPolicySettings = new OverallTimeoutPolicySettings(overallTimeout);
+				new ResiliencePoliciesSettings
+				{
+					OverallTimeoutPolicySettings = new OverallTimeoutPolicySettings(overallTimeout),
 				});
 
 			var services = serviceCollection.BuildServiceProvider();
