@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Dodo.HttpClientResiliencePolicies.RetrySettings;
+using Dodo.HttpClientResiliencePolicies.RetryPolicy;
 using Dodo.HttpClientResiliencePolicies.Tests.DSL;
 using NUnit.Framework;
 using Polly;
