@@ -43,7 +43,6 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 				SleepDurationProvider.Constant(retryCount, TimeSpan.FromMilliseconds(50)));
 
 			var circuitBreakerSettings = BuildCircuitBreakerSettings(minimumThroughput);
-			circuitBreakerSettings.IsHostSpecificOn = true;
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithHostAndStatusCode("ru-prod.com", HttpStatusCode.ServiceUnavailable)
 				.WithHostAndStatusCode("ee-prod.com", HttpStatusCode.OK)

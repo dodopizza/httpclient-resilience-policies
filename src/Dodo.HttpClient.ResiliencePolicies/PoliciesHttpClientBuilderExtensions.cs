@@ -63,20 +63,18 @@ namespace Dodo.HttpClientResiliencePolicies
 			this IHttpClientBuilder clientBuilder,
 			ICircuitBreakerPolicySettings settings)
 		{
-			if (settings.IsHostSpecificOn)
+			// This implementation takes into consideration situations
+			// when you use the only HttpClient against different hosts.
+			// In this case we want to have separate CircuitBreaker metrics for each host.
+			// It allows us avoid situations when all requests to all hosts
+			// will be stopped by CircuitBreaker due to single host is not available.
+			var registry = new PolicyRegistry();
+			return clientBuilder.AddPolicyHandler(message =>
 			{
-				var registry = new PolicyRegistry();
-				return clientBuilder.AddPolicyHandler(message =>
-				{
-					var policyKey = message.RequestUri.Host;
-					var policy = registry.GetOrAdd(policyKey, BuildCircuitBreakerPolicy(settings));
-					return policy;
-				});
-			}
-			else
-			{
-				return clientBuilder.AddPolicyHandler(BuildCircuitBreakerPolicy(settings));
-			}
+				var policyKey = message.RequestUri.Host;
+				var policy = registry.GetOrAdd(policyKey, BuildCircuitBreakerPolicy(settings));
+				return policy;
+			});
 		}
 
 		private static AsyncCircuitBreakerPolicy<HttpResponseMessage> BuildCircuitBreakerPolicy(
