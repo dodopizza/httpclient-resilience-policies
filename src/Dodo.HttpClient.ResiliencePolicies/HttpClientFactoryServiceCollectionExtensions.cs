@@ -5,9 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Dodo.HttpClientResiliencePolicies
 {
-	public static class HttpClientBuilderExtensionsClients
+	public static class HttpClientFactoryServiceCollectionExtensions
 	{
-				/// <summary>
+		/// <summary>
 		/// Adds the <see cref="IHttpClientFactory"/> and related services to the <see cref="IServiceCollection"/>
 		/// with pre-configured JSON headers, HttpClient Timeout and resilience policies.
 		/// </summary>

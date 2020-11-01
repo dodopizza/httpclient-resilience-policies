@@ -15,7 +15,7 @@ namespace Dodo.HttpClientResiliencePolicies
 	/// <summary>
 	/// Extension methods for configuring <see cref="IHttpClientBuilder"/> with Polly retry, timeout, circuit breaker policies.
 	/// </summary>
-	public static class HttpClientBuilderExtensionsPolicies
+	public static class PoliciesHttpClientBuilderExtensions
 	{
 		/// <summary>
 		/// Adds pre-configured resilience policies.
