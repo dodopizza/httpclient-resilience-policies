@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using Dodo.HttpClientResiliencePolicies.CircuitBreakerSettings;
-using Dodo.HttpClientResiliencePolicies.RetrySettings;
+using Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy;
+using Dodo.HttpClientResiliencePolicies.RetryPolicy;
 using Dodo.HttpClientResiliencePolicies.Tests.Fakes;
-using Dodo.HttpClientResiliencePolicies.TimeoutPolicySettings;
+using Dodo.HttpClientResiliencePolicies.TimeoutPolicy;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
@@ -69,13 +69,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 			var settings = BuildClientSettings();
 			var services = new ServiceCollection();
 			services
-				.AddJsonClient<IMockJsonClient, MockJsonClient>(_uri, c =>
-				{
-					c.CircuitBreakerSettings = settings.CircuitBreakerSettings;
-					c.OverallTimeoutPolicySettings = settings.OverallTimeoutPolicySettings;
-					c.RetrySettings = settings.RetrySettings;
-					c.TimeoutPerTryPolicySettings = settings.TimeoutPerTryPolicySettings;
-				}, ClientName)
+				.AddJsonClient<IMockJsonClient, MockJsonClient>(_uri, settings, ClientName)
 				.ConfigurePrimaryHttpMessageHandler(() => handler);
 
 			var serviceProvider = services.BuildServiceProvider();
@@ -96,8 +90,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 
 			return new ResiliencePoliciesSettings()
 			{
-				OverallTimeoutPolicySettings = new OverallTimeoutPolicySettings { Timeout = _timeoutOverall },
-				TimeoutPerTryPolicySettings = new TimeoutPerTryPolicySettings { Timeout = _timeoutPerTry },
+				OverallTimeoutPolicySettings = new OverallTimeoutPolicySettings(_timeoutOverall),
+				TimeoutPerTryPolicySettings = new TimeoutPerTryPolicySettings(_timeoutPerTry),
 				RetrySettings = _retrySettings ?? new RetryPolicySettings(),
 				CircuitBreakerSettings = defaultCircuitBreakerSettings
 			};

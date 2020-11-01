@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Dodo.HttpClientResiliencePolicies.RetrySettings
+namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 {
 	public interface ISleepDurationProvider
 	{

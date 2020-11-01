@@ -2,7 +2,7 @@ using System;
 using System.Net.Http;
 using Polly;
 
-namespace Dodo.HttpClientResiliencePolicies.CircuitBreakerSettings
+namespace Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy
 {
 	public class CircuitBreakerPolicySettings : ICircuitBreakerPolicySettings
 	{
@@ -37,13 +37,13 @@ namespace Dodo.HttpClientResiliencePolicies.CircuitBreakerSettings
 			DurationOfBreak = durationOfBreak;
 			SamplingDuration = samplingDuration;
 
-			OnBreak = _doNothingOnBreak;
-			OnReset = _doNothingOnReset;
-			OnHalfOpen = _doNothingOnHalfOpen;
+			OnBreak = DoNothingOnBreak;
+			OnReset = DoNothingOnReset;
+			OnHalfOpen = DoNothingOnHalfOpen;
 		}
 
-		private static readonly Action<DelegateResult<HttpResponseMessage>, TimeSpan> _doNothingOnBreak = (_, __) => { };
-		private static readonly Action _doNothingOnReset = () => { };
-		private static readonly Action _doNothingOnHalfOpen = () => { };
+		private static readonly Action<DelegateResult<HttpResponseMessage>, TimeSpan> DoNothingOnBreak = (_, __) => { };
+		private static readonly Action DoNothingOnReset = () => { };
+		private static readonly Action DoNothingOnHalfOpen = () => { };
 	}
 }

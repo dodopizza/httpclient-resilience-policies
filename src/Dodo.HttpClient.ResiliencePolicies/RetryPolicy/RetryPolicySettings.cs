@@ -2,7 +2,7 @@ using System;
 using System.Net.Http;
 using Polly;
 
-namespace Dodo.HttpClientResiliencePolicies.RetrySettings
+namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 {
 	public class RetryPolicySettings : IRetryPolicySettings
 	{
@@ -10,7 +10,7 @@ namespace Dodo.HttpClientResiliencePolicies.RetrySettings
 		public Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnRetry { get; set; }
 
 		public RetryPolicySettings()
-		: this(RetrySettings.SleepDurationProvider.Jitter(
+		: this(RetryPolicy.SleepDurationProvider.Jitter(
 			Defaults.Retry.RetryCount,
 			TimeSpan.FromMilliseconds(Defaults.Retry.MedianFirstRetryDelayInMilliseconds)))
 		{
@@ -20,9 +20,9 @@ namespace Dodo.HttpClientResiliencePolicies.RetrySettings
 			ISleepDurationProvider sleepDurationProvider)
 		{
 			SleepDurationProvider = sleepDurationProvider;
-			OnRetry = _doNothingOnRetry;
+			OnRetry = DoNothingOnRetry;
 		}
 
-		private static readonly Action<DelegateResult<HttpResponseMessage>, TimeSpan> _doNothingOnRetry = (_, __) => { };
+		private static readonly Action<DelegateResult<HttpResponseMessage>, TimeSpan> DoNothingOnRetry = (_, __) => { };
 	}
 }

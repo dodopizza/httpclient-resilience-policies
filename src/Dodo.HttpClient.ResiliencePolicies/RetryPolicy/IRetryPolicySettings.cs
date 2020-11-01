@@ -2,7 +2,7 @@ using System;
 using System.Net.Http;
 using Polly;
 
-namespace Dodo.HttpClientResiliencePolicies.RetrySettings
+namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 {
 	public interface IRetryPolicySettings
 	{
