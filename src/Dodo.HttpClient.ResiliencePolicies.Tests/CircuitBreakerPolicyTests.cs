@@ -17,10 +17,9 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		{
 			const int retryCount = 5;
 			const int minimumThroughput = 2;
-			var retrySettings = new SimpleRetryPolicySettings(retryCount)
-			{
-				SleepDurationProvider = i => TimeSpan.FromMilliseconds(50)
-			};
+			var retrySettings = new RetryPolicySettings(
+				SleepDurationProvider.Constant(retryCount, TimeSpan.FromMilliseconds(50)));
+
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
 				.WithTimeoutOverall(TimeSpan.FromSeconds(5))
@@ -40,10 +39,9 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		{
 			const int retryCount = 5;
 			const int minimumThroughput = 2;
-			var retrySettings = new SimpleRetryPolicySettings(retryCount)
-			{
-				SleepDurationProvider = i => TimeSpan.FromMilliseconds(50)
-			};
+			var retrySettings = new RetryPolicySettings(
+				SleepDurationProvider.Constant(retryCount, TimeSpan.FromMilliseconds(50)));
+
 			var circuitBreakerSettings = BuildCircuitBreakerSettings(minimumThroughput);
 			circuitBreakerSettings.IsHostSpecificOn = true;
 			var wrapper = Create.HttpClientWrapperWrapperBuilder

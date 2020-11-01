@@ -13,6 +13,7 @@ namespace Dodo.HttpClientResiliencePolicies
 		public static class Retry
 		{
 			public const int RetryCount = 2;
+			public const int InitialDelayMilliseconds = 20;
 			public const int MedianFirstRetryDelayInMilliseconds = 2000;
 		}
 

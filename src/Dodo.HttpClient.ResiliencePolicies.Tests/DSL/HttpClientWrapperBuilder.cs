@@ -98,7 +98,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 			{
 				OverallTimeoutPolicySettings = new OverallTimeoutPolicySettings { Timeout = _timeoutOverall },
 				TimeoutPerTryPolicySettings = new TimeoutPerTryPolicySettings { Timeout = _timeoutPerTry },
-				RetrySettings = _retrySettings ?? new JitterRetryPolicySettings(),
+				RetrySettings = _retrySettings ?? new RetryPolicySettings(),
 				CircuitBreakerSettings = defaultCircuitBreakerSettings
 			};
 		}
