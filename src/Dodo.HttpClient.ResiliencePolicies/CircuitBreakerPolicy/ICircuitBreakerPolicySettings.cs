@@ -14,7 +14,5 @@ namespace Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy
 		Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnBreak { get; set; }
 		Action OnReset { get; set; }
 		Action OnHalfOpen { get; set; }
-
-		bool IsHostSpecificOn { get; set; }
 	}
 }

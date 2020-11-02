@@ -15,8 +15,6 @@ namespace Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy
 		public Action OnReset { get; set; }
 		public Action OnHalfOpen { get; set; }
 
-		public bool IsHostSpecificOn { get; set; }
-
 		public CircuitBreakerPolicySettings()
 			: this(
 				Defaults.CircuitBreaker.FailureThreshold,
