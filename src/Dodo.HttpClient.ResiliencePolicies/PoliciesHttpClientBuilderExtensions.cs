@@ -55,7 +55,7 @@ namespace Dodo.HttpClientResiliencePolicies
 					.HandleTransientHttpError()
 					.Or<TimeoutRejectedException>()
 					.WaitAndRetryAsync(
-						settings.SleepDurationProvider.SleepFunction,
+						settings.SleepDurationProvider,
 						settings.OnRetry));
 		}
 

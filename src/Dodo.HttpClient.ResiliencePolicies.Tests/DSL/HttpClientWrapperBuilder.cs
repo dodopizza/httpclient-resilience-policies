@@ -88,7 +88,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 				samplingDuration: TimeSpan.FromMilliseconds(20)
 			);
 
-			return new ResiliencePoliciesSettings()
+			return new ResiliencePoliciesSettings
 			{
 				OverallTimeoutPolicySettings = new OverallTimeoutPolicySettings(_timeoutOverall),
 				TimeoutPerTryPolicySettings = new TimeoutPerTryPolicySettings(_timeoutPerTry),
