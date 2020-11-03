@@ -18,8 +18,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		public async Task Should_retry_3_times_when_client_returns_503()
 		{
 			const int retryCount = 3;
-			var retrySettings = new RetryPolicySettings(
-				SleepDurationProvider.Constant(retryCount, TimeSpan.FromMilliseconds(1)));
+			var retrySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(1));
 
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
@@ -36,9 +35,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		public async Task Should_retry_6_times_for_two_threads_when_client_returns_503()
 		{
 			const int retryCount = 3;
-			var retrySettings = new RetryPolicySettings(
-				SleepDurationProvider.Jitter(retryCount,
-					medianFirstRetryDelay: TimeSpan.FromMilliseconds(50)));
+			var retrySettings = RetryPolicySettings.Jitter(retryCount,
+					medianFirstRetryDelay: TimeSpan.FromMilliseconds(50));
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
 				.WithRetrySettings(retrySettings)
@@ -55,11 +53,11 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		{
 			const int retryCount = 3;
 			var retryAttempts = new Dictionary<string, List<TimeSpan>>();
-			var retrySettings = new RetryPolicySettings(SleepDurationProvider.Jitter(retryCount,
-				medianFirstRetryDelay: TimeSpan.FromMilliseconds(50) ))
-			{
-				OnRetry = BuildOnRetryAction(retryAttempts)
-			};
+			var retrySettings = RetryPolicySettings.Jitter(retryCount,
+				medianFirstRetryDelay: TimeSpan.FromMilliseconds(50));
+			retrySettings.
+				OnRetry = BuildOnRetryAction(retryAttempts);
+
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
 				.WithRetrySettings(retrySettings)
@@ -75,8 +73,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		public async Task Should_retry_when_client_returns_500()
 		{
 			const int retryCount = 3;
-			var retrySettings = new RetryPolicySettings(
-				SleepDurationProvider.Constant(retryCount, TimeSpan.FromMilliseconds(1)));
+			var retrySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(1));
 
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.InternalServerError)
