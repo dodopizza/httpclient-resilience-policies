@@ -1,16 +1,19 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Dodo.HttpClientResiliencePolicies.TimeoutPolicySettings
+namespace Dodo.HttpClientResiliencePolicies.TimeoutPolicy
 {
 	public sealed class TimeoutPerTryPolicySettings : ITimeoutPolicySettings
 	{
+		public TimeSpan Timeout { get; }
+
 		public TimeoutPerTryPolicySettings()
 		{
 			Timeout = TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutPerTryInMilliseconds);
 		}
 
-		public TimeSpan Timeout { get; set; }
+		public TimeoutPerTryPolicySettings(TimeSpan timeout)
+		{
+			Timeout = timeout;
+		}
 	}
 }
