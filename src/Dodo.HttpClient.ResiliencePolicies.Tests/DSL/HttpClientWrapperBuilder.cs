@@ -20,7 +20,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 		private TimeSpan _timeoutPerTry = TimeSpan.FromDays(1);
 		private TimeSpan _timeoutOverall = TimeSpan.FromDays(1);
 		private TimeSpan _responseLatency = TimeSpan.Zero;
-		private int? _retryAfterSeconds = null;
+		private TimeSpan? _retryAfterSpan = null;
 		private DateTime? _retryAfterDate = null;
 
 		public HttpClientWrapperBuilder WithStatusCode(HttpStatusCode statusCode)
@@ -65,9 +65,9 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 			return this;
 		}
 
-		public HttpClientWrapperBuilder WithRetryAfterHeader(int delaySeconds)
+		public HttpClientWrapperBuilder WithRetryAfterHeader(TimeSpan delay)
 		{
-			_retryAfterSeconds = delaySeconds;
+			_retryAfterSpan = delay;
 			return this;
 		}
 
@@ -81,11 +81,15 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 		{
 			var handler = new MockHttpMessageHandler(_hostsResponseCodes, _responseLatency);
 
-			if (_retryAfterDate != null)
+			if (_retryAfterDate.HasValue)
+			{
 				handler.SetRetryAfterResponseHeader(_retryAfterDate.Value);
+			}
 
-			if (_retryAfterSeconds != null)
-				handler.SetRetryAfterResponseHeader(_retryAfterSeconds.Value);
+			if (_retryAfterSpan.HasValue)
+			{
+				handler.SetRetryAfterResponseHeader(_retryAfterSpan.Value);
+			}
 
 			var settings = BuildClientSettings();
 			var services = new ServiceCollection();

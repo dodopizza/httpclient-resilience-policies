@@ -112,7 +112,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			var retrySettings = RetryPolicySettings.Constant(retryCount).WithRetryAfter();
 
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
-				.WithRetryAfterHeader(1)
+				.WithRetryAfterHeader(TimeSpan.FromSeconds(1))
 				.WithStatusCode(HttpStatusCode.InternalServerError)
 				.WithRetrySettings(retrySettings)
 				.Please();
@@ -121,7 +121,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			await wrapper.Client.GetAsync("http://localhost");
 			stopWatch.Stop();
 
-			Assert.Less(3.0d, stopWatch.Elapsed.TotalSeconds);
+			Assert.LessOrEqual(3.0d, stopWatch.Elapsed.TotalSeconds);
 		}
 
 		[Test]
@@ -131,7 +131,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			var retrySettings = RetryPolicySettings.Constant(retryCount).WithRetryAfter();
 
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
-				.WithRetryAfterHeader(1)
+				.WithRetryAfterHeader(TimeSpan.FromSeconds(1))
 				.WithStatusCode(HttpStatusCode.InternalServerError)
 				.WithRetrySettings(retrySettings)
 				.WithTimeoutOverall(TimeSpan.FromSeconds(2))
