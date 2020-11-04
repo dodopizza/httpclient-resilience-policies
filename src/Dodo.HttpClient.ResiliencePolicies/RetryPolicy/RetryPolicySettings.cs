@@ -1,24 +1,21 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Polly;
 using Polly.Contrib.WaitAndRetry;
 
-namespace Dodo.HttpClientResiliencePolicies.RetrySettings
+namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 {
-	public class RetryPolicySettings
+	public class RetryPolicySettings : IRetryPolicySettings
 	{
-		public int RetryCount { get; set; }
+		private readonly int _retryCount;
+		int IRetryPolicySettings.RetryCount => _retryCount;
 
-		public RetryPolicySettings()
+		private readonly Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> _sleepDurationProvider;
+		Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> IRetryPolicySettings.SleepDurationProvider
 		{
-			RetryCount = Defaults.Retry.RetryCount;
-			SleepDurationProvider = _simpleSleepDurationProvider;
-			OnRetry = _doNothingOnRetry;
-		}
-
-		public Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> SleepDurationProvider {
 			get => (retryCount, response, context) =>
 			{
 				if (_useRetryAfter)
@@ -33,38 +30,79 @@ namespace Dodo.HttpClientResiliencePolicies.RetrySettings
 
 				return _sleepDurationProvider(retryCount, response, context);
 			};
-			set {
-				_sleepDurationProvider = value;
-			}
 		}
 
-		public virtual Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> OnRetry { get; set; }
+		public Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> OnRetry { get; set; }
 
-		public void EnableRetryAfterFeature()
+		public RetryPolicySettings()
+		{
+			_sleepDurationProvider = SleepDurationProvider.Jitter(
+				Defaults.Retry.RetryCount,
+				TimeSpan.FromMilliseconds(Defaults.Retry.MedianFirstRetryDelayInMilliseconds));
+
+			OnRetry = DoNothingOnRetry;
+			_retryCount = Defaults.Retry.RetryCount;
+		}
+
+		private RetryPolicySettings(
+			int retryCount,
+			Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> sleepDurationProvider)
+		{
+			_sleepDurationProvider = sleepDurationProvider;
+			OnRetry = DoNothingOnRetry;
+			_retryCount = retryCount;
+		}
+
+		private bool _useRetryAfter;
+
+		private static readonly Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> DoNothingOnRetry = (_, __, ___, ____) => Task.CompletedTask;
+
+		internal void EnableRetryAfterFeature()
 		{
 			_useRetryAfter = true;
 		}
 
-		public void UseSimpleStrategy()
+		public static RetryPolicySettings Constant(int retryCount)
 		{
-			_sleepDurationProvider = _simpleSleepDurationProvider;
+			return Constant(retryCount, TimeSpan.FromMilliseconds(Defaults.Retry.InitialDelayMilliseconds));
 		}
 
-		public void UseJitterStrategy()
+		public static RetryPolicySettings Constant(int retryCount, TimeSpan delay)
 		{
-			_sleepDurationProvider = _jitterSleepDurationProvider(RetryCount,
-				TimeSpan.FromMilliseconds(Defaults.Retry.MedianFirstRetryDelayInMilliseconds));
+			return new RetryPolicySettings(retryCount, SleepDurationProvider.Constant(retryCount, delay));
 		}
 
-		public void UseJitterStrategy(TimeSpan medianFirstRetryDelay)
+		public static RetryPolicySettings Linear(int retryCount)
 		{
-			_sleepDurationProvider = _jitterSleepDurationProvider(RetryCount, medianFirstRetryDelay);
+			return Linear(retryCount, TimeSpan.FromMilliseconds(Defaults.Retry.InitialDelayMilliseconds));
 		}
 
-		private bool _useRetryAfter;
-		private Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> _sleepDurationProvider;
+		public static RetryPolicySettings Linear(int retryCount, TimeSpan initialDelay)
+		{
+			return new RetryPolicySettings(retryCount, SleepDurationProvider.Constant(retryCount, initialDelay));
+		}
 
-		private static TimeSpan? getServerWaitDuration(DelegateResult<HttpResponseMessage> response)
+		public static RetryPolicySettings Exponential(int retryCount)
+		{
+			return Exponential(retryCount, TimeSpan.FromMilliseconds(Defaults.Retry.InitialDelayMilliseconds));
+		}
+
+		public static RetryPolicySettings Exponential(int retryCount, TimeSpan initialDelay)
+		{
+			return new RetryPolicySettings(retryCount, SleepDurationProvider.Exponential(retryCount, initialDelay));
+		}
+
+		public static RetryPolicySettings Jitter(int retryCount)
+		{
+			return Jitter(retryCount, TimeSpan.FromMilliseconds(Defaults.Retry.MedianFirstRetryDelayInMilliseconds));
+		}
+
+		public static RetryPolicySettings Jitter(int retryCount, TimeSpan medianFirstRetryDelay)
+		{
+			return new RetryPolicySettings(retryCount, SleepDurationProvider.Jitter(retryCount, medianFirstRetryDelay));
+		}
+
+		private TimeSpan? getServerWaitDuration(DelegateResult<HttpResponseMessage> response)
 		{
 			var retryAfter = response?.Result?.Headers?.RetryAfter;
 			if (retryAfter == null)
@@ -75,13 +113,43 @@ namespace Dodo.HttpClientResiliencePolicies.RetrySettings
 				: retryAfter.Delta.GetValueOrDefault(TimeSpan.Zero);
 		}
 
-		private static readonly Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> _doNothingOnRetry = (_, __, ___, ____) => Task.CompletedTask;
+		#region nested class
 
-		private static Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> _simpleSleepDurationProvider
-			= (i, r, c) => TimeSpan.FromMilliseconds(20 * Math.Pow(2, i));
+		private static class SleepDurationProvider
+		{
+			internal static Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> Constant(int retryCount, TimeSpan delay)
+			{
+				if (retryCount < 0) throw new ArgumentOutOfRangeException(nameof(retryCount), retryCount, "should be >= 0");
+				if (delay < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(delay), delay, "should be >= 0ms");
 
-		private static Func<int, TimeSpan, Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan>> _jitterSleepDurationProvider =
-			(retryCount, medianFirstRetryDelay) => (i, r, c) =>
-			   Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay, retryCount).ToArray()[i - 1];
+				return (i, r, c) => Backoff.ConstantBackoff(delay, retryCount).ToArray()[i - 1];
+			}
+
+			internal static Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> Linear(int retryCount, TimeSpan initialDelay)
+			{
+				if (retryCount < 0) throw new ArgumentOutOfRangeException(nameof(retryCount), retryCount, "should be >= 0");
+				if (initialDelay < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(initialDelay), initialDelay, "should be >= 0ms");
+
+				return (i, r, c) => Backoff.LinearBackoff(initialDelay, retryCount).ToArray()[i - 1];
+			}
+
+			internal static Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> Exponential(int retryCount, TimeSpan initialDelay)
+			{
+				if (retryCount < 0) throw new ArgumentOutOfRangeException(nameof(retryCount), retryCount, "should be >= 0");
+				if (initialDelay < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(initialDelay), initialDelay, "should be >= 0ms");
+
+				return (i, r, c) => Backoff.ExponentialBackoff(initialDelay, retryCount).ToArray()[i - 1];
+			}
+
+			internal static Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> Jitter(int retryCount, TimeSpan medianFirstRetryDelay)
+			{
+				if (retryCount < 0) throw new ArgumentOutOfRangeException(nameof(retryCount), retryCount, "should be >= 0");
+				if (medianFirstRetryDelay < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(medianFirstRetryDelay), medianFirstRetryDelay, "should be >= 0ms");
+
+				return (i, r, c) => Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay, retryCount).ToArray()[i - 1];
+			}
+
+			#endregion
+		}
 	}
 }

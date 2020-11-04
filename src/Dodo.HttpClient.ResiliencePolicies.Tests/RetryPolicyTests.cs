@@ -98,7 +98,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 				}
 				else
 				{
-					retryAttempts[taskId] = new List<TimeSpan> {span};
+					retryAttempts[taskId] = new List<TimeSpan> { span };
 				}
 
 				return Task.CompletedTask;
@@ -109,11 +109,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		public async Task Should_retry_sleep_longer_when_RetryAfterDecorator_is_on()
 		{
 			const int retryCount = 3;
-			var retrySettings = new RetryPolicySettings()
-			{
-				RetryCount = retryCount
-			};
-			retrySettings.EnableRetryAfterFeature();
+			var retrySettings = RetryPolicySettings.Constant(retryCount).WithRetryAfter();
+
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithRetryAfterHeader(1)
 				.WithStatusCode(HttpStatusCode.InternalServerError)
@@ -131,11 +128,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		public void Should_catchTimeout_because_of_overall_less_then_sleepDuration_of_RetryAfterDecorator()
 		{
 			const int retryCount = 3;
-			var retrySettings = new RetryPolicySettings()
-			{
-				RetryCount = retryCount
-			};
-			retrySettings.EnableRetryAfterFeature();
+			var retrySettings = RetryPolicySettings.Constant(retryCount).WithRetryAfter();
+
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithRetryAfterHeader(1)
 				.WithStatusCode(HttpStatusCode.InternalServerError)
