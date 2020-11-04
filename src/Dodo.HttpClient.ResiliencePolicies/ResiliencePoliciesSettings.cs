@@ -1,6 +1,7 @@
-using Dodo.HttpClientResiliencePolicies.CircuitBreakerSettings;
-using Dodo.HttpClientResiliencePolicies.RetrySettings;
-using Dodo.HttpClientResiliencePolicies.TimeoutPolicySettings;
+using System;
+using Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy;
+using Dodo.HttpClientResiliencePolicies.RetryPolicy;
+using Dodo.HttpClientResiliencePolicies.TimeoutPolicy;
 
 namespace Dodo.HttpClientResiliencePolicies
 {
@@ -18,8 +19,8 @@ namespace Dodo.HttpClientResiliencePolicies
 		{
 			OverallTimeoutPolicySettings = new OverallTimeoutPolicySettings();
 			TimeoutPerTryPolicySettings = new TimeoutPerTryPolicySettings();
-			RetrySettings = new SimpleRetryPolicySettings();
-			CircuitBreakerSettings = new CircuitBreakerSettings.CircuitBreakerPolicySettings();
+			RetrySettings = new RetryPolicySettings();
+			CircuitBreakerSettings = new CircuitBreakerPolicySettings();
 		}
 	}
 }
