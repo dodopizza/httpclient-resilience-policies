@@ -119,7 +119,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			await wrapper.Client.GetAsync("http://localhost");
 			stopWatch.Stop();
 
-			Assert.LessOrEqual(3.0d, stopWatch.Elapsed.TotalSeconds);
+			Assert.That(3.0d, Is.GreaterThanOrEqualTo(stopWatch.Elapsed.TotalSeconds).Within(0.1));
 		}
 
 		[Test]
