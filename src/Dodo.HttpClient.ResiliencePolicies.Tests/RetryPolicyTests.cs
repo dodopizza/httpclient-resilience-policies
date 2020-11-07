@@ -86,10 +86,10 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			Assert.AreEqual(retryCount + 1, wrapper.NumberOfCalls);
 		}
 
-		private Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> BuildOnRetryAction(
+		private Action<DelegateResult<HttpResponseMessage>, TimeSpan> BuildOnRetryAction(
 			IDictionary<string, List<TimeSpan>> retryAttempts)
 		{
-			return (result, span, i, c) =>
+			return (result, span) =>
 			{
 				var taskId = result.Result.RequestMessage.Headers.GetValues("TaskId").First();
 				if (retryAttempts.ContainsKey(taskId))
@@ -100,8 +100,6 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 				{
 					retryAttempts[taskId] = new List<TimeSpan> { span };
 				}
-
-				return Task.CompletedTask;
 			};
 		}
 
@@ -109,7 +107,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		public async Task Should_retry_sleep_longer_when_RetryAfterDecorator_is_on()
 		{
 			const int retryCount = 3;
-			var retrySettings = RetryPolicySettings.Constant(retryCount).WithRetryAfter();
+			var retrySettings = RetryPolicySettings.Constant(retryCount);
 
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithRetryAfterHeader(TimeSpan.FromSeconds(1))
@@ -128,7 +126,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		public void Should_catchTimeout_because_of_overall_less_then_sleepDuration_of_RetryAfterDecorator()
 		{
 			const int retryCount = 3;
-			var retrySettings = RetryPolicySettings.Constant(retryCount).WithRetryAfter();
+			var retrySettings = RetryPolicySettings.Constant(retryCount);
 
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithRetryAfterHeader(TimeSpan.FromSeconds(1))

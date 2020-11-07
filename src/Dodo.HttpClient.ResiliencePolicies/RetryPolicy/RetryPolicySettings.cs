@@ -18,21 +18,26 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 		{
 			get => (retryCount, response, context) =>
 			{
-				if (_useRetryAfter)
+				var serverWaitDuration = getServerWaitDuration(response);
+				if (serverWaitDuration.HasValue)
 				{
-					var serverWaitDuration = getServerWaitDuration(response);
-
-					if (serverWaitDuration != null)
-					{
-						return serverWaitDuration.Value;
-					}
+					return serverWaitDuration.Value;
 				}
 
 				return _sleepDurationProvider(retryCount, response, context);
 			};
 		}
 
-		public Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> OnRetry { get; set; }
+		Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> IRetryPolicySettings.OnRetryForPolly
+		{
+			get => (response, span, retryCount, context) =>
+			{
+				OnRetry(response, span);
+				return Task.CompletedTask;
+			};
+		}
+
+		public Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnRetry { get; set; }
 
 		public RetryPolicySettings()
 		{
@@ -53,14 +58,7 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 			_retryCount = retryCount;
 		}
 
-		private bool _useRetryAfter;
-
-		private static readonly Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> DoNothingOnRetry = (_, __, ___, ____) => Task.CompletedTask;
-
-		internal void EnableRetryAfterFeature()
-		{
-			_useRetryAfter = true;
-		}
+		private static readonly Action<DelegateResult<HttpResponseMessage>, TimeSpan> DoNothingOnRetry = (_, __) => { };
 
 		public static RetryPolicySettings Constant(int retryCount)
 		{
@@ -106,11 +104,21 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 		{
 			var retryAfter = response?.Result?.Headers?.RetryAfter;
 			if (retryAfter == null)
+			{
 				return null;
+			}
 
-			return retryAfter.Date.HasValue
-				? retryAfter.Date.Value - DateTime.UtcNow
-				: retryAfter.Delta.GetValueOrDefault(TimeSpan.Zero);
+			if (retryAfter.Delta.HasValue) // Delta priority check, because its simple TimeSpan value
+			{
+				return retryAfter.Delta.Value;
+			}
+
+			if (retryAfter.Date.HasValue)
+			{
+				return retryAfter.Date.Value - DateTime.UtcNow;
+			}
+
+			return null; // when nothing was found
 		}
 
 		#region nested class
