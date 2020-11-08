@@ -1,41 +1,30 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Polly;
-using Polly.Contrib.WaitAndRetry;
 
 namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 {
-	public class RetryPolicySettings : IRetryPolicySettings
+	public partial class RetryPolicySettings : IRetryPolicySettings
 	{
 		private readonly int _retryCount;
 		int IRetryPolicySettings.RetryCount => _retryCount;
 
 		private readonly Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> _sleepDurationProvider;
-		Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> IRetryPolicySettings.SleepDurationProvider
-		{
-			get => (retryCount, response, context) =>
+		Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> IRetryPolicySettings.SleepDurationProvider =>
+			(retryCount, response, context) =>
 			{
-				var serverWaitDuration = getServerWaitDuration(response);
-				if (serverWaitDuration.HasValue)
-				{
-					return serverWaitDuration.Value;
-				}
-
-				return _sleepDurationProvider(retryCount, response, context);
+				var serverWaitDuration = GetServerWaitDuration(response);
+				return serverWaitDuration ?? _sleepDurationProvider(retryCount, response, context);
 			};
-		}
 
-		Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> IRetryPolicySettings.OnRetryForPolly
-		{
-			get => (response, span, retryCount, context) =>
+		Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> IRetryPolicySettings.OnRetryWrapper =>
+			(response, span, retryCount, context) =>
 			{
 				OnRetry(response, span);
 				return Task.CompletedTask;
 			};
-		}
 
 		public Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnRetry { get; set; }
 
@@ -100,7 +89,7 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 			return new RetryPolicySettings(retryCount, SleepDurationProvider.Jitter(retryCount, medianFirstRetryDelay));
 		}
 
-		private TimeSpan? getServerWaitDuration(DelegateResult<HttpResponseMessage> response)
+		private static TimeSpan? GetServerWaitDuration(DelegateResult<HttpResponseMessage> response)
 		{
 			var retryAfter = response?.Result?.Headers?.RetryAfter;
 			if (retryAfter == null)
@@ -119,45 +108,6 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 			}
 
 			return null; // when nothing was found
-		}
-
-		#region nested class
-
-		private static class SleepDurationProvider
-		{
-			internal static Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> Constant(int retryCount, TimeSpan delay)
-			{
-				if (retryCount < 0) throw new ArgumentOutOfRangeException(nameof(retryCount), retryCount, "should be >= 0");
-				if (delay < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(delay), delay, "should be >= 0ms");
-
-				return (i, r, c) => Backoff.ConstantBackoff(delay, retryCount).ToArray()[i - 1];
-			}
-
-			internal static Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> Linear(int retryCount, TimeSpan initialDelay)
-			{
-				if (retryCount < 0) throw new ArgumentOutOfRangeException(nameof(retryCount), retryCount, "should be >= 0");
-				if (initialDelay < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(initialDelay), initialDelay, "should be >= 0ms");
-
-				return (i, r, c) => Backoff.LinearBackoff(initialDelay, retryCount).ToArray()[i - 1];
-			}
-
-			internal static Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> Exponential(int retryCount, TimeSpan initialDelay)
-			{
-				if (retryCount < 0) throw new ArgumentOutOfRangeException(nameof(retryCount), retryCount, "should be >= 0");
-				if (initialDelay < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(initialDelay), initialDelay, "should be >= 0ms");
-
-				return (i, r, c) => Backoff.ExponentialBackoff(initialDelay, retryCount).ToArray()[i - 1];
-			}
-
-			internal static Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> Jitter(int retryCount, TimeSpan medianFirstRetryDelay)
-			{
-				if (retryCount < 0) throw new ArgumentOutOfRangeException(nameof(retryCount), retryCount, "should be >= 0");
-				if (medianFirstRetryDelay < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(medianFirstRetryDelay), medianFirstRetryDelay, "should be >= 0ms");
-
-				return (i, r, c) => Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay, retryCount).ToArray()[i - 1];
-			}
-
-			#endregion
 		}
 	}
 }
