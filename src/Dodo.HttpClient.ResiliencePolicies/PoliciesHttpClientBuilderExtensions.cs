@@ -55,8 +55,9 @@ namespace Dodo.HttpClientResiliencePolicies
 					.HandleTransientHttpError()
 					.Or<TimeoutRejectedException>()
 					.WaitAndRetryAsync(
+						settings.RetryCount,
 						settings.SleepDurationProvider,
-						settings.OnRetry));
+						settings.OnRetryForPolly));
 		}
 
 		private static IHttpClientBuilder AddCircuitBreakerPolicy(

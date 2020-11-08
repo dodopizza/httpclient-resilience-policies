@@ -8,6 +8,7 @@ using Dodo.HttpClientResiliencePolicies.RetryPolicy;
 using Dodo.HttpClientResiliencePolicies.Tests.DSL;
 using NUnit.Framework;
 using Polly;
+using Polly.Timeout;
 
 namespace Dodo.HttpClientResiliencePolicies.Tests
 {
@@ -97,9 +98,45 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 				}
 				else
 				{
-					retryAttempts[taskId] = new List<TimeSpan> {span};
+					retryAttempts[taskId] = new List<TimeSpan> { span };
 				}
 			};
+		}
+
+		[Test]
+		public async Task Should_retry_sleep_longer_when_RetryAfterDecorator_is_on()
+		{
+			const int retryCount = 3;
+			var retrySettings = RetryPolicySettings.Constant(retryCount);
+
+			var wrapper = Create.HttpClientWrapperWrapperBuilder
+				.WithRetryAfterHeader(TimeSpan.FromSeconds(1))
+				.WithStatusCode(HttpStatusCode.InternalServerError)
+				.WithRetrySettings(retrySettings)
+				.Please();
+
+			var stopWatch = System.Diagnostics.Stopwatch.StartNew();
+			await wrapper.Client.GetAsync("http://localhost");
+			stopWatch.Stop();
+
+			Assert.That(3.0d, Is.GreaterThanOrEqualTo(stopWatch.Elapsed.TotalSeconds).Within(0.1));
+		}
+
+		[Test]
+		public void Should_catchTimeout_because_of_overall_less_then_sleepDuration_of_RetryAfterDecorator()
+		{
+			const int retryCount = 3;
+			var retrySettings = RetryPolicySettings.Constant(retryCount);
+
+			var wrapper = Create.HttpClientWrapperWrapperBuilder
+				.WithRetryAfterHeader(TimeSpan.FromSeconds(1))
+				.WithStatusCode(HttpStatusCode.InternalServerError)
+				.WithRetrySettings(retrySettings)
+				.WithTimeoutOverall(TimeSpan.FromSeconds(2))
+				.Please();
+
+			Assert.CatchAsync<TimeoutRejectedException>(async () =>
+				await wrapper.Client.GetAsync("http://localhost"));
 		}
 	}
 }

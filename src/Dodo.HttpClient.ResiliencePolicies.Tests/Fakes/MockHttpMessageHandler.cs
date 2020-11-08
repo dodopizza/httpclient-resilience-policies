@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Bson;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -14,6 +15,9 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.Fakes
 
 		public long NumberOfCalls => _numberOfCalls;
 		private long _numberOfCalls = 0;
+
+		private DateTime? _retryAfterDate;
+		private TimeSpan? _retryAfterSpan;
 
 		public MockHttpMessageHandler(HttpStatusCode statusCode, TimeSpan latency)
 			: this(new Dictionary<string, HttpStatusCode> {{string.Empty, statusCode}}, latency)
@@ -34,6 +38,15 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.Fakes
 			_latency = latency;
 		}
 
+		public void SetRetryAfterResponseHeader(DateTime retryAfterDate)
+		{
+			_retryAfterDate = retryAfterDate;
+		}
+
+		public void SetRetryAfterResponseHeader(TimeSpan retryAfterSpan)
+		{
+			_retryAfterSpan = retryAfterSpan;
+		}
 
 		protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
 			CancellationToken cancellationToken)
@@ -46,12 +59,24 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.Fakes
 				? _hostsResponseCodes[request.RequestUri.Host]
 				: _hostsResponseCodes[string.Empty];
 
-			return await Task.FromResult(
-				new HttpResponseMessage
-				{
-					RequestMessage = request,
-					StatusCode = statusCode
-				});
+			var result = new HttpResponseMessage
+			{
+				RequestMessage = request,
+				StatusCode = statusCode
+			};
+
+			if (_retryAfterDate.HasValue)
+			{
+				result.Headers.RetryAfter = new System.Net.Http.Headers.RetryConditionHeaderValue(_retryAfterDate.Value);
+			}
+
+			if (_retryAfterSpan.HasValue)
+			{
+				result.Headers.RetryAfter
+					= new System.Net.Http.Headers.RetryConditionHeaderValue(_retryAfterSpan.Value);
+			}
+
+			return await Task.FromResult(result);
 		}
 	}
 }
