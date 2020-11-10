@@ -14,7 +14,10 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 	{
 		private const string ClientName = "TestClient";
 		private readonly Uri _uri = new Uri("http://localhost");
-		private readonly Dictionary<string, HttpStatusCode> _hostsResponseCodes = new Dictionary<string, HttpStatusCode>();
+
+		private readonly Dictionary<string, HttpStatusCode> _hostsResponseCodes =
+			new Dictionary<string, HttpStatusCode>();
+
 		private IRetryPolicySettings _retrySettings;
 		private ICircuitBreakerPolicySettings _circuitBreakerSettings;
 		private TimeSpan _timeoutPerTry = TimeSpan.FromDays(1);
@@ -99,7 +102,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 
 			var serviceProvider = services.BuildServiceProvider();
 			var factory = serviceProvider.GetService<IHttpClientFactory>();
-			var client = factory.CreateClient(ClientName);
+			var client = factory?.CreateClient(ClientName) ??
+			             throw new NullReferenceException($"\"{nameof(factory)}\" was not created properly");
 			return new HttpClientWrapper(client, handler);
 		}
 

@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace Dodo.HttpClientResiliencePolicies.Tests
 {
 	[TestFixture]
-	public class HttpClientBuilderExtensionsClientsTests
+	public class HttpClientFactoryServiceCollectionExtensionsTests
 	{
 		[Test]
 		public void When_AddJsonClient_WithNullClientName_than_ConfiguresDefaultJsonClient()
