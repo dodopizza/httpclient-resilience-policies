@@ -18,8 +18,9 @@ jobs:
     strategy:
       matrix:
         dotnet: [
-          { framework: netcoreapp2.1, version: 2.1.806 },
-          { framework: netcoreapp3.1, version: 3.1.202 }
+          { framework: netcoreapp2.1, version: 2.1.x },
+          { framework: netcoreapp3.1, version: 3.1.x },
+          { framework: net5, version: 5.0.x },
         ]
 
     name: ${{ matrix.dotnet.framework }} – run tests
