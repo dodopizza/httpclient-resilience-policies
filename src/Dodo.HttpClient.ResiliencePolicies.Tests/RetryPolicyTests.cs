@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
-using Dodo.HttpClientResiliencePolicies.RetryPolicy;
+using Dodo.HttpClientResiliencePolicies.Core.RetryPolicy;
 using Dodo.HttpClientResiliencePolicies.Tests.DSL;
 using NUnit.Framework;
 using Polly;
@@ -85,7 +84,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			Assert.AreEqual(retryCount + 1, wrapper.NumberOfCalls);
 		}
 
-		private Action<DelegateResult<HttpResponseMessage>, TimeSpan> BuildOnRetryAction(
+		private Action<Core.PolicyResult, TimeSpan> BuildOnRetryAction(
 			IDictionary<string, List<TimeSpan>> retryAttempts)
 		{
 			return (result, span) =>

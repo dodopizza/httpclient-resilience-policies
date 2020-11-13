@@ -7,7 +7,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 
 	public static class Helper
 	{
-		public static async Task InvokeMultipleHttpRequests(HttpClient client, int taskCount, string uri = "http://localhost")
+		public static async Task InvokeMultipleHttpRequests(System.Net.Http.HttpClient client, int taskCount, string uri = "http://localhost")
 		{
 			var tasks = new Task[taskCount];
 			for (var i = 0; i < taskCount; i++)

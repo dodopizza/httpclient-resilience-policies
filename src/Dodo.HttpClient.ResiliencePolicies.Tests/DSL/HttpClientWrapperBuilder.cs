@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy;
+using Dodo.HttpClientResiliencePolicies.Core.RetryPolicy;
 using Dodo.HttpClientResiliencePolicies.RetryPolicy;
 using Dodo.HttpClientResiliencePolicies.Tests.Fakes;
 using Dodo.HttpClientResiliencePolicies.TimeoutPolicy;

@@ -36,7 +36,7 @@ namespace Dodo.HttpClientResiliencePolicies
 		{
 			var delta = TimeSpan.FromMilliseconds(1000);
 
-			void DefaultClient(HttpClient client)
+			void DefaultClient(System.Net.Http.HttpClient client)
 			{
 				client.BaseAddress = baseAddress;
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

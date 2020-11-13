@@ -1,5 +1,6 @@
 using System;
 using Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy;
+using Dodo.HttpClientResiliencePolicies.Core.RetryPolicy;
 using Dodo.HttpClientResiliencePolicies.RetryPolicy;
 using Dodo.HttpClientResiliencePolicies.TimeoutPolicy;
 

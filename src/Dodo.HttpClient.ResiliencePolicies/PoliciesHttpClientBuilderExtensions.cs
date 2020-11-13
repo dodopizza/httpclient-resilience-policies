@@ -1,14 +1,6 @@
-using System.Net;
-using System.Net.Http;
-using Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy;
-using Dodo.HttpClientResiliencePolicies.RetryPolicy;
-using Dodo.HttpClientResiliencePolicies.TimeoutPolicy;
+using Dodo.HttpClientResiliencePolicies.Core;
 using Microsoft.Extensions.DependencyInjection;
-using Polly;
-using Polly.CircuitBreaker;
-using Polly.Extensions.Http;
-using Polly.Registry;
-using Polly.Timeout;
+
 
 namespace Dodo.HttpClientResiliencePolicies
 {
@@ -39,66 +31,19 @@ namespace Dodo.HttpClientResiliencePolicies
 			this IHttpClientBuilder clientBuilder,
 			ResiliencePoliciesSettings settings)
 		{
-			return clientBuilder
-				.AddTimeoutPolicy(settings.OverallTimeoutPolicySettings)
-				.AddRetryPolicy(settings.RetrySettings)
-				.AddCircuitBreakerPolicy(settings.CircuitBreakerSettings)
-				.AddTimeoutPolicy(settings.TimeoutPerTryPolicySettings);
+			clientBuilder
+				.UsePolly()
+				.AddPolicy(settings.OverallTimeoutPolicySettings)
+				.AddPolicy(settings.RetrySettings)
+				.AddPolicy(settings.CircuitBreakerSettings)
+				.AddPolicy(settings.TimeoutPerTryPolicySettings);
+
+			return clientBuilder;
 		}
 
-		private static IHttpClientBuilder AddRetryPolicy(
-			this IHttpClientBuilder clientBuilder,
-			IRetryPolicySettings settings)
+		private static IPolicyBuilder UsePolly(this IHttpClientBuilder httpClientBuilder)
 		{
-			return clientBuilder
-				.AddPolicyHandler(HttpPolicyExtensions
-					.HandleTransientHttpError()
-					.Or<TimeoutRejectedException>()
-					.WaitAndRetryAsync(
-						settings.SleepDurationProvider,
-						settings.OnRetry));
-		}
-
-		private static IHttpClientBuilder AddCircuitBreakerPolicy(
-			this IHttpClientBuilder clientBuilder,
-			ICircuitBreakerPolicySettings settings)
-		{
-			// This implementation takes into consideration situations
-			// when you use the only HttpClient against different hosts.
-			// In this case we want to have separate CircuitBreaker metrics for each host.
-			// It allows us avoid situations when all requests to all hosts
-			// will be stopped by CircuitBreaker due to single host is not available.
-			var registry = new PolicyRegistry();
-			return clientBuilder.AddPolicyHandler(message =>
-			{
-				var policyKey = message.RequestUri.Host;
-				var policy = registry.GetOrAdd(policyKey, BuildCircuitBreakerPolicy(settings));
-				return policy;
-			});
-		}
-
-		private static AsyncCircuitBreakerPolicy<HttpResponseMessage> BuildCircuitBreakerPolicy(
-			ICircuitBreakerPolicySettings settings)
-		{
-			return HttpPolicyExtensions
-				.HandleTransientHttpError()
-				.Or<TimeoutRejectedException>()
-				.OrResult(r => r.StatusCode == (HttpStatusCode) 429) // Too Many Requests
-				.AdvancedCircuitBreakerAsync(
-					settings.FailureThreshold,
-					settings.SamplingDuration,
-					settings.MinimumThroughput,
-					settings.DurationOfBreak,
-					settings.OnBreak,
-					settings.OnReset,
-					settings.OnHalfOpen);
-		}
-
-		private static IHttpClientBuilder AddTimeoutPolicy(
-			this IHttpClientBuilder httpClientBuilder,
-			ITimeoutPolicySettings settings)
-		{
-			return httpClientBuilder.AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(settings.Timeout));
+			return new Polly.PolicyBuilder(httpClientBuilder);
 		}
 	}
 }

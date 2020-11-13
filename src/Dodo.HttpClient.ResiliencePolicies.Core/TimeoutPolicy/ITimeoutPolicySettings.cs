@@ -2,7 +2,7 @@ using System;
 
 namespace Dodo.HttpClientResiliencePolicies.TimeoutPolicy
 {
-	public interface ITimeoutPolicySettings
+	public interface ITimeoutPolicySettings : IPolicySettings
 	{
 		TimeSpan Timeout { get; }
 	}
