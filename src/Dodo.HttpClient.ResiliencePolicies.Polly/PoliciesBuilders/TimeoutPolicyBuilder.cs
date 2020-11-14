@@ -1,5 +1,5 @@
 using System.Net.Http;
-using Dodo.HttpClientResiliencePolicies.TimeoutPolicy;
+using Dodo.HttpClientResiliencePolicies.Core.TimeoutPolicy;
 using Polly;
 using Polly.Timeout;
 

@@ -1,6 +1,4 @@
-using System;
-
-namespace Dodo.HttpClientResiliencePolicies
+namespace Dodo.HttpClientResiliencePolicies.Core
 {
 	public static class Defaults
 	{

@@ -1,8 +1,6 @@
 using System;
-using System.Net.Http;
-using PolicyResult = Dodo.HttpClientResiliencePolicies.Core.PolicyResult;
 
-namespace Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy
+namespace Dodo.HttpClientResiliencePolicies.Core.CircuitBreakerPolicy
 {
 	public class CircuitBreakerPolicySettings : ICircuitBreakerPolicySettings
 	{
@@ -35,12 +33,12 @@ namespace Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy
 			DurationOfBreak = durationOfBreak;
 			SamplingDuration = samplingDuration;
 
-			//OnBreak = DoNothingOnBreak;
+			OnBreak = DoNothingOnBreak;
 			OnReset = DoNothingOnReset;
 			OnHalfOpen = DoNothingOnHalfOpen;
 		}
 
-	//	private static readonly Action<DelegateResult<HttpResponseMessage>, TimeSpan> DoNothingOnBreak = (_, __) => { };
+		private static readonly Action<PolicyResult, TimeSpan> DoNothingOnBreak = (_, __) => { };
 		private static readonly Action DoNothingOnReset = () => { };
 		private static readonly Action DoNothingOnHalfOpen = () => { };
 	}

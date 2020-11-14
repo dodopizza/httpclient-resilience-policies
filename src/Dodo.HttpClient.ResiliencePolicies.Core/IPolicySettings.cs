@@ -1,4 +1,4 @@
-namespace Dodo.HttpClientResiliencePolicies.TimeoutPolicy
+namespace Dodo.HttpClientResiliencePolicies.Core
 {
 	public interface IPolicySettings
 	{

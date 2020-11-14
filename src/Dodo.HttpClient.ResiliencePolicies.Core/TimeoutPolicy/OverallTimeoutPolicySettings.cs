@@ -1,6 +1,6 @@
 using System;
 
-namespace Dodo.HttpClientResiliencePolicies.TimeoutPolicy
+namespace Dodo.HttpClientResiliencePolicies.Core.TimeoutPolicy
 {
 	public sealed class OverallTimeoutPolicySettings : ITimeoutPolicySettings
 	{

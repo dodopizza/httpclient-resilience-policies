@@ -1,7 +1,7 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
-using Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy;
+using Dodo.HttpClientResiliencePolicies.Core.CircuitBreakerPolicy;
 using Dodo.HttpClientResiliencePolicies.Core.RetryPolicy;
 using Dodo.HttpClientResiliencePolicies.Tests.DSL;
 using NUnit.Framework;

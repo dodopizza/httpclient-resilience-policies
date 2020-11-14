@@ -1,7 +1,7 @@
 using System;
 using System.Net;
 using System.Net.Http;
-using Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy;
+using Dodo.HttpClientResiliencePolicies.Core.CircuitBreakerPolicy;
 using Polly;
 using Polly.CircuitBreaker;
 using Polly.Extensions.Http;

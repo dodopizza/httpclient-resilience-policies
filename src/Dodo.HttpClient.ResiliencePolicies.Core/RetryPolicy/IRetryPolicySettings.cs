@@ -1,7 +1,7 @@
 using System;
-using Dodo.HttpClientResiliencePolicies.Core;
+using Dodo.HttpClientResiliencePolicies.RetryPolicy;
 
-namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
+namespace Dodo.HttpClientResiliencePolicies.Core.RetryPolicy
 {
 	public interface IRetryPolicySettings
 	{

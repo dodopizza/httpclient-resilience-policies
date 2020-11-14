@@ -1,7 +1,6 @@
 using System;
-using PolicyResult = Dodo.HttpClientResiliencePolicies.Core.PolicyResult;
 
-namespace Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy
+namespace Dodo.HttpClientResiliencePolicies.Core.CircuitBreakerPolicy
 {
 	public interface ICircuitBreakerPolicySettings
 	{

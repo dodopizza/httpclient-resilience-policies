@@ -1,10 +1,8 @@
-using System;
-using Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy;
+using Dodo.HttpClientResiliencePolicies.Core.CircuitBreakerPolicy;
 using Dodo.HttpClientResiliencePolicies.Core.RetryPolicy;
-using Dodo.HttpClientResiliencePolicies.RetryPolicy;
-using Dodo.HttpClientResiliencePolicies.TimeoutPolicy;
+using Dodo.HttpClientResiliencePolicies.Core.TimeoutPolicy;
 
-namespace Dodo.HttpClientResiliencePolicies
+namespace Dodo.HttpClientResiliencePolicies.Core
 {
 	public class ResiliencePoliciesSettings
 	{

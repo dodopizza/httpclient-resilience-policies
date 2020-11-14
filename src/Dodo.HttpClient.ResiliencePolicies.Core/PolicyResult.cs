@@ -6,13 +6,13 @@ namespace Dodo.HttpClientResiliencePolicies.Core
 	public sealed class PolicyResult
 	{
 		/// <summary>
-		/// Create an instance of <see cref="DelegateResult{TResult}"/> representing an execution which returned <paramref name="result"/>
+		/// Create an instance of <see cref="PolicyResult"/> representing an execution which returned <paramref name="result"/>
 		/// </summary>
 		/// <param name="result">The result.</param>
 		public PolicyResult(HttpResponseMessage result) => Result = result;
 
 		/// <summary>
-		/// Create an instance of <see cref="DelegateResult{TResult}"/> representing an execution which threw <paramref name="exception"/>
+		/// Create an instance of <see cref="PolicyResult"/> representing an execution which threw <paramref name="exception"/>
 		/// </summary>
 		/// <param name="exception">The exception.</param>
 		public PolicyResult(Exception exception) => Exception = exception;

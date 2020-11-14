@@ -1,7 +1,8 @@
 using System;
 using System.Net.Http;
+using Dodo.HttpClientResiliencePolicies.Core;
+using Dodo.HttpClientResiliencePolicies.Core.TimeoutPolicy;
 using Dodo.HttpClientResiliencePolicies.Tests.Fakes;
-using Dodo.HttpClientResiliencePolicies.TimeoutPolicy;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
