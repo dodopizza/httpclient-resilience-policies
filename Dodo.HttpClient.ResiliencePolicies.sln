@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dodo.HttpClient.ResiliencePolicies", "src\Dodo.HttpClient.ResiliencePolicies\Dodo.HttpClient.ResiliencePolicies.csproj", "{558A02C8-BC81-4ED0-8C10-E9F5C2DF9351}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dodo.HttpClient.ResiliencePolicies.Polly.Tests", "src\Dodo.HttpClient.ResiliencePolicies.Polly.Tests\Dodo.HttpClient.ResiliencePolicies.Polly.Tests.csproj", "{F9AA2D51-3A10-4323-BDFF-D3568C065DA2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dodo.HttpClient.ResiliencePolicies.Polly.Tests", "tests\Dodo.HttpClient.ResiliencePolicies.Polly.Tests\Dodo.HttpClient.ResiliencePolicies.Polly.Tests.csproj", "{F9AA2D51-3A10-4323-BDFF-D3568C065DA2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dodo.HttpClient.ResiliencePolicies.Core", "src\Dodo.HttpClient.ResiliencePolicies.Core\Dodo.HttpClient.ResiliencePolicies.Core.csproj", "{4CCA385B-8AA6-429F-86F5-ED204E9A701D}"
 EndProject
