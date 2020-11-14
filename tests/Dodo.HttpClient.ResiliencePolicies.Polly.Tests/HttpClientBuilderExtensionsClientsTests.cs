@@ -102,7 +102,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 
 			// Assert
 			Assert.NotNull(client);
-			var overallTimeout = TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutOverallInMilliseconds);
+			var overallTimeout = TimeSpan.FromMilliseconds(50000);
 			Assert.AreEqual(overallTimeout.Add(TimeSpan.FromMilliseconds(1000)), client.Timeout);
 		}
 	}

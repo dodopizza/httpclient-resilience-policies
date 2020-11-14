@@ -1,6 +1,6 @@
 namespace Dodo.HttpClientResiliencePolicies.Core
 {
-	public static class Defaults
+	internal static class Defaults
 	{
 		public static class Timeout
 		{
