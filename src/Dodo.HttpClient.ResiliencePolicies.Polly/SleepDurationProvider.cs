@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Dodo.HttpClientResiliencePolicies.RetryPolicy;
+using Dodo.HttpClientResiliencePolicies.Core.RetryPolicy.SleepDurationFunctions;
 using Polly.Contrib.WaitAndRetry;
 
 namespace Dodo.HttpClientResiliencePolicies.Polly

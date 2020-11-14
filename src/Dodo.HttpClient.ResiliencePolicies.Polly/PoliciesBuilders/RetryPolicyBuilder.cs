@@ -3,7 +3,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Dodo.HttpClientResiliencePolicies.Core.RetryPolicy;
-using Dodo.HttpClientResiliencePolicies.RetryPolicy;
 using Polly;
 using Polly.Extensions.Http;
 using Polly.Retry;

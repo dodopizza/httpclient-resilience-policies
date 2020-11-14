@@ -1,5 +1,5 @@
 using System;
-using Dodo.HttpClientResiliencePolicies.RetryPolicy;
+using Dodo.HttpClientResiliencePolicies.Core.RetryPolicy.SleepDurationFunctions;
 
 namespace Dodo.HttpClientResiliencePolicies.Core.RetryPolicy
 {

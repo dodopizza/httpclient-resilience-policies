@@ -1,6 +1,6 @@
 using System;
 
-namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
+namespace Dodo.HttpClientResiliencePolicies.Core.RetryPolicy.SleepDurationFunctions
 {
 	public class ConstantFunction : ISleepDurationFunction
 	{

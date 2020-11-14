@@ -3,7 +3,6 @@ using Dodo.HttpClientResiliencePolicies.Core.CircuitBreakerPolicy;
 using Dodo.HttpClientResiliencePolicies.Core.RetryPolicy;
 using Dodo.HttpClientResiliencePolicies.Core.TimeoutPolicy;
 using Dodo.HttpClientResiliencePolicies.Polly.PoliciesBuilders;
-using Dodo.HttpClientResiliencePolicies.RetryPolicy;
 using Microsoft.Extensions.DependencyInjection;
 using IPolicyBuilder = Dodo.HttpClientResiliencePolicies.Core.IPolicyBuilder;
 

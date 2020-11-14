@@ -1,5 +1,5 @@
 using System;
-using Dodo.HttpClientResiliencePolicies.RetryPolicy;
+using Dodo.HttpClientResiliencePolicies.Core.RetryPolicy.SleepDurationFunctions;
 
 namespace Dodo.HttpClientResiliencePolicies.Core.RetryPolicy
 {
@@ -10,18 +10,16 @@ namespace Dodo.HttpClientResiliencePolicies.Core.RetryPolicy
 		public Action<PolicyResult, TimeSpan> OnRetry { get; set; }
 
 		public RetryPolicySettings()
+		: this(new JitterFunction(Defaults.Retry.RetryCount,
+			TimeSpan.FromMilliseconds(Defaults.Retry.InitialDelayMilliseconds)))
 		{
-			SleepDurationFunction = new JitterFunction(Defaults.Retry.RetryCount,
-				TimeSpan.FromMilliseconds(Defaults.Retry.InitialDelayMilliseconds));
-			OnRetry = DoNothingOnRetry;
 		}
-
-		private static readonly Action<PolicyResult, TimeSpan> DoNothingOnRetry = (_, __) => { };
 
 		private RetryPolicySettings(
 			ISleepDurationFunction function)
 		{
 			SleepDurationFunction = function;
+
 			OnRetry = DoNothingOnRetry;
 		}
 
@@ -68,5 +66,7 @@ namespace Dodo.HttpClientResiliencePolicies.Core.RetryPolicy
 		{
 			return new RetryPolicySettings(new JitterFunction(retryCount, medianFirstRetryDelay));
 		}
+
+		private static readonly Action<PolicyResult, TimeSpan> DoNothingOnRetry = (_, __) => { };
 	}
 }

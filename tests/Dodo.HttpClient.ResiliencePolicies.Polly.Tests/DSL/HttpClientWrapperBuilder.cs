@@ -6,7 +6,6 @@ using Dodo.HttpClientResiliencePolicies.Core;
 using Dodo.HttpClientResiliencePolicies.Core.CircuitBreakerPolicy;
 using Dodo.HttpClientResiliencePolicies.Core.RetryPolicy;
 using Dodo.HttpClientResiliencePolicies.Core.TimeoutPolicy;
-using Dodo.HttpClientResiliencePolicies.RetryPolicy;
 using Dodo.HttpClientResiliencePolicies.Tests.Fakes;
 using Microsoft.Extensions.DependencyInjection;
 

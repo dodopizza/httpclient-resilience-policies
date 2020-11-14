@@ -1,4 +1,4 @@
-namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
+namespace Dodo.HttpClientResiliencePolicies.Core.RetryPolicy.SleepDurationFunctions
 {
 	public interface ISleepDurationFunction
 	{
