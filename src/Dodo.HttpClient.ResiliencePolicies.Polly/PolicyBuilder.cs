@@ -11,7 +11,6 @@ namespace Dodo.HttpClientResiliencePolicies.Polly
 	public sealed class PolicyBuilder : IPolicyBuilder
 	{
 		private readonly IHttpClientBuilder _httpClientBuilder;
-		private readonly IPolicyFactory _policyFactory;
 
 		public PolicyBuilder(IHttpClientBuilder httpClientBuilder)
 		{
@@ -19,27 +18,29 @@ namespace Dodo.HttpClientResiliencePolicies.Polly
 				throw new ArgumentNullException(nameof(httpClientBuilder));
 
 			_httpClientBuilder = httpClientBuilder;
-			_policyFactory = new PolicyFactory();
 		}
 
 		public IPolicyBuilder AddPolicy(
 			ITimeoutPolicySettings settings)
 		{
-			_httpClientBuilder.AddPolicyHandler(_policyFactory.Create(settings));
+			_httpClientBuilder.AddPolicyHandler(
+				new TimeoutPolicyBuilder().Build(settings));
 			 return this;
 		}
 
 		public IPolicyBuilder AddPolicy(
 			ICircuitBreakerPolicySettings settings)
 		{
-			_httpClientBuilder.AddPolicyHandler(_policyFactory.Create(settings));
+			_httpClientBuilder.AddPolicyHandler(
+				new CircleBreakerPolicyBuilder().Build(settings));
 			return this;
 		}
 
 		public IPolicyBuilder AddPolicy(
 			IRetryPolicySettings settings)
 		{
-			_httpClientBuilder.AddPolicyHandler(_policyFactory.Create(settings));
+			_httpClientBuilder.AddPolicyHandler(
+				new RetryPolicyBuilder().Build(settings));
 			return this;
 		}
 	}
