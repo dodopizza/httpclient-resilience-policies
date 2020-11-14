@@ -14,12 +14,15 @@ namespace Dodo.HttpClientResiliencePolicies.Core
 
 		public ICircuitBreakerPolicySettings CircuitBreakerSettings { get; set; }
 
-		public ResiliencePoliciesSettings()
+		public static ResiliencePoliciesSettings Default()
 		{
-			OverallTimeoutPolicySettings = new OverallTimeoutPolicySettings();
-			TimeoutPerTryPolicySettings = new TimeoutPerTryPolicySettings();
-			RetrySettings = RetryPolicySettings.Default();
-			CircuitBreakerSettings = new CircuitBreakerPolicySettings();
+			return new ResiliencePoliciesSettings
+			{
+				OverallTimeoutPolicySettings = Core.TimeoutPolicy.OverallTimeoutPolicySettings.Default(),
+				TimeoutPerTryPolicySettings = Core.TimeoutPolicy.TimeoutPerTryPolicySettings.Default(),
+				RetrySettings = RetryPolicySettings.Default(),
+				CircuitBreakerSettings = CircuitBreakerPolicySettings.Default()
+			};
 		}
 	}
 }

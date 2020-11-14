@@ -6,14 +6,14 @@ namespace Dodo.HttpClientResiliencePolicies.Core.TimeoutPolicy
 	{
 		public TimeSpan Timeout { get; }
 
-		public OverallTimeoutPolicySettings()
-		{
-			Timeout = TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutOverallInMilliseconds);
-		}
-
 		public OverallTimeoutPolicySettings(TimeSpan timeout)
 		{
 			Timeout = timeout;
+		}
+
+		public static ITimeoutPolicySettings Default()
+		{
+			return new OverallTimeoutPolicySettings(TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutOverallInMilliseconds));
 		}
 	}
 }

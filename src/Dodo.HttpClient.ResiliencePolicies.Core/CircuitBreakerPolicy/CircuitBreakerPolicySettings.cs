@@ -13,15 +13,6 @@ namespace Dodo.HttpClientResiliencePolicies.Core.CircuitBreakerPolicy
 		public Action OnReset { get; set; }
 		public Action OnHalfOpen { get; set; }
 
-		public CircuitBreakerPolicySettings()
-			: this(
-				Defaults.CircuitBreaker.FailureThreshold,
-				Defaults.CircuitBreaker.MinimumThroughput,
-				TimeSpan.FromMilliseconds(Defaults.CircuitBreaker.DurationOfBreakInMilliseconds),
-				TimeSpan.FromMilliseconds(Defaults.CircuitBreaker.SamplingDurationInMilliseconds))
-		{
-		}
-
 		public CircuitBreakerPolicySettings(
 			double failureThreshold,
 			int minimumThroughput,
@@ -41,5 +32,13 @@ namespace Dodo.HttpClientResiliencePolicies.Core.CircuitBreakerPolicy
 		private static readonly Action<PolicyResult, TimeSpan> DoNothingOnBreak = (_, __) => { };
 		private static readonly Action DoNothingOnReset = () => { };
 		private static readonly Action DoNothingOnHalfOpen = () => { };
+
+		public static ICircuitBreakerPolicySettings Default()
+		{
+			return new CircuitBreakerPolicySettings(Defaults.CircuitBreaker.FailureThreshold,
+				Defaults.CircuitBreaker.MinimumThroughput,
+				TimeSpan.FromMilliseconds(Defaults.CircuitBreaker.DurationOfBreakInMilliseconds),
+				TimeSpan.FromMilliseconds(Defaults.CircuitBreaker.SamplingDurationInMilliseconds));
+		}
 	}
 }
