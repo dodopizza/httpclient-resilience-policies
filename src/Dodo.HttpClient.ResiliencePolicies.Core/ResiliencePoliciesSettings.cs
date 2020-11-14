@@ -18,7 +18,7 @@ namespace Dodo.HttpClientResiliencePolicies.Core
 		{
 			OverallTimeoutPolicySettings = new OverallTimeoutPolicySettings();
 			TimeoutPerTryPolicySettings = new TimeoutPerTryPolicySettings();
-			RetrySettings = new RetryPolicySettings();
+			RetrySettings = RetryPolicySettings.Default();
 			CircuitBreakerSettings = new CircuitBreakerPolicySettings();
 		}
 	}

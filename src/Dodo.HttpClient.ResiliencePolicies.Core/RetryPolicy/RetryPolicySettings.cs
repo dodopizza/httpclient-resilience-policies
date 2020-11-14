@@ -9,18 +9,18 @@ namespace Dodo.HttpClientResiliencePolicies.Core.RetryPolicy
 
 		public Action<PolicyResult, TimeSpan> OnRetry { get; set; }
 
-		public RetryPolicySettings()
-		: this(new JitterFunction(Defaults.Retry.RetryCount,
-			TimeSpan.FromMilliseconds(Defaults.Retry.InitialDelayMilliseconds)))
-		{
-		}
-
 		private RetryPolicySettings(
 			ISleepDurationFunction function)
 		{
 			SleepDurationFunction = function;
 
 			OnRetry = DoNothingOnRetry;
+		}
+
+		public static IRetryPolicySettings Default()
+		{
+			return Jitter(Defaults.Retry.RetryCount,
+				TimeSpan.FromMilliseconds(Defaults.Retry.InitialDelayMilliseconds));
 		}
 
 		public static IRetryPolicySettings Constant(int retryCount)
