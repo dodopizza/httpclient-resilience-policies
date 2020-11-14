@@ -8,6 +8,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dodo.HttpClient.ResilienceP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dodo.HttpClient.ResiliencePolicies.Polly", "src\Dodo.HttpClient.ResiliencePolicies.Polly\Dodo.HttpClient.ResiliencePolicies.Polly.csproj", "{5ACA750E-9469-41B5-88B5-126A70AD1846}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E81FC5AE-DBB2-41D1-8FE5-D5481D080C50}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{1E268640-C581-4361-9F20-920A3E3C5FDE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +40,9 @@ Global
 		{5ACA750E-9469-41B5-88B5-126A70AD1846}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{558A02C8-BC81-4ED0-8C10-E9F5C2DF9351} = {E81FC5AE-DBB2-41D1-8FE5-D5481D080C50}
+		{4CCA385B-8AA6-429F-86F5-ED204E9A701D} = {E81FC5AE-DBB2-41D1-8FE5-D5481D080C50}
+		{5ACA750E-9469-41B5-88B5-126A70AD1846} = {E81FC5AE-DBB2-41D1-8FE5-D5481D080C50}
+		{F9AA2D51-3A10-4323-BDFF-D3568C065DA2} = {1E268640-C581-4361-9F20-920A3E3C5FDE}
 	EndGlobalSection
 EndGlobal
