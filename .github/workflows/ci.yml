@@ -35,4 +35,4 @@ jobs:
 
       - name: Run tests
         run: |
-          dotnet test --configuration Release --framework ${{ matrix.dotnet.framework }} ./tests/Dodo.HttpClient.ResiliencePolicies.Tests/Dodo.HttpClient.ResiliencePolicies.Polly.Tests.csproj /p:Framework=${{ matrix.dotnet.framework }}
+          dotnet test --configuration Release --framework ${{ matrix.dotnet.framework }} ./tests/Dodo.HttpClient.ResiliencePolicies.Polly.Tests/Dodo.HttpClient.ResiliencePolicies.Polly.Tests.csproj /p:Framework=${{ matrix.dotnet.framework }}
