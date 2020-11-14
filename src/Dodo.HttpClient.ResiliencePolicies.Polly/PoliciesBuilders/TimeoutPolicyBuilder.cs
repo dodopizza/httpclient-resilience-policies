@@ -1,15 +1,21 @@
 using System.Net.Http;
 using Dodo.HttpClientResiliencePolicies.Core.TimeoutPolicy;
 using Polly;
-using Polly.Timeout;
 
 namespace Dodo.HttpClientResiliencePolicies.Polly.PoliciesBuilders
 {
-	internal sealed class TimeoutPolicyBuilder
+	internal sealed class TimeoutPolicyBuilder : IPolicyBuilder
 	{
-		public AsyncTimeoutPolicy<HttpResponseMessage> Build(ITimeoutPolicySettings settings)
+		private readonly ITimeoutPolicySettings _settings;
+
+		public TimeoutPolicyBuilder(ITimeoutPolicySettings settings)
 		{
-			return Policy.TimeoutAsync<HttpResponseMessage>(settings.Timeout);
+			_settings = settings;
+		}
+
+		public IAsyncPolicy<HttpResponseMessage> Build()
+		{
+			return Policy.TimeoutAsync<HttpResponseMessage>(_settings.Timeout);
 		}
 	}
 }

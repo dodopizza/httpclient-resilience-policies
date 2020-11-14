@@ -1,45 +1,54 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Dodo.HttpClientResiliencePolicies.Core.RetryPolicy;
 using Polly;
 using Polly.Extensions.Http;
-using Polly.Retry;
 using Polly.Timeout;
 using PolicyResult = Dodo.HttpClientResiliencePolicies.Core.PolicyResult;
 
 namespace Dodo.HttpClientResiliencePolicies.Polly.PoliciesBuilders
 {
-	internal sealed class RetryPolicyBuilder
+	internal sealed class RetryPolicyBuilder : IPolicyBuilder
 	{
-		public AsyncRetryPolicy<HttpResponseMessage>Build(IRetryPolicySettings settings)
+		private readonly int _retryCount;
+		private readonly IEnumerable<TimeSpan> _sleepDuration;
+		private readonly Action<PolicyResult, TimeSpan> _onRetry;
+
+		public RetryPolicyBuilder(IRetryPolicySettings settings)
 		{
-			Task OnRetryWrapper(DelegateResult<HttpResponseMessage> response, TimeSpan span, int retryCount, Context context)
-			{
-				PolicyResult commonResponse = response.Result != null
-					? new PolicyResult(response.Result)
-					: new PolicyResult(response.Exception);
-				settings.OnRetry(commonResponse, span);
-				return Task.CompletedTask;
-			}
+			_sleepDuration= SleepDurationImplementation.Convert(settings.SleepDurationFunction);
+			_retryCount = settings.SleepDurationFunction.RetryCount;
+			_onRetry = settings.OnRetry;
+		}
 
-			var sleepDuration= SleepDurationImplementation.Convert(settings.SleepDurationFunction);
-
-			TimeSpan SleepDurationProvider(int retryCount, DelegateResult<HttpResponseMessage> response, Context context)
-			{
-				var serverWaitDuration = GetServerWaitDuration(response);
-				// ReSharper disable once PossibleMultipleEnumeration
-				return serverWaitDuration ?? sleepDuration.ToArray()[retryCount-1];
-			};
-
+		public IAsyncPolicy<HttpResponseMessage>  Build()
+		{
 			return HttpPolicyExtensions
 				.HandleTransientHttpError()
 				.Or<TimeoutRejectedException>()
 				.WaitAndRetryAsync(
-					settings.SleepDurationFunction.RetryCount,
+					_retryCount,
 					SleepDurationProvider,
-					OnRetryWrapper);
+					OnRetry);
+		}
+
+		private TimeSpan SleepDurationProvider(int retryCount, DelegateResult<HttpResponseMessage> response, Context context)
+		{
+			var serverWaitDuration = GetServerWaitDuration(response);
+			// ReSharper disable once PossibleMultipleEnumeration
+			return serverWaitDuration ?? _sleepDuration.ToArray()[retryCount-1];
+		}
+
+		private Task OnRetry(DelegateResult<HttpResponseMessage> response, TimeSpan span, int retryCount, Context context)
+		{
+			PolicyResult commonResponse = response.Result != null
+				? new PolicyResult(response.Result)
+				: new PolicyResult(response.Exception);
+			_onRetry(commonResponse, span);
+			return Task.CompletedTask;
 		}
 
 		private static TimeSpan? GetServerWaitDuration(DelegateResult<HttpResponseMessage> response)

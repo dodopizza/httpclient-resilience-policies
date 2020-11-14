@@ -24,7 +24,7 @@ namespace Dodo.HttpClientResiliencePolicies.Polly
 			ITimeoutPolicySettings settings)
 		{
 			_httpClientBuilder.AddPolicyHandler(
-				new TimeoutPolicyBuilder().Build(settings));
+				new TimeoutPolicyBuilder(settings).Build());
 			 return this;
 		}
 
@@ -32,7 +32,7 @@ namespace Dodo.HttpClientResiliencePolicies.Polly
 			ICircuitBreakerPolicySettings settings)
 		{
 			_httpClientBuilder.AddPolicyHandler(
-				new CircleBreakerPolicyBuilder().Build(settings));
+				new PolicyRegistryBuilder(new CircleBreakerPolicyBuilder(settings)).Build());
 			return this;
 		}
 
@@ -40,7 +40,7 @@ namespace Dodo.HttpClientResiliencePolicies.Polly
 			IRetryPolicySettings settings)
 		{
 			_httpClientBuilder.AddPolicyHandler(
-				new RetryPolicyBuilder().Build(settings));
+				new RetryPolicyBuilder(settings).Build());
 			return this;
 		}
 	}
