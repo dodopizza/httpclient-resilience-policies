@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  
   <PropertyGroup>
     <TargetFrameworks Condition="'$(Framework)' != 'netcoreapp2.1'">netstandard2.0;netcoreapp3.1;net5</TargetFrameworks>
     <TargetFramework Condition="'$(Framework)' == 'netcoreapp2.1'">netstandard2.0</TargetFramework>
@@ -7,17 +8,16 @@
     <RootNamespace>Dodo.HttpClientResiliencePolicies</RootNamespace>
     <Title>Dodo.HttpClient.ResiliencePolicies</Title>
   </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0"/>
     <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0"/>
-    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="5.0.0"/>
-    <PackageReference Include="Polly" Version="7.2.1"/>
-    <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1"/>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dodo.HttpClient.ResiliencePolicies.Core\Dodo.HttpClient.ResiliencePolicies.Core.csproj"/>
     <ProjectReference Include="..\Dodo.HttpClient.ResiliencePolicies.Polly\Dodo.HttpClient.ResiliencePolicies.Polly.csproj"/>
   </ItemGroup>
+  
   <ItemGroup>
     <None Include="..\..\images\dodopizza-logo.png">
       <PackagePath>\</PackagePath>
@@ -35,6 +35,7 @@
       <Link>README.md</Link>
     </None>
   </ItemGroup>
+  
   <PropertyGroup Label="nuspec">
     <PackageId>Dodo.HttpClient.ResiliencePolicies</PackageId>
     <AssemblyTitle>Dodo.HttpClient.ResiliencePolicies</AssemblyTitle>
