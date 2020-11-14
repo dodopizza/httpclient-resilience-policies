@@ -9,7 +9,7 @@ using NUnit.Framework;
 namespace Dodo.HttpClientResiliencePolicies.Tests
 {
 	[TestFixture]
-	public class HttpClientBuilderExtensionsClientsTests
+	public class HttpClientFactoryServiceCollectionExtensionsTests
 	{
 		[Test]
 		public void When_AddJsonClient_WithNullClientName_than_ConfiguresDefaultJsonClient()
@@ -102,7 +102,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 
 			// Assert
 			Assert.NotNull(client);
-			var overallTimeout = TimeSpan.FromMilliseconds(50000);
+			var overallTimeout = TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutOverallInMilliseconds);
 			Assert.AreEqual(overallTimeout.Add(TimeSpan.FromMilliseconds(1000)), client.Timeout);
 		}
 	}

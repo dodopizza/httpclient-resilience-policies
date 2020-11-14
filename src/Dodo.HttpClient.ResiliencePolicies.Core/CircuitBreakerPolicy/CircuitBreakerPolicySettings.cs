@@ -9,7 +9,7 @@ namespace Dodo.HttpClientResiliencePolicies.Core.CircuitBreakerPolicy
 		public TimeSpan DurationOfBreak { get; }
 		public TimeSpan SamplingDuration { get; }
 
-		public Action<PolicyResult, TimeSpan>  OnBreak { get; set; }
+		public Action<PolicyResult, TimeSpan> OnBreak { get; set; }
 		public Action OnReset { get; set; }
 		public Action OnHalfOpen { get; set; }
 
