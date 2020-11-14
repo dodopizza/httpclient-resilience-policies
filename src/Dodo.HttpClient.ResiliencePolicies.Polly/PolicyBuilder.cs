@@ -1,6 +1,6 @@
 ﻿using System;
-using Dodo.HttpClient.ResiliencePolicies.Polly.PoliciesBuilders;
 using Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy;
+using Dodo.HttpClientResiliencePolicies.Polly.PoliciesBuilders;
 using Dodo.HttpClientResiliencePolicies.RetryPolicy;
 using Dodo.HttpClientResiliencePolicies.TimeoutPolicy;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +11,7 @@ namespace Dodo.HttpClientResiliencePolicies.Polly
 	public sealed class PolicyBuilder : IPolicyBuilder
 	{
 		private readonly IHttpClientBuilder _httpClientBuilder;
-		private IPolicyFactory _policyFactory;
+		private readonly IPolicyFactory _policyFactory;
 
 		public PolicyBuilder(IHttpClientBuilder httpClientBuilder)
 		{

@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
+using Dodo.HttpClientResiliencePolicies.RetryPolicy;
 using Polly.Contrib.WaitAndRetry;
 
-namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
+namespace Dodo.HttpClientResiliencePolicies.Polly
 {
 	internal static class SleepDurationImplementation
 	{
@@ -43,5 +44,4 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 			return Backoff.DecorrelatedJitterBackoffV2(function.MedianFirstRetryDelay, function.RetryCount);
 		}
 	}
-
 }

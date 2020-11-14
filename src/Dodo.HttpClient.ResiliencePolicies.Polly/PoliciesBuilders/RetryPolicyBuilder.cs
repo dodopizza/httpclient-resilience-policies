@@ -9,9 +9,9 @@ using Polly.Retry;
 using Polly.Timeout;
 using PolicyResult = Dodo.HttpClientResiliencePolicies.Core.PolicyResult;
 
-namespace Dodo.HttpClient.ResiliencePolicies.Polly.PoliciesBuilders
+namespace Dodo.HttpClientResiliencePolicies.Polly.PoliciesBuilders
 {
-	internal sealed class RetryPolicyBuilder //: IPolicyBuilder
+	internal sealed class RetryPolicyBuilder
 	{
 		public AsyncRetryPolicy<HttpResponseMessage>Build(IRetryPolicySettings settings)
 		{

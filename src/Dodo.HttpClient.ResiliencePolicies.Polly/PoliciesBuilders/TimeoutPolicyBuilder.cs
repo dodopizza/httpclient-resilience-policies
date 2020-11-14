@@ -3,9 +3,9 @@ using Dodo.HttpClientResiliencePolicies.TimeoutPolicy;
 using Polly;
 using Polly.Timeout;
 
-namespace Dodo.HttpClient.ResiliencePolicies.Polly.PoliciesBuilders
+namespace Dodo.HttpClientResiliencePolicies.Polly.PoliciesBuilders
 {
-	public class TimeoutPolicyBuilder
+	internal sealed class TimeoutPolicyBuilder
 	{
 		public AsyncTimeoutPolicy<HttpResponseMessage> Build(ITimeoutPolicySettings settings)
 		{

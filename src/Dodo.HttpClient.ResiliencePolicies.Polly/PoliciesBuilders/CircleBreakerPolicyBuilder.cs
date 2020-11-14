@@ -9,11 +9,10 @@ using Polly.Registry;
 using Polly.Timeout;
 using PolicyResult = Dodo.HttpClientResiliencePolicies.Core.PolicyResult;
 
-namespace Dodo.HttpClient.ResiliencePolicies.Polly.PoliciesBuilders
+namespace Dodo.HttpClientResiliencePolicies.Polly.PoliciesBuilders
 {
-	public class CircleBreakerPolicyBuilder // : IPolicyBuilder<Func<HttpRequestMessage, IAsyncPolicy<HttpResponseMessage>>>
+	internal sealed class CircleBreakerPolicyBuilder
 	{
-
 		internal Func<HttpRequestMessage, IAsyncPolicy<HttpResponseMessage>> Build(ICircuitBreakerPolicySettings settings)
 		{
 			// This implementation takes into consideration situations
@@ -30,7 +29,7 @@ namespace Dodo.HttpClient.ResiliencePolicies.Polly.PoliciesBuilders
 			};
 		}
 
-		internal static AsyncCircuitBreakerPolicy<HttpResponseMessage> Build1(
+		private static AsyncCircuitBreakerPolicy<HttpResponseMessage> Build1(
 			ICircuitBreakerPolicySettings settings)
 		{
 			void OnBreakWrapper(DelegateResult<HttpResponseMessage> result, TimeSpan s)

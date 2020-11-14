@@ -7,9 +7,9 @@ using Polly;
 using Polly.Retry;
 using Polly.Timeout;
 
-namespace Dodo.HttpClient.ResiliencePolicies.Polly.PoliciesBuilders
+namespace Dodo.HttpClientResiliencePolicies.Polly.PoliciesBuilders
 {
-	public interface IPolicyFactory
+	internal interface IPolicyFactory
 	{
 		Func<HttpRequestMessage, IAsyncPolicy<HttpResponseMessage>>
 			Create(ICircuitBreakerPolicySettings settings);
