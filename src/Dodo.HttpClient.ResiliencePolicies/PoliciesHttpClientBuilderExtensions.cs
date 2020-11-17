@@ -41,8 +41,8 @@ namespace Dodo.HttpClientResiliencePolicies
 		{
 			return clientBuilder
 				.AddTimeoutPolicy(settings.OverallTimeoutPolicySettings)
-				.AddRetryPolicy(settings.RetrySettings)
-				.AddCircuitBreakerPolicy(settings.CircuitBreakerSettings)
+				.AddRetryPolicy(settings.RetryPolicySettings)
+				.AddCircuitBreakerPolicy(settings.CircuitBreakerPolicySettings)
 				.AddTimeoutPolicy(settings.TimeoutPerTryPolicySettings);
 		}
 

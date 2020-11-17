@@ -11,16 +11,28 @@ namespace Dodo.HttpClientResiliencePolicies
 
 		public ITimeoutPolicySettings TimeoutPerTryPolicySettings { get; set; }
 
-		public IRetryPolicySettings RetrySettings { get; set; }
+		public IRetryPolicySettings RetryPolicySettings { get; set; }
 
-		public ICircuitBreakerPolicySettings CircuitBreakerSettings { get; set; }
+		public ICircuitBreakerPolicySettings CircuitBreakerPolicySettings { get; set; }
 
 		public ResiliencePoliciesSettings()
 		{
 			OverallTimeoutPolicySettings = new OverallTimeoutPolicySettings();
 			TimeoutPerTryPolicySettings = new TimeoutPerTryPolicySettings();
-			RetrySettings = new RetryPolicySettings();
-			CircuitBreakerSettings = new CircuitBreakerPolicySettings();
+			RetryPolicySettings = new RetryPolicySettings();
+			CircuitBreakerPolicySettings = new CircuitBreakerPolicySettings();
+		}
+
+		public ResiliencePoliciesSettings(
+			TimeSpan overallTimeout,
+			TimeSpan timeoutPerTry,
+			IRetryPolicySettings retryPolicyPolicySettings,
+			ICircuitBreakerPolicySettings circuitBreakerPolicyPolicySettings)
+		{
+			OverallTimeoutPolicySettings = new OverallTimeoutPolicySettings(overallTimeout);
+			TimeoutPerTryPolicySettings = new TimeoutPerTryPolicySettings(timeoutPerTry);
+			RetryPolicySettings = retryPolicyPolicySettings;
+			CircuitBreakerPolicySettings = circuitBreakerPolicyPolicySettings;
 		}
 	}
 }
