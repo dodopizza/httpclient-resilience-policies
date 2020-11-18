@@ -33,13 +33,13 @@ namespace Dodo.HttpClientResiliencePolicies
 		public ITimeoutPolicySettings OverallTimeoutPolicySettings
 		{
 			get => _overallTimeoutPolicySettings;
-			set => _overallTimeoutPolicySettings = value ?? throw new NullReferenceException(
+			set => _overallTimeoutPolicySettings = value ?? throw new ArgumentNullException(
 				$"{nameof(OverallTimeoutPolicySettings)} cannot be set to null.");
 		}
 		public ITimeoutPolicySettings TimeoutPerTryPolicySettings
 		{
 			get => _timeoutPerTryPolicySettings;
-			set => _timeoutPerTryPolicySettings = value ?? throw new NullReferenceException(
+			set => _timeoutPerTryPolicySettings = value ?? throw new ArgumentNullException(
 				$"{nameof(TimeoutPerTryPolicySettings)} cannot be set to null.");
 		}
 
@@ -50,7 +50,7 @@ namespace Dodo.HttpClientResiliencePolicies
 			{
 				var onRetryHandler = OnRetry;
 
-				_retryPolicySettings = value ?? throw new NullReferenceException(
+				_retryPolicySettings = value ?? throw new ArgumentNullException(
 					$"{nameof(RetryPolicySettings)} cannot be set to null.");
 				_retryPolicySettings.OnRetry = onRetryHandler;
 			}
@@ -65,7 +65,7 @@ namespace Dodo.HttpClientResiliencePolicies
 				var onResetHandler = OnReset;
 				var onHalfOpenHandler = OnHalfOpen;
 
-				_circuitBreakerPolicySettings = value ?? throw new NullReferenceException(
+				_circuitBreakerPolicySettings = value ?? throw new ArgumentNullException(
 					$"{nameof(CircuitBreakerPolicySettings)} cannot be set to null.");
 				_circuitBreakerPolicySettings.OnBreak = onBreakHandler;
 				_circuitBreakerPolicySettings.OnReset = onResetHandler;
