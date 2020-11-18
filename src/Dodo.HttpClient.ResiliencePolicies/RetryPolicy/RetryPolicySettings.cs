@@ -28,7 +28,7 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 		Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> IRetryPolicySettings.OnRetryWrapper =>
 			(response, span, retryCount, context) =>
 			{
-				_onRetryHandler(response, span);
+				_onRetryHandler?.Invoke(response, span);
 				return Task.CompletedTask;
 			};
 
