@@ -11,8 +11,8 @@ namespace Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy
 		TimeSpan DurationOfBreak { get; }
 		TimeSpan SamplingDuration { get; }
 
-		Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnBreak { get; set; }
-		Action OnReset { get; set; }
-		Action OnHalfOpen { get; set; }
+		internal Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnBreak { get; set; }
+		internal Action OnReset { get; set; }
+		internal Action OnHalfOpen { get; set; }
 	}
 }

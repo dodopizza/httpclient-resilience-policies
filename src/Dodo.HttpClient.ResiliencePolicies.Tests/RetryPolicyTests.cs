@@ -54,14 +54,16 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		{
 			const int retryCount = 3;
 			var retryAttempts = new Dictionary<string, List<TimeSpan>>();
-			var retrySettings = RetryPolicySettings.Jitter(retryCount,
-				medianFirstRetryDelay: TimeSpan.FromMilliseconds(50));
-			retrySettings.
-				OnRetry = BuildOnRetryAction(retryAttempts);
+			var settings = new ResiliencePoliciesSettings
+			{
+				RetryPolicySettings =
+					RetryPolicySettings.Jitter(retryCount, medianFirstRetryDelay: TimeSpan.FromMilliseconds(50)),
+				OnRetry = BuildOnRetryAction(retryAttempts),
+			};
 
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
-				.WithRetrySettings(retrySettings)
+				.WithFullResiliencePolicySettings(settings)
 				.Please();
 
 			const int taskCount = 2;

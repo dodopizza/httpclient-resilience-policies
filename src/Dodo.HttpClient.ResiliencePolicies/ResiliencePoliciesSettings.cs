@@ -9,12 +9,13 @@ namespace Dodo.HttpClientResiliencePolicies
 {
 	public class ResiliencePoliciesSettings
 	{
+		private ITimeoutPolicySettings _overallTimeoutPolicySettings = new OverallTimeoutPolicySettings();
+		private ITimeoutPolicySettings _timeoutPerTryPolicySettings = new TimeoutPerTryPolicySettings();
+		private IRetryPolicySettings _retryPolicySettings = new RetryPolicySettings();
+		private ICircuitBreakerPolicySettings _circuitBreakerPolicySettings = new CircuitBreakerPolicySettings();
+
 		public ResiliencePoliciesSettings()
 		{
-			OverallTimeoutPolicySettings = new OverallTimeoutPolicySettings();
-			TimeoutPerTryPolicySettings = new TimeoutPerTryPolicySettings();
-			RetryPolicySettings = new RetryPolicySettings();
-			CircuitBreakerPolicySettings = new CircuitBreakerPolicySettings();
 		}
 
 		public ResiliencePoliciesSettings(
@@ -23,16 +24,54 @@ namespace Dodo.HttpClientResiliencePolicies
 			IRetryPolicySettings retryPolicyPolicySettings,
 			ICircuitBreakerPolicySettings circuitBreakerPolicyPolicySettings)
 		{
-			OverallTimeoutPolicySettings = new OverallTimeoutPolicySettings(overallTimeout);
-			TimeoutPerTryPolicySettings = new TimeoutPerTryPolicySettings(timeoutPerTry);
-			RetryPolicySettings = retryPolicyPolicySettings;
-			CircuitBreakerPolicySettings = circuitBreakerPolicyPolicySettings;
+			_overallTimeoutPolicySettings = new OverallTimeoutPolicySettings(overallTimeout);
+			_timeoutPerTryPolicySettings = new TimeoutPerTryPolicySettings(timeoutPerTry);
+			_retryPolicySettings = retryPolicyPolicySettings;
+			_circuitBreakerPolicySettings = circuitBreakerPolicyPolicySettings;
 		}
 
-		public ITimeoutPolicySettings OverallTimeoutPolicySettings { get; set; }
-		public ITimeoutPolicySettings TimeoutPerTryPolicySettings { get; set; }
-		public IRetryPolicySettings RetryPolicySettings { get; set; }
-		public ICircuitBreakerPolicySettings CircuitBreakerPolicySettings { get; set; }
+		public ITimeoutPolicySettings OverallTimeoutPolicySettings
+		{
+			get => _overallTimeoutPolicySettings;
+			set => _overallTimeoutPolicySettings = value ?? throw new NullReferenceException(
+				$"{nameof(OverallTimeoutPolicySettings)} cannot be set to null.");
+		}
+		public ITimeoutPolicySettings TimeoutPerTryPolicySettings
+		{
+			get => _timeoutPerTryPolicySettings;
+			set => _timeoutPerTryPolicySettings = value ?? throw new NullReferenceException(
+				$"{nameof(TimeoutPerTryPolicySettings)} cannot be set to null.");
+		}
+
+		public IRetryPolicySettings RetryPolicySettings
+		{
+			get => _retryPolicySettings;
+			set
+			{
+				var onRetryHandler = OnRetry;
+
+				_retryPolicySettings = value ?? throw new NullReferenceException(
+					$"{nameof(RetryPolicySettings)} cannot be set to null.");
+				_retryPolicySettings.OnRetry = onRetryHandler;
+			}
+		}
+
+		public ICircuitBreakerPolicySettings CircuitBreakerPolicySettings
+		{
+			get => _circuitBreakerPolicySettings;
+			set
+			{
+				var onBreakHandler = OnBreak;
+				var onResetHandler = OnReset;
+				var onHalfOpenHandler = OnHalfOpen;
+
+				_circuitBreakerPolicySettings = value ?? throw new NullReferenceException(
+					$"{nameof(CircuitBreakerPolicySettings)} cannot be set to null.");
+				_circuitBreakerPolicySettings.OnBreak = onBreakHandler;
+				_circuitBreakerPolicySettings.OnReset = onResetHandler;
+				_circuitBreakerPolicySettings.OnHalfOpen = onHalfOpenHandler;
+			}
+		}
 
 		public Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnRetry
 		{

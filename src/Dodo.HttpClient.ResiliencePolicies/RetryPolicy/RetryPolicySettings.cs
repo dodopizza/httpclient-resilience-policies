@@ -8,8 +8,9 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 {
 	public partial class RetryPolicySettings : IRetryPolicySettings
 	{
-		private readonly int _retryCount;
-		int IRetryPolicySettings.RetryCount => _retryCount;
+		private Action<DelegateResult<HttpResponseMessage>, TimeSpan> _onRetryHandler;
+
+		public int RetryCount { get; }
 
 		private readonly Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> _sleepDurationProvider;
 		Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> IRetryPolicySettings.SleepDurationProvider =>
@@ -19,14 +20,17 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 				return serverWaitDuration ?? _sleepDurationProvider(retryCount, response, context);
 			};
 
+		Action<DelegateResult<HttpResponseMessage>, TimeSpan> IRetryPolicySettings.OnRetry
+		{
+			get => _onRetryHandler;
+			set => _onRetryHandler = value;
+		}
 		Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> IRetryPolicySettings.OnRetryWrapper =>
 			(response, span, retryCount, context) =>
 			{
-				OnRetry(response, span);
+				_onRetryHandler(response, span);
 				return Task.CompletedTask;
 			};
-
-		public Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnRetry { get; set; }
 
 		public RetryPolicySettings()
 		{
@@ -34,8 +38,8 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 				Defaults.Retry.RetryCount,
 				TimeSpan.FromMilliseconds(Defaults.Retry.MedianFirstRetryDelayInMilliseconds));
 
-			OnRetry = DoNothingOnRetry;
-			_retryCount = Defaults.Retry.RetryCount;
+			_onRetryHandler = DoNothingOnRetry;
+			RetryCount = Defaults.Retry.RetryCount;
 		}
 
 		private RetryPolicySettings(
@@ -43,8 +47,8 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 			Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> sleepDurationProvider)
 		{
 			_sleepDurationProvider = sleepDurationProvider;
-			OnRetry = DoNothingOnRetry;
-			_retryCount = retryCount;
+			_onRetryHandler = DoNothingOnRetry;
+			RetryCount = retryCount;
 		}
 
 		private static readonly Action<DelegateResult<HttpResponseMessage>, TimeSpan> DoNothingOnRetry = (_, __) => { };

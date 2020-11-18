@@ -8,10 +8,10 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 {
 	public interface IRetryPolicySettings
 	{
-		Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnRetry { get; set; }
+		public int RetryCount { get; }
 
-		internal int RetryCount { get; }
 		internal Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> SleepDurationProvider { get; }
+		internal Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnRetry { get; set; }
 		internal Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> OnRetryWrapper { get; }
 	}
 }
