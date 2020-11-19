@@ -20,8 +20,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			const int minimumThroughput = 2;
 			var settings = new ResiliencePoliciesSettings
 			{
-				OverallTimeoutPolicySettings = new TimeoutPolicySettings(TimeSpan.FromSeconds(100)),
-				RetryPolicySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(500)),
+				OverallTimeoutPolicySettings = new TimeoutPolicySettings(TimeSpan.FromSeconds(5)),
+				RetryPolicySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(100)),
 				CircuitBreakerPolicySettings = BuildCircuitBreakerSettings(minimumThroughput),
 			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
@@ -33,7 +33,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			Assert.CatchAsync<BrokenCircuitException>(async () =>
 				await Helper.InvokeMultipleHttpRequests(wrapper.Client, taskCount));
 
-			Assert.AreEqual(minimumThroughput, wrapper.NumberOfCalls);
+			Assert.LessOrEqual(wrapper.NumberOfCalls, taskCount);
 		}
 
 		[Test]
