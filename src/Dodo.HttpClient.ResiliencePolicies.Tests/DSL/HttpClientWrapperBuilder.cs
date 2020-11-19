@@ -19,8 +19,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 			new Dictionary<string, HttpStatusCode>();
 
 		private ResiliencePoliciesSettings _fullResiliencePoliciesSettings;
-		private IRetryPolicySettings _retryPolicySettings;
-		private ICircuitBreakerPolicySettings _circuitBreakerPolicySettings;
+		private RetryPolicySettings _retryPolicySettings;
+		private CircuitBreakerPolicySettings _circuitBreakerPolicySettings;
 		private TimeSpan _timeoutPerTry = TimeSpan.FromDays(1);
 		private TimeSpan _timeoutOverall = TimeSpan.FromDays(1);
 		private TimeSpan _responseLatency = TimeSpan.Zero;
@@ -51,13 +51,13 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 			return this;
 		}
 
-		public HttpClientWrapperBuilder WithRetrySettings(IRetryPolicySettings retrySettings)
+		public HttpClientWrapperBuilder WithRetrySettings(RetryPolicySettings retrySettings)
 		{
 			_retryPolicySettings = retrySettings;
 			return this;
 		}
 
-		public HttpClientWrapperBuilder WithCircuitBreakerSettings(ICircuitBreakerPolicySettings circuitBreakerSettings)
+		public HttpClientWrapperBuilder WithCircuitBreakerSettings(CircuitBreakerPolicySettings circuitBreakerSettings)
 		{
 			_circuitBreakerPolicySettings = circuitBreakerSettings;
 			return this;
@@ -126,8 +126,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 
 			return new ResiliencePoliciesSettings
 			{
-				OverallTimeoutPolicySettings = new OverallTimeoutPolicySettings(_timeoutOverall),
-				TimeoutPerTryPolicySettings = new TimeoutPerTryPolicySettings(_timeoutPerTry),
+				OverallTimeoutPolicySettings = new TimeoutPolicySettings(_timeoutOverall),
+				TimeoutPerTryPolicySettings = new TimeoutPolicySettings(_timeoutPerTry),
 				RetryPolicySettings = _retryPolicySettings ?? new RetryPolicySettings(),
 				CircuitBreakerPolicySettings = defaultCircuitBreakerSettings
 			};

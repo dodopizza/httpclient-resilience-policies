@@ -4,7 +4,7 @@ using Polly;
 
 namespace Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy
 {
-	public class CircuitBreakerPolicySettings : ICircuitBreakerPolicySettings
+	public class CircuitBreakerPolicySettings
 	{
 		private Action<DelegateResult<HttpResponseMessage>, TimeSpan> _onBreakHandler;
 		private Action _onResetHandler;
@@ -15,19 +15,19 @@ namespace Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy
 		public TimeSpan DurationOfBreak { get; }
 		public TimeSpan SamplingDuration { get; }
 
-		Action<DelegateResult<HttpResponseMessage>, TimeSpan> ICircuitBreakerPolicySettings.OnBreak
+		internal Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnBreak
 		{
 			get => _onBreakHandler;
 			set => _onBreakHandler = value;
 		}
 
-		Action ICircuitBreakerPolicySettings.OnReset
+		internal Action OnReset
 		{
 			get => _onResetHandler;
 			set => _onResetHandler = value;
 		}
 
-		Action ICircuitBreakerPolicySettings.OnHalfOpen
+		internal Action OnHalfOpen
 		{
 			get => _onHalfOpenHandler;
 			set => _onHalfOpenHandler = value;

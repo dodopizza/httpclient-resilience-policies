@@ -48,7 +48,7 @@ namespace Dodo.HttpClientResiliencePolicies
 
 		private static IHttpClientBuilder AddRetryPolicy(
 			this IHttpClientBuilder clientBuilder,
-			IRetryPolicySettings settings)
+			RetryPolicySettings settings)
 		{
 			return clientBuilder
 				.AddPolicyHandler(HttpPolicyExtensions
@@ -56,13 +56,13 @@ namespace Dodo.HttpClientResiliencePolicies
 					.Or<TimeoutRejectedException>()
 					.WaitAndRetryAsync(
 						settings.RetryCount,
-						settings.SleepDurationProvider,
+						settings.SleepDurationProviderWrapper,
 						settings.OnRetryWrapper));
 		}
 
 		private static IHttpClientBuilder AddCircuitBreakerPolicy(
 			this IHttpClientBuilder clientBuilder,
-			ICircuitBreakerPolicySettings settings)
+			CircuitBreakerPolicySettings settings)
 		{
 			// This implementation takes into consideration situations
 			// when you use the only HttpClient against different hosts.
@@ -79,7 +79,7 @@ namespace Dodo.HttpClientResiliencePolicies
 		}
 
 		private static AsyncCircuitBreakerPolicy<HttpResponseMessage> BuildCircuitBreakerPolicy(
-			ICircuitBreakerPolicySettings settings)
+			CircuitBreakerPolicySettings settings)
 		{
 			return HttpPolicyExtensions
 				.HandleTransientHttpError()
@@ -97,7 +97,7 @@ namespace Dodo.HttpClientResiliencePolicies
 
 		private static IHttpClientBuilder AddTimeoutPolicy(
 			this IHttpClientBuilder httpClientBuilder,
-			ITimeoutPolicySettings settings)
+			TimeoutPolicySettings settings)
 		{
 			return httpClientBuilder.AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(settings.Timeout));
 		}

@@ -60,7 +60,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			Assert.AreEqual(minimumThroughput + taskCount, wrapper.NumberOfCalls);
 		}
 
-		private static ICircuitBreakerPolicySettings BuildCircuitBreakerSettings(int throughput)
+		private static CircuitBreakerPolicySettings BuildCircuitBreakerSettings(int throughput)
 		{
 			return new CircuitBreakerPolicySettings(
 				failureThreshold: 0.5,

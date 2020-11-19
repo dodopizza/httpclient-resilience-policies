@@ -2,16 +2,16 @@ using System;
 
 namespace Dodo.HttpClientResiliencePolicies.TimeoutPolicy
 {
-	public sealed class OverallTimeoutPolicySettings : ITimeoutPolicySettings
+	public class TimeoutPolicySettings
 	{
 		public TimeSpan Timeout { get; }
 
-		public OverallTimeoutPolicySettings()
+		public TimeoutPolicySettings()
 		{
 			Timeout = TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutOverallInMilliseconds);
 		}
 
-		public OverallTimeoutPolicySettings(TimeSpan timeout)
+		public TimeoutPolicySettings(TimeSpan timeout)
 		{
 			Timeout = timeout;
 		}

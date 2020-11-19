@@ -9,10 +9,10 @@ namespace Dodo.HttpClientResiliencePolicies
 {
 	public class ResiliencePoliciesSettings
 	{
-		private ITimeoutPolicySettings _overallTimeoutPolicySettings = new OverallTimeoutPolicySettings();
-		private ITimeoutPolicySettings _timeoutPerTryPolicySettings = new TimeoutPerTryPolicySettings();
-		private IRetryPolicySettings _retryPolicySettings = new RetryPolicySettings();
-		private ICircuitBreakerPolicySettings _circuitBreakerPolicySettings = new CircuitBreakerPolicySettings();
+		private TimeoutPolicySettings _overallTimeoutPolicySettings = new TimeoutPolicySettings();
+		private TimeoutPolicySettings _timeoutPerTryPolicySettings = new TimeoutPolicySettings();
+		private RetryPolicySettings _retryPolicySettings = new RetryPolicySettings();
+		private CircuitBreakerPolicySettings _circuitBreakerPolicySettings = new CircuitBreakerPolicySettings();
 
 		public ResiliencePoliciesSettings()
 		{
@@ -21,29 +21,29 @@ namespace Dodo.HttpClientResiliencePolicies
 		public ResiliencePoliciesSettings(
 			TimeSpan overallTimeout,
 			TimeSpan timeoutPerTry,
-			IRetryPolicySettings retryPolicyPolicySettings,
-			ICircuitBreakerPolicySettings circuitBreakerPolicyPolicySettings)
+			RetryPolicySettings retryPolicyPolicySettings,
+			CircuitBreakerPolicySettings circuitBreakerPolicyPolicySettings)
 		{
-			_overallTimeoutPolicySettings = new OverallTimeoutPolicySettings(overallTimeout);
-			_timeoutPerTryPolicySettings = new TimeoutPerTryPolicySettings(timeoutPerTry);
+			_overallTimeoutPolicySettings = new TimeoutPolicySettings(overallTimeout);
+			_timeoutPerTryPolicySettings = new TimeoutPolicySettings(timeoutPerTry);
 			_retryPolicySettings = retryPolicyPolicySettings;
 			_circuitBreakerPolicySettings = circuitBreakerPolicyPolicySettings;
 		}
 
-		public ITimeoutPolicySettings OverallTimeoutPolicySettings
+		public TimeoutPolicySettings OverallTimeoutPolicySettings
 		{
 			get => _overallTimeoutPolicySettings;
 			set => _overallTimeoutPolicySettings = value ?? throw new ArgumentNullException(
 				$"{nameof(OverallTimeoutPolicySettings)} cannot be set to null.");
 		}
-		public ITimeoutPolicySettings TimeoutPerTryPolicySettings
+		public TimeoutPolicySettings TimeoutPerTryPolicySettings
 		{
 			get => _timeoutPerTryPolicySettings;
 			set => _timeoutPerTryPolicySettings = value ?? throw new ArgumentNullException(
 				$"{nameof(TimeoutPerTryPolicySettings)} cannot be set to null.");
 		}
 
-		public IRetryPolicySettings RetryPolicySettings
+		public RetryPolicySettings RetryPolicySettings
 		{
 			get => _retryPolicySettings;
 			set
@@ -56,7 +56,7 @@ namespace Dodo.HttpClientResiliencePolicies
 			}
 		}
 
-		public ICircuitBreakerPolicySettings CircuitBreakerPolicySettings
+		public CircuitBreakerPolicySettings CircuitBreakerPolicySettings
 		{
 			get => _circuitBreakerPolicySettings;
 			set

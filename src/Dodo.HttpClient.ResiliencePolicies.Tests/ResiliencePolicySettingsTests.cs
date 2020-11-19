@@ -71,7 +71,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			Assert.IsTrue(onBreakFired);
 		}
 
-		private static ICircuitBreakerPolicySettings BuildCircuitBreakerSettings()
+		private static CircuitBreakerPolicySettings BuildCircuitBreakerSettings()
 		{
 			return new CircuitBreakerPolicySettings(
 				failureThreshold: 0.5,

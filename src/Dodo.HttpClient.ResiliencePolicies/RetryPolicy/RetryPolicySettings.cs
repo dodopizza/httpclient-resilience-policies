@@ -6,26 +6,26 @@ using Polly;
 
 namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 {
-	public partial class RetryPolicySettings : IRetryPolicySettings
+	public partial class RetryPolicySettings
 	{
 		private Action<DelegateResult<HttpResponseMessage>, TimeSpan> _onRetryHandler;
 
 		public int RetryCount { get; }
 
 		private readonly Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> _sleepDurationProvider;
-		Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> IRetryPolicySettings.SleepDurationProvider =>
+		internal Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> SleepDurationProviderWrapper =>
 			(retryCount, response, context) =>
 			{
 				var serverWaitDuration = GetServerWaitDuration(response);
 				return serverWaitDuration ?? _sleepDurationProvider(retryCount, response, context);
 			};
 
-		Action<DelegateResult<HttpResponseMessage>, TimeSpan> IRetryPolicySettings.OnRetry
+		internal Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnRetry
 		{
 			get => _onRetryHandler;
 			set => _onRetryHandler = value;
 		}
-		Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> IRetryPolicySettings.OnRetryWrapper =>
+		internal  Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> OnRetryWrapper =>
 			(response, span, retryCount, context) =>
 			{
 				_onRetryHandler?.Invoke(response, span);

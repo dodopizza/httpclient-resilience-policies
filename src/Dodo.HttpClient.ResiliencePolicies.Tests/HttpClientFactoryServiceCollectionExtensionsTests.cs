@@ -67,7 +67,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 				new Uri("http://example.com/"),
 				new ResiliencePoliciesSettings
 				{
-					OverallTimeoutPolicySettings = new OverallTimeoutPolicySettings(overallTimeout),
+					OverallTimeoutPolicySettings = new TimeoutPolicySettings(overallTimeout),
 				});
 
 			var services = serviceCollection.BuildServiceProvider();
