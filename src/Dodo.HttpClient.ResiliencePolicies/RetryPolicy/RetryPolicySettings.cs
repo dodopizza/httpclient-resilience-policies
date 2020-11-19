@@ -7,8 +7,6 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 {
 	public partial class RetryPolicySettings
 	{
-		private Action<DelegateResult<HttpResponseMessage>, TimeSpan> _onRetryHandler;
-
 		public int RetryCount { get; }
 
 		private readonly Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> _sleepDurationProvider;
@@ -19,15 +17,11 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 				return serverWaitDuration ?? _sleepDurationProvider(retryCount, response, context);
 			};
 
-		internal Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnRetry
-		{
-			get => _onRetryHandler;
-			set => _onRetryHandler = value;
-		}
+		internal Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnRetry { get; set; }
 		internal  Func<DelegateResult<HttpResponseMessage>, TimeSpan, int, Context, Task> OnRetryWrapper =>
 			(response, span, retryCount, context) =>
 			{
-				_onRetryHandler?.Invoke(response, span);
+				OnRetry?.Invoke(response, span);
 				return Task.CompletedTask;
 			};
 
@@ -37,7 +31,7 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 				Defaults.Retry.RetryCount,
 				TimeSpan.FromMilliseconds(Defaults.Retry.MedianFirstRetryDelayInMilliseconds));
 
-			_onRetryHandler = DoNothingOnRetry;
+			OnRetry = DoNothingOnRetry;
 			RetryCount = Defaults.Retry.RetryCount;
 		}
 
@@ -46,7 +40,7 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 			Func<int, DelegateResult<HttpResponseMessage>, Context, TimeSpan> sleepDurationProvider)
 		{
 			_sleepDurationProvider = sleepDurationProvider;
-			_onRetryHandler = DoNothingOnRetry;
+			OnRetry = DoNothingOnRetry;
 			RetryCount = retryCount;
 		}
 

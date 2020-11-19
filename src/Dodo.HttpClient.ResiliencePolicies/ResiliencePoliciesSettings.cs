@@ -75,46 +75,26 @@ namespace Dodo.HttpClientResiliencePolicies
 
 		public Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnRetry
 		{
-			get => RetryPolicySettings?.OnRetry;
-			set
-			{
-				if (RetryPolicySettings == null) throw new NullReferenceException(
-					$"{nameof(RetryPolicySettings)} should be initialized first.");
-				RetryPolicySettings.OnRetry = value;
-			}
+			get => RetryPolicySettings.OnRetry;
+			set => RetryPolicySettings.OnRetry = value;
 		}
 
 		public Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnBreak
 		{
-			get => CircuitBreakerPolicySettings?.OnBreak;
-			set
-			{
-				if (CircuitBreakerPolicySettings == null) throw new NullReferenceException(
-					$"{nameof(CircuitBreakerPolicySettings)} should be initialized first.");
-				CircuitBreakerPolicySettings.OnBreak = value;
-			}
+			get => CircuitBreakerPolicySettings.OnBreak;
+			set => CircuitBreakerPolicySettings.OnBreak = value;
 		}
 
 		public Action OnReset
 		{
-			get => CircuitBreakerPolicySettings?.OnReset;
-			set
-			{
-				if (CircuitBreakerPolicySettings == null) throw new NullReferenceException(
-					$"{nameof(CircuitBreakerPolicySettings)} should be initialized first.");
-				CircuitBreakerPolicySettings.OnReset = value;
-			}
+			get => CircuitBreakerPolicySettings.OnReset;
+			set => CircuitBreakerPolicySettings.OnReset = value;
 		}
 
 		public Action OnHalfOpen
 		{
-			get => CircuitBreakerPolicySettings?.OnHalfOpen;
-			set
-			{
-				if (CircuitBreakerPolicySettings == null) throw new NullReferenceException(
-					$"{nameof(CircuitBreakerPolicySettings)} should be initialized first.");
-				CircuitBreakerPolicySettings.OnHalfOpen = value;
-			}
+			get => CircuitBreakerPolicySettings.OnHalfOpen;
+			set => CircuitBreakerPolicySettings.OnHalfOpen = value;
 		}
 	}
 }
