@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Dodo.HttpClientResiliencePolicies.RetryPolicy;
 using Dodo.HttpClientResiliencePolicies.Tests.DSL;
+using Dodo.HttpClientResiliencePolicies.TimeoutPolicy;
 using NUnit.Framework;
 using Polly;
 using Polly.Timeout;
@@ -19,11 +20,13 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		public async Task Should_retry_3_times_when_client_returns_503()
 		{
 			const int retryCount = 3;
-			var retrySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(1));
-
+			var settings = new ResiliencePoliciesSettings
+			{
+				RetryPolicySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(1)),
+			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
-				.WithRetrySettings(retrySettings)
+				.WithResiliencePolicySettings(settings)
 				.Please();
 
 			var result = await wrapper.Client.GetAsync("http://localhost");
@@ -36,11 +39,13 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		public async Task Should_retry_6_times_for_two_threads_when_client_returns_503()
 		{
 			const int retryCount = 3;
-			var retrySettings = RetryPolicySettings.Jitter(retryCount,
-					medianFirstRetryDelay: TimeSpan.FromMilliseconds(50));
+			var settings = new ResiliencePoliciesSettings
+			{
+				RetryPolicySettings = RetryPolicySettings.Jitter(retryCount, TimeSpan.FromMilliseconds(50)),
+			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
-				.WithRetrySettings(retrySettings)
+				.WithResiliencePolicySettings(settings)
 				.Please();
 
 			const int taskCount = 2;
@@ -56,14 +61,13 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			var retryAttempts = new Dictionary<string, List<TimeSpan>>();
 			var settings = new ResiliencePoliciesSettings
 			{
-				RetryPolicySettings =
-					RetryPolicySettings.Jitter(retryCount, medianFirstRetryDelay: TimeSpan.FromMilliseconds(50)),
+				RetryPolicySettings = RetryPolicySettings.Jitter(retryCount, TimeSpan.FromMilliseconds(50)),
 				OnRetry = BuildOnRetryAction(retryAttempts),
 			};
 
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
-				.WithFullResiliencePolicySettings(settings)
+				.WithResiliencePolicySettings(settings)
 				.Please();
 
 			const int taskCount = 2;
@@ -76,11 +80,13 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		public async Task Should_retry_when_client_returns_500()
 		{
 			const int retryCount = 3;
-			var retrySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(1));
-
+			var settings = new ResiliencePoliciesSettings
+			{
+				RetryPolicySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(1)),
+			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.InternalServerError)
-				.WithRetrySettings(retrySettings)
+				.WithResiliencePolicySettings(settings)
 				.Please();
 
 			await wrapper.Client.GetAsync("http://localhost");
@@ -88,7 +94,47 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			Assert.AreEqual(retryCount + 1, wrapper.NumberOfCalls);
 		}
 
-		private Action<DelegateResult<HttpResponseMessage>, TimeSpan> BuildOnRetryAction(
+		[Test]
+		public async Task Should_retry_sleep_longer_when_RetryAfterDecorator_is_on()
+		{
+			const int retryCount = 3;
+			var settings = new ResiliencePoliciesSettings
+			{
+				RetryPolicySettings = RetryPolicySettings.Constant(retryCount),
+			};
+			var wrapper = Create.HttpClientWrapperWrapperBuilder
+				.WithRetryAfterHeader(TimeSpan.FromSeconds(1))
+				.WithStatusCode(HttpStatusCode.InternalServerError)
+				.WithResiliencePolicySettings(settings)
+				.Please();
+
+			var stopWatch = System.Diagnostics.Stopwatch.StartNew();
+			await wrapper.Client.GetAsync("http://localhost");
+			stopWatch.Stop();
+
+			Assert.That(3.0d, Is.GreaterThanOrEqualTo(stopWatch.Elapsed.TotalSeconds).Within(0.1));
+		}
+
+		[Test]
+		public void Should_catchTimeout_because_of_overall_less_then_sleepDuration_of_RetryAfterDecorator()
+		{
+			const int retryCount = 3;
+			var settings = new ResiliencePoliciesSettings
+			{
+				OverallTimeoutPolicySettings = new TimeoutPolicySettings(TimeSpan.FromSeconds(2)),
+				RetryPolicySettings = RetryPolicySettings.Constant(retryCount),
+			};
+			var wrapper = Create.HttpClientWrapperWrapperBuilder
+				.WithRetryAfterHeader(TimeSpan.FromSeconds(1))
+				.WithStatusCode(HttpStatusCode.InternalServerError)
+				.WithResiliencePolicySettings(settings)
+				.Please();
+
+			Assert.CatchAsync<TimeoutRejectedException>(async () =>
+				await wrapper.Client.GetAsync("http://localhost"));
+		}
+
+		private static Action<DelegateResult<HttpResponseMessage>, TimeSpan> BuildOnRetryAction(
 			IDictionary<string, List<TimeSpan>> retryAttempts)
 		{
 			return (result, span) =>
@@ -103,42 +149,6 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 					retryAttempts[taskId] = new List<TimeSpan> { span };
 				}
 			};
-		}
-
-		[Test]
-		public async Task Should_retry_sleep_longer_when_RetryAfterDecorator_is_on()
-		{
-			const int retryCount = 3;
-			var retrySettings = RetryPolicySettings.Constant(retryCount);
-
-			var wrapper = Create.HttpClientWrapperWrapperBuilder
-				.WithRetryAfterHeader(TimeSpan.FromSeconds(1))
-				.WithStatusCode(HttpStatusCode.InternalServerError)
-				.WithRetrySettings(retrySettings)
-				.Please();
-
-			var stopWatch = System.Diagnostics.Stopwatch.StartNew();
-			await wrapper.Client.GetAsync("http://localhost");
-			stopWatch.Stop();
-
-			Assert.That(3.0d, Is.GreaterThanOrEqualTo(stopWatch.Elapsed.TotalSeconds).Within(0.1));
-		}
-
-		[Test]
-		public void Should_catchTimeout_because_of_overall_less_then_sleepDuration_of_RetryAfterDecorator()
-		{
-			const int retryCount = 3;
-			var retrySettings = RetryPolicySettings.Constant(retryCount);
-
-			var wrapper = Create.HttpClientWrapperWrapperBuilder
-				.WithRetryAfterHeader(TimeSpan.FromSeconds(1))
-				.WithStatusCode(HttpStatusCode.InternalServerError)
-				.WithRetrySettings(retrySettings)
-				.WithTimeoutOverall(TimeSpan.FromSeconds(2))
-				.Please();
-
-			Assert.CatchAsync<TimeoutRejectedException>(async () =>
-				await wrapper.Client.GetAsync("http://localhost"));
 		}
 	}
 }

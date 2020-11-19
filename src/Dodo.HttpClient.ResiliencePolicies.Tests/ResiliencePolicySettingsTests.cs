@@ -23,7 +23,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
-				.WithFullResiliencePolicySettings(settings)
+				.WithResiliencePolicySettings(settings)
 				.Please();
 
 			await wrapper.Client.GetAsync("http://localhost");
@@ -42,7 +42,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
-				.WithFullResiliencePolicySettings(settings)
+				.WithResiliencePolicySettings(settings)
 				.Please();
 
 			await wrapper.Client.GetAsync("http://localhost");
@@ -61,7 +61,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
-				.WithFullResiliencePolicySettings(settings)
+				.WithResiliencePolicySettings(settings)
 				.Please();
 
 			const int taskCount = 4;

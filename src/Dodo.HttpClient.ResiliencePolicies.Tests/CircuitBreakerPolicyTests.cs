@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy;
 using Dodo.HttpClientResiliencePolicies.RetryPolicy;
 using Dodo.HttpClientResiliencePolicies.Tests.DSL;
+using Dodo.HttpClientResiliencePolicies.TimeoutPolicy;
 using NUnit.Framework;
 using Polly.CircuitBreaker;
 
@@ -17,13 +18,15 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		{
 			const int retryCount = 5;
 			const int minimumThroughput = 2;
-			var retrySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(50));
-
+			var settings = new ResiliencePoliciesSettings
+			{
+				OverallTimeoutPolicySettings = new TimeoutPolicySettings(TimeSpan.FromSeconds(5)),
+				RetryPolicySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(50)),
+				CircuitBreakerPolicySettings = BuildCircuitBreakerSettings(minimumThroughput),
+			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
-				.WithTimeoutOverall(TimeSpan.FromSeconds(5))
-				.WithCircuitBreakerSettings(BuildCircuitBreakerSettings(minimumThroughput))
-				.WithRetrySettings(retrySettings)
+				.WithResiliencePolicySettings(settings)
 				.Please();
 
 			const int taskCount = 4;
@@ -38,15 +41,16 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		{
 			const int retryCount = 5;
 			const int minimumThroughput = 2;
-			var retrySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(50));
-
-			var circuitBreakerSettings = BuildCircuitBreakerSettings(minimumThroughput);
+			var settings = new ResiliencePoliciesSettings
+			{
+				OverallTimeoutPolicySettings = new TimeoutPolicySettings(TimeSpan.FromSeconds(5)),
+				RetryPolicySettings =RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(50)),
+				CircuitBreakerPolicySettings = BuildCircuitBreakerSettings(minimumThroughput),
+			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithHostAndStatusCode("ru-prod.com", HttpStatusCode.ServiceUnavailable)
 				.WithHostAndStatusCode("ee-prod.com", HttpStatusCode.OK)
-				.WithTimeoutOverall(TimeSpan.FromSeconds(5))
-				.WithCircuitBreakerSettings(circuitBreakerSettings)
-				.WithRetrySettings(retrySettings)
+				.WithResiliencePolicySettings(settings)
 				.Please();
 
 			const int taskCount = 4;
