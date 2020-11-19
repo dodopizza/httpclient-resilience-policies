@@ -17,11 +17,11 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		public void Should_break_after_4_concurrent_calls()
 		{
 			const int retryCount = 5;
-			const int minimumThroughput = 2;
+			const int minimumThroughput = 4;
 			var settings = new ResiliencePoliciesSettings
 			{
 				OverallTimeoutPolicySettings = new TimeoutPolicySettings(TimeSpan.FromSeconds(5)),
-				RetryPolicySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(50)),
+				RetryPolicySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(100)),
 				CircuitBreakerPolicySettings = BuildCircuitBreakerSettings(minimumThroughput),
 			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder

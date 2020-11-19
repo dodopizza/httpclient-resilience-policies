@@ -38,18 +38,17 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			const int retryCount = 5;
 			var settings = new ResiliencePoliciesSettings
 			{
-				OverallTimeoutPolicySettings = new TimeoutPolicySettings(TimeSpan.FromMilliseconds(100)),
+				OverallTimeoutPolicySettings = new TimeoutPolicySettings(TimeSpan.FromMilliseconds(200)),
 				RetryPolicySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(1)),
 			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
-				.WithResponseLatency(TimeSpan.FromMilliseconds(50))
+				.WithResponseLatency(TimeSpan.FromMilliseconds(100))
 				.WithResiliencePolicySettings(settings)
 				.Please();
 
 			Assert.CatchAsync<TimeoutRejectedException>(async () =>
 				await wrapper.Client.GetAsync("http://localhost"));
-
 			Assert.AreEqual(2, wrapper.NumberOfCalls);
 		}
 
