@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -108,7 +109,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 				.WithResiliencePolicySettings(settings)
 				.Please();
 
-			var stopWatch = System.Diagnostics.Stopwatch.StartNew();
+			var stopWatch = Stopwatch.StartNew();
 			await wrapper.Client.GetAsync("http://localhost");
 			stopWatch.Stop();
 

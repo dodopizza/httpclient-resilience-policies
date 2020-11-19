@@ -1,11 +1,8 @@
-using System;
 using System.Net;
 using System.Threading.Tasks;
-using Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy;
 using Dodo.HttpClientResiliencePolicies.RetryPolicy;
 using Dodo.HttpClientResiliencePolicies.Tests.DSL;
 using NUnit.Framework;
-using Polly.CircuitBreaker;
 
 namespace Dodo.HttpClientResiliencePolicies.Tests
 {
@@ -48,37 +45,6 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			await wrapper.Client.GetAsync("http://localhost");
 
 			Assert.AreEqual(Defaults.Retry.RetryCount, retryCounter);
-		}
-
-		[Test]
-		public void Should_catch_CircuitBreaker_OnBreak_handler_passed_through_ResiliencePolicySettings()
-		{
-			var onBreakFired = false;
-			var settings = new ResiliencePoliciesSettings
-			{
-				CircuitBreakerPolicySettings = BuildCircuitBreakerSettings(),
-				OnBreak = (_, __) => { onBreakFired = true; },
-			};
-			var wrapper = Create.HttpClientWrapperWrapperBuilder
-				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
-				.WithResiliencePolicySettings(settings)
-				.Please();
-
-			const int taskCount = 4;
-			Assert.CatchAsync<BrokenCircuitException>(async () =>
-				await Helper.InvokeMultipleHttpRequests(wrapper.Client, taskCount));
-
-			Assert.IsTrue(onBreakFired);
-		}
-
-		private static CircuitBreakerPolicySettings BuildCircuitBreakerSettings()
-		{
-			return new CircuitBreakerPolicySettings(
-				failureThreshold: 0.5,
-				minimumThroughput: 2,
-				durationOfBreak: TimeSpan.FromMinutes(1),
-				samplingDuration: TimeSpan.FromMilliseconds(20)
-			);
 		}
 	}
 }

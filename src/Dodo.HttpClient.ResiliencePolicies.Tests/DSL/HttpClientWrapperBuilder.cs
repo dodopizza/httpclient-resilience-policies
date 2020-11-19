@@ -2,10 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy;
-using Dodo.HttpClientResiliencePolicies.RetryPolicy;
 using Dodo.HttpClientResiliencePolicies.Tests.Fakes;
-using Dodo.HttpClientResiliencePolicies.TimeoutPolicy;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
