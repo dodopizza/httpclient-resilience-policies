@@ -6,32 +6,14 @@ namespace Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy
 {
 	public sealed class CircuitBreakerPolicySettings
 	{
-		private Action<DelegateResult<HttpResponseMessage>, TimeSpan> _onBreakHandler;
-		private Action _onResetHandler;
-		private Action _onHalfOpenHandler;
-
 		public double FailureThreshold { get; }
 		public int MinimumThroughput { get; }
 		public TimeSpan DurationOfBreak { get; }
 		public TimeSpan SamplingDuration { get; }
 
-		internal Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnBreak
-		{
-			get => _onBreakHandler;
-			set => _onBreakHandler = value;
-		}
-
-		internal Action OnReset
-		{
-			get => _onResetHandler;
-			set => _onResetHandler = value;
-		}
-
-		internal Action OnHalfOpen
-		{
-			get => _onHalfOpenHandler;
-			set => _onHalfOpenHandler = value;
-		}
+		internal Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnBreak { get; set; }
+		internal Action OnReset { get; set; }
+		internal Action OnHalfOpen { get; set; }
 
 		public CircuitBreakerPolicySettings()
 			: this(
@@ -53,9 +35,9 @@ namespace Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy
 			DurationOfBreak = durationOfBreak;
 			SamplingDuration = samplingDuration;
 
-			_onBreakHandler = DoNothingOnBreak;
-			_onResetHandler = DoNothingOnReset;
-			_onHalfOpenHandler = DoNothingOnHalfOpen;
+			OnBreak = DoNothingOnBreak;
+			OnReset = DoNothingOnReset;
+			OnHalfOpen = DoNothingOnHalfOpen;
 		}
 
 		private static readonly Action<DelegateResult<HttpResponseMessage>, TimeSpan> DoNothingOnBreak = (_, __) => { };
