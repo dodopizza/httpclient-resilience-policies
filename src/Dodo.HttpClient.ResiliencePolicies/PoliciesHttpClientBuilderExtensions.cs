@@ -5,7 +5,6 @@ using Dodo.HttpClientResiliencePolicies.RetryPolicy;
 using Dodo.HttpClientResiliencePolicies.TimeoutPolicy;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
-using Polly.CircuitBreaker;
 using Polly.Extensions.Http;
 using Polly.Registry;
 using Polly.Timeout;
@@ -48,16 +47,13 @@ namespace Dodo.HttpClientResiliencePolicies
 
 		private static IHttpClientBuilder AddRetryPolicy(
 			this IHttpClientBuilder clientBuilder,
-			IRetryPolicySettings settings)
+			IRetryPolicySettings retryPolicySettings)
 		{
 			return clientBuilder
 				.AddPolicyHandler(HttpPolicyExtensions
 					.HandleTransientHttpError()
 					.Or<TimeoutRejectedException>()
-					.WaitAndRetryAsync(
-						settings.RetryCount,
-						settings.SleepDurationProvider,
-						settings.OnRetryWrapper));
+					.WaitAndRetryAsync(retryPolicySettings));
 		}
 
 		private static IHttpClientBuilder AddCircuitBreakerPolicy(
@@ -78,21 +74,14 @@ namespace Dodo.HttpClientResiliencePolicies
 			});
 		}
 
-		private static AsyncCircuitBreakerPolicy<HttpResponseMessage> BuildCircuitBreakerPolicy(
+		private static IAsyncPolicy<HttpResponseMessage> BuildCircuitBreakerPolicy(
 			ICircuitBreakerPolicySettings settings)
 		{
 			return HttpPolicyExtensions
 				.HandleTransientHttpError()
 				.Or<TimeoutRejectedException>()
 				.OrResult(r => r.StatusCode == (HttpStatusCode) 429) // Too Many Requests
-				.AdvancedCircuitBreakerAsync(
-					settings.FailureThreshold,
-					settings.SamplingDuration,
-					settings.MinimumThroughput,
-					settings.DurationOfBreak,
-					settings.OnBreak,
-					settings.OnReset,
-					settings.OnHalfOpen);
+				.AdvancedCircuitBreakerAsync(settings);
 		}
 
 		private static IHttpClientBuilder AddTimeoutPolicy(
