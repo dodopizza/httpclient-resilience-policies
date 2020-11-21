@@ -5,7 +5,7 @@ using Polly;
 
 namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 {
-	public partial class RetryPolicySettings
+	public sealed partial class RetryPolicySettings
 	{
 		public int RetryCount { get; }
 

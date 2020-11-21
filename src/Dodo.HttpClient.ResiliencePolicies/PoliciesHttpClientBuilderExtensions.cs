@@ -1,8 +1,8 @@
+using System;
 using System.Net;
 using System.Net.Http;
 using Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy;
 using Dodo.HttpClientResiliencePolicies.RetryPolicy;
-using Dodo.HttpClientResiliencePolicies.TimeoutPolicy;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.CircuitBreaker;
@@ -40,10 +40,10 @@ namespace Dodo.HttpClientResiliencePolicies
 			ResiliencePoliciesSettings settings)
 		{
 			return clientBuilder
-				.AddTimeoutPolicy(settings.OverallTimeoutPolicySettings)
+				.AddTimeoutPolicy(settings.OverallTimeout)
 				.AddRetryPolicy(settings.RetryPolicySettings)
 				.AddCircuitBreakerPolicy(settings.CircuitBreakerPolicySettings)
-				.AddTimeoutPolicy(settings.TimeoutPerTryPolicySettings);
+				.AddTimeoutPolicy(settings.TimeoutPerTry);
 		}
 
 		private static IHttpClientBuilder AddRetryPolicy(
@@ -97,9 +97,9 @@ namespace Dodo.HttpClientResiliencePolicies
 
 		private static IHttpClientBuilder AddTimeoutPolicy(
 			this IHttpClientBuilder httpClientBuilder,
-			TimeoutPolicySettings settings)
+			TimeSpan timeout)
 		{
-			return httpClientBuilder.AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(settings.Timeout));
+			return httpClientBuilder.AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(timeout));
 		}
 	}
 }

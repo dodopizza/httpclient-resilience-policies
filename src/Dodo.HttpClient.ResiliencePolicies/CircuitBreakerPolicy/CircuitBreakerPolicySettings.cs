@@ -4,7 +4,7 @@ using Polly;
 
 namespace Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy
 {
-	public class CircuitBreakerPolicySettings
+	public sealed class CircuitBreakerPolicySettings
 	{
 		private Action<DelegateResult<HttpResponseMessage>, TimeSpan> _onBreakHandler;
 		private Action _onResetHandler;

@@ -2,7 +2,6 @@ using System;
 using System.Net;
 using Dodo.HttpClientResiliencePolicies.RetryPolicy;
 using Dodo.HttpClientResiliencePolicies.Tests.DSL;
-using Dodo.HttpClientResiliencePolicies.TimeoutPolicy;
 using NUnit.Framework;
 using Polly.Timeout;
 
@@ -17,7 +16,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			const int retryCount = 5;
 			var settings = new ResiliencePoliciesSettings
 			{
-				TimeoutPerTryPolicySettings = new TimeoutPolicySettings(TimeSpan.FromMilliseconds(100)),
+				TimeoutPerTry = TimeSpan.FromMilliseconds(100),
 				RetryPolicySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(200)),
 			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
@@ -38,7 +37,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			const int retryCount = 5;
 			var settings = new ResiliencePoliciesSettings
 			{
-				OverallTimeoutPolicySettings = new TimeoutPolicySettings(TimeSpan.FromMilliseconds(200)),
+				OverallTimeout = TimeSpan.FromMilliseconds(200),
 				RetryPolicySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(1)),
 			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
@@ -57,7 +56,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		{
 			var settings = new ResiliencePoliciesSettings
 			{
-				OverallTimeoutPolicySettings = new TimeoutPolicySettings(TimeSpan.FromMilliseconds(100)),
+				OverallTimeout = TimeSpan.FromMilliseconds(100),
 			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.OK)
@@ -76,8 +75,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			const int retryCount = 5;
 			var settings = new ResiliencePoliciesSettings
 			{
-				OverallTimeoutPolicySettings = new TimeoutPolicySettings(TimeSpan.FromMilliseconds(100)),
-				TimeoutPerTryPolicySettings = new TimeoutPolicySettings(TimeSpan.FromMilliseconds(200)),
+				OverallTimeout = TimeSpan.FromMilliseconds(100),
+				TimeoutPerTry = TimeSpan.FromMilliseconds(200),
 				RetryPolicySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(200)),
 			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
@@ -98,8 +97,8 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			const int overallTimeoutInMilliseconds = 200;
 			var settings = new ResiliencePoliciesSettings
 			{
-				OverallTimeoutPolicySettings =
-					new TimeoutPolicySettings(TimeSpan.FromMilliseconds(overallTimeoutInMilliseconds)),
+				OverallTimeout =
+					TimeSpan.FromMilliseconds(overallTimeoutInMilliseconds),
 			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithResiliencePolicySettings(settings)

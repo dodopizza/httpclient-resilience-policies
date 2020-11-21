@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy;
 using Dodo.HttpClientResiliencePolicies.RetryPolicy;
 using Dodo.HttpClientResiliencePolicies.Tests.DSL;
-using Dodo.HttpClientResiliencePolicies.TimeoutPolicy;
 using NUnit.Framework;
 using Polly.CircuitBreaker;
 
@@ -20,7 +19,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			const int minimumThroughput = 2;
 			var settings = new ResiliencePoliciesSettings
 			{
-				OverallTimeoutPolicySettings = new TimeoutPolicySettings(TimeSpan.FromSeconds(5)),
+				OverallTimeout = TimeSpan.FromSeconds(5),
 				RetryPolicySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(100)),
 				CircuitBreakerPolicySettings = BuildCircuitBreakerSettings(minimumThroughput),
 			};
@@ -43,7 +42,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			const int minimumThroughput = 2;
 			var settings = new ResiliencePoliciesSettings
 			{
-				OverallTimeoutPolicySettings = new TimeoutPolicySettings(TimeSpan.FromSeconds(5)),
+				OverallTimeout = TimeSpan.FromSeconds(5),
 				RetryPolicySettings =RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(50)),
 				CircuitBreakerPolicySettings = BuildCircuitBreakerSettings(minimumThroughput),
 			};

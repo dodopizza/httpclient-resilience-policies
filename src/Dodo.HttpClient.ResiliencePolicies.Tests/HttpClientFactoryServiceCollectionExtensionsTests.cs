@@ -1,7 +1,6 @@
 using System;
 using System.Net.Http;
 using Dodo.HttpClientResiliencePolicies.Tests.Fakes;
-using Dodo.HttpClientResiliencePolicies.TimeoutPolicy;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
@@ -67,7 +66,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 				new Uri("http://example.com/"),
 				new ResiliencePoliciesSettings
 				{
-					OverallTimeoutPolicySettings = new TimeoutPolicySettings(overallTimeout),
+					OverallTimeout = overallTimeout,
 				});
 
 			var services = serviceCollection.BuildServiceProvider();

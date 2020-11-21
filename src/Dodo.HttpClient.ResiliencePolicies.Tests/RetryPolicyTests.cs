@@ -7,7 +7,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Dodo.HttpClientResiliencePolicies.RetryPolicy;
 using Dodo.HttpClientResiliencePolicies.Tests.DSL;
-using Dodo.HttpClientResiliencePolicies.TimeoutPolicy;
 using NUnit.Framework;
 using Polly;
 using Polly.Timeout;
@@ -122,7 +121,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			const int retryCount = 3;
 			var settings = new ResiliencePoliciesSettings
 			{
-				OverallTimeoutPolicySettings = new TimeoutPolicySettings(TimeSpan.FromSeconds(2)),
+				OverallTimeout = TimeSpan.FromSeconds(2),
 				RetryPolicySettings = RetryPolicySettings.Constant(retryCount),
 			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
