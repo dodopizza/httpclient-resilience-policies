@@ -19,10 +19,14 @@ namespace Dodo.HttpClientResiliencePolicies
 			get => _retryPolicySettings;
 			set
 			{
+				if (value == null)
+				{
+					throw new ArgumentNullException($"{nameof(RetryPolicySettings)} cannot be set to null.");
+				}
+
 				var onRetryHandler = OnRetry;
 
-				_retryPolicySettings = value ?? throw new ArgumentNullException(
-					$"{nameof(RetryPolicySettings)} cannot be set to null.");
+				_retryPolicySettings = value;
 				_retryPolicySettings.OnRetry = onRetryHandler;
 			}
 		}
@@ -32,12 +36,16 @@ namespace Dodo.HttpClientResiliencePolicies
 			get => _circuitBreakerPolicySettings;
 			set
 			{
+				if (value == null)
+				{
+					throw new ArgumentNullException($"{nameof(CircuitBreakerPolicySettings)} cannot be set to null.");
+				}
+
 				var onBreakHandler = OnBreak;
 				var onResetHandler = OnReset;
 				var onHalfOpenHandler = OnHalfOpen;
 
-				_circuitBreakerPolicySettings = value ?? throw new ArgumentNullException(
-					$"{nameof(CircuitBreakerPolicySettings)} cannot be set to null.");
+				_circuitBreakerPolicySettings = value;
 				_circuitBreakerPolicySettings.OnBreak = onBreakHandler;
 				_circuitBreakerPolicySettings.OnReset = onResetHandler;
 				_circuitBreakerPolicySettings.OnHalfOpen = onHalfOpenHandler;
