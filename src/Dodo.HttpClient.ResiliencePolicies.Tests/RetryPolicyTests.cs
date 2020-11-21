@@ -116,7 +116,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		}
 
 		[Test]
-		public void Should_catchTimeout_because_of_overall_less_then_sleepDuration_of_RetryAfterDecorator()
+		public void Should_catch_timeout_because_of_overall_less_then_sleep_duration_of_RetryAfterDecorator()
 		{
 			const int retryCount = 3;
 			var settings = new ResiliencePoliciesSettings
