@@ -6,6 +6,7 @@
     <LangVersion>8.0</LangVersion>
     <IsPackable>false</IsPackable>
     <RootNamespace>Dodo.HttpClientResiliencePolicies.Tests</RootNamespace>
+    <WarningsAsErrors>true</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

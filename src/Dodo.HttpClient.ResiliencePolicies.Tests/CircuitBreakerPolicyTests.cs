@@ -17,20 +17,22 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		{
 			const int retryCount = 5;
 			const int minimumThroughput = 2;
-			var retrySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(50));
-
+			var settings = new ResiliencePoliciesSettings
+			{
+				OverallTimeout = TimeSpan.FromSeconds(5),
+				RetryPolicySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(100)),
+				CircuitBreakerPolicySettings = BuildCircuitBreakerSettings(minimumThroughput),
+			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
-				.WithTimeoutOverall(TimeSpan.FromSeconds(5))
-				.WithCircuitBreakerSettings(BuildCircuitBreakerSettings(minimumThroughput))
-				.WithRetrySettings(retrySettings)
+				.WithResiliencePolicySettings(settings)
 				.Please();
 
 			const int taskCount = 4;
 			Assert.CatchAsync<BrokenCircuitException>(async () =>
 				await Helper.InvokeMultipleHttpRequests(wrapper.Client, taskCount));
 
-			Assert.AreEqual(minimumThroughput, wrapper.NumberOfCalls);
+			Assert.LessOrEqual(wrapper.NumberOfCalls, taskCount);
 		}
 
 		[Test]
@@ -38,15 +40,16 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 		{
 			const int retryCount = 5;
 			const int minimumThroughput = 2;
-			var retrySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(50));
-
-			var circuitBreakerSettings = BuildCircuitBreakerSettings(minimumThroughput);
+			var settings = new ResiliencePoliciesSettings
+			{
+				OverallTimeout = TimeSpan.FromSeconds(5),
+				RetryPolicySettings =RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(50)),
+				CircuitBreakerPolicySettings = BuildCircuitBreakerSettings(minimumThroughput),
+			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithHostAndStatusCode("ru-prod.com", HttpStatusCode.ServiceUnavailable)
 				.WithHostAndStatusCode("ee-prod.com", HttpStatusCode.OK)
-				.WithTimeoutOverall(TimeSpan.FromSeconds(5))
-				.WithCircuitBreakerSettings(circuitBreakerSettings)
-				.WithRetrySettings(retrySettings)
+				.WithResiliencePolicySettings(settings)
 				.Please();
 
 			const int taskCount = 4;
@@ -60,7 +63,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			Assert.AreEqual(minimumThroughput + taskCount, wrapper.NumberOfCalls);
 		}
 
-		private static ICircuitBreakerPolicySettings BuildCircuitBreakerSettings(int throughput)
+		private static CircuitBreakerPolicySettings BuildCircuitBreakerSettings(int throughput)
 		{
 			return new CircuitBreakerPolicySettings(
 				failureThreshold: 0.5,

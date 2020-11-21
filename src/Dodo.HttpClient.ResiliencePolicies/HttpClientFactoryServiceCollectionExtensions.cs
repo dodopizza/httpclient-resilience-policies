@@ -40,7 +40,7 @@ namespace Dodo.HttpClientResiliencePolicies
 			{
 				client.BaseAddress = baseAddress;
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-				client.Timeout = settings.OverallTimeoutPolicySettings.Timeout + delta;
+				client.Timeout = settings.OverallTimeout + delta;
 			}
 
 			var httpClientBuilder = string.IsNullOrEmpty(clientName)

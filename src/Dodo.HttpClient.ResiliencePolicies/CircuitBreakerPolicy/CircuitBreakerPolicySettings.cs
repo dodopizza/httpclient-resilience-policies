@@ -4,16 +4,16 @@ using Polly;
 
 namespace Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy
 {
-	public class CircuitBreakerPolicySettings : ICircuitBreakerPolicySettings
+	public sealed class CircuitBreakerPolicySettings
 	{
 		public double FailureThreshold { get; }
 		public int MinimumThroughput { get; }
 		public TimeSpan DurationOfBreak { get; }
 		public TimeSpan SamplingDuration { get; }
 
-		public Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnBreak { get; set; }
-		public Action OnReset { get; set; }
-		public Action OnHalfOpen { get; set; }
+		internal Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnBreak { get; set; }
+		internal Action OnReset { get; set; }
+		internal Action OnHalfOpen { get; set; }
 
 		public CircuitBreakerPolicySettings()
 			: this(

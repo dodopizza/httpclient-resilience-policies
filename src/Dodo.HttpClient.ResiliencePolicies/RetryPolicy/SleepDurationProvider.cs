@@ -6,7 +6,7 @@ using Polly.Contrib.WaitAndRetry;
 
 namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 {
-	public partial class RetryPolicySettings
+	public sealed partial class RetryPolicySettings
 	{
 		private static class SleepDurationProvider
 		{
