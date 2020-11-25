@@ -5,9 +5,9 @@ using Polly.Contrib.WaitAndRetry;
 
 namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 {
-	public class RetryPolicySettings //: IRetryPolicySettings
+	public class RetryPolicySettings : IRetryPolicySettings
 	{
-		internal ISleepDurationProvider SleepDurationFunction { get; }
+		public ISleepDurationProvider SleepDurationFunction { get; }
 
 		public Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnRetry { get; set; }
 
@@ -18,10 +18,7 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 			OnRetry = DoNothingOnRetry;
 		}
 
-		public RetryPolicySettings()
-		{
-
-		}
+		public RetryPolicySettings(){}
 
 		public static RetryPolicySettings Constant(int retryCount)
 		{

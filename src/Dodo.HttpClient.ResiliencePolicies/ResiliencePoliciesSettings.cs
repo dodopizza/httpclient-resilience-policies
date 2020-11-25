@@ -11,7 +11,7 @@ namespace Dodo.HttpClientResiliencePolicies
 
 		public ITimeoutPolicySettings TimeoutPerTryPolicySettings { get; set; }
 
-		public RetryPolicySettings RetrySettings { get; set; }
+		public IRetryPolicySettings RetrySettings { get; set; }
 
 		public ICircuitBreakerPolicySettings CircuitBreakerSettings { get; set; }
 
