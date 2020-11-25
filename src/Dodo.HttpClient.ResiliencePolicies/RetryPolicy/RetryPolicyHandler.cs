@@ -8,25 +8,25 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 {
 	internal sealed class RetryPolicyHandler
 	{
-		private readonly IRetryPolicySettings _retryPolicySettings;
+		private readonly RetryPolicySettings _retryPolicySettings;
 
-		internal RetryPolicyHandler(IRetryPolicySettings retryPolicySettings)
+		internal RetryPolicyHandler(RetryPolicySettings retryPolicySettings)
 		{
 			_retryPolicySettings = retryPolicySettings;
 		}
 
-		public int RetryCount => _retryPolicySettings.SleepDurationFunction.RetryCount;
+		public int RetryCount => _retryPolicySettings.SleepProvider.RetryCount;
 
 		public TimeSpan SleepDurationProvider(int retryCount, DelegateResult<HttpResponseMessage> response, Context context)
 		{
 			var serverWaitDuration = GetServerWaitDuration(response);
 			// ReSharper disable once PossibleMultipleEnumeration
-			return serverWaitDuration ?? _retryPolicySettings.SleepDurationFunction.Durations.ToArray()[retryCount-1];
+			return serverWaitDuration ?? _retryPolicySettings.SleepProvider.Durations.ToArray()[retryCount-1];
 		}
 
 		public Task OnRetry(DelegateResult<HttpResponseMessage> response, TimeSpan span, int retryCount, Context context)
 		{
-			_retryPolicySettings.OnRetry(response, span);
+			_retryPolicySettings.OnRetry?.Invoke(response, span);
 			//todo bulanova: не нравится что асихронный метод в синхронный превращается
 			return Task.CompletedTask;
 		}

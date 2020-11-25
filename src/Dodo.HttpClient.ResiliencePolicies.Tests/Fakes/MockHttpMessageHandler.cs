@@ -1,8 +1,8 @@
-using Newtonsoft.Json.Bson;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -67,13 +67,13 @@ namespace Dodo.HttpClientResiliencePolicies.Tests.Fakes
 
 			if (_retryAfterDate.HasValue)
 			{
-				result.Headers.RetryAfter = new System.Net.Http.Headers.RetryConditionHeaderValue(_retryAfterDate.Value);
+				result.Headers.RetryAfter = new RetryConditionHeaderValue(_retryAfterDate.Value);
 			}
 
 			if (_retryAfterSpan.HasValue)
 			{
 				result.Headers.RetryAfter
-					= new System.Net.Http.Headers.RetryConditionHeaderValue(_retryAfterSpan.Value);
+					= new RetryConditionHeaderValue(_retryAfterSpan.Value);
 			}
 
 			return await Task.FromResult(result);

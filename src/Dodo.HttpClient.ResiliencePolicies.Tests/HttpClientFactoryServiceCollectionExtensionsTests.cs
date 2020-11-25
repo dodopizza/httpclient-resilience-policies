@@ -1,14 +1,13 @@
 using System;
 using System.Net.Http;
 using Dodo.HttpClientResiliencePolicies.Tests.Fakes;
-using Dodo.HttpClientResiliencePolicies.TimeoutPolicy;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace Dodo.HttpClientResiliencePolicies.Tests
 {
 	[TestFixture]
-	public class HttpClientBuilderExtensionsClientsTests
+	public class HttpClientFactoryServiceCollectionExtensionsTests
 	{
 		[Test]
 		public void When_AddJsonClient_WithNullClientName_than_ConfiguresDefaultJsonClient()
@@ -67,7 +66,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 				new Uri("http://example.com/"),
 				new ResiliencePoliciesSettings
 				{
-					OverallTimeoutPolicySettings = new OverallTimeoutPolicySettings(overallTimeout),
+					OverallTimeout = overallTimeout,
 				});
 
 			var services = serviceCollection.BuildServiceProvider();

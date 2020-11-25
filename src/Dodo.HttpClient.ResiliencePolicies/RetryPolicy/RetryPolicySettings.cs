@@ -1,24 +1,30 @@
 using System;
 using System.Net.Http;
 using Polly;
-using Polly.Contrib.WaitAndRetry;
 
 namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 {
-	public class RetryPolicySettings : IRetryPolicySettings
+	public sealed class RetryPolicySettings
 	{
-		public ISleepDurationProvider SleepDurationFunction { get; }
+		internal ISleepDurationProvider SleepProvider { get; }
 
-		public Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnRetry { get; set; }
+		internal Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnRetry { get; set; }
 
 		public RetryPolicySettings(
-			ISleepDurationProvider function)
+			ISleepDurationProvider provider)
 		{
-			SleepDurationFunction = function;
+			if (provider == null) throw new ArgumentNullException(nameof(provider));
+
+			SleepProvider = provider;
 			OnRetry = DoNothingOnRetry;
 		}
 
-		public RetryPolicySettings(){}
+		public RetryPolicySettings()
+			: this(SleepDurationProvider.Jitter(
+				Defaults.Retry.RetryCount,
+				TimeSpan.FromMilliseconds(Defaults.Retry.MedianFirstRetryDelayInMilliseconds)))
+		{
+		}
 
 		public static RetryPolicySettings Constant(int retryCount)
 		{
@@ -28,66 +34,50 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 
 		public static RetryPolicySettings Constant(int retryCount, TimeSpan initialDelay)
 		{
-			if (retryCount < 0) throw new ArgumentOutOfRangeException(nameof(retryCount), retryCount, "should be >= 0");
-			if (initialDelay < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(initialDelay), initialDelay, "should be >= 0ms");
-
 			return new RetryPolicySettings(
-				new SleepDurationProvider(retryCount, Backoff.ConstantBackoff(initialDelay, retryCount)));
+				SleepDurationProvider.Constant(retryCount,initialDelay));
 		}
 
-		public static IRetryPolicySettings Linear(int retryCount)
+		public static RetryPolicySettings Linear(int retryCount)
 		{
 			return Linear(retryCount,
 				TimeSpan.FromMilliseconds(Defaults.Retry.InitialDelayMilliseconds));
 		}
 
-		public static IRetryPolicySettings Linear(int retryCount, TimeSpan initialDelay)
+		public static RetryPolicySettings Linear(int retryCount, TimeSpan initialDelay)
 		{
-			if (retryCount < 0) throw new ArgumentOutOfRangeException(nameof(retryCount), retryCount, "should be >= 0");
-			if (initialDelay < TimeSpan.Zero)
-				throw new ArgumentOutOfRangeException(nameof(initialDelay), initialDelay, "should be >= 0ms");
-
 			return new RetryPolicySettings(
-				new SleepDurationProvider(retryCount, Backoff.LinearBackoff(initialDelay, retryCount)));
+				SleepDurationProvider.Linear(retryCount, initialDelay));
 		}
 
-		public static IRetryPolicySettings Exponential(int retryCount)
+		public static RetryPolicySettings Exponential(int retryCount)
 		{
 			return Exponential(retryCount,
 				TimeSpan.FromMilliseconds(Defaults.Retry.InitialDelayMilliseconds));
 		}
 
-		public static IRetryPolicySettings Exponential(int retryCount, TimeSpan initialDelay)
+		public static RetryPolicySettings Exponential(int retryCount, TimeSpan initialDelay)
 		{
-			if (retryCount < 0) throw new ArgumentOutOfRangeException(nameof(retryCount), retryCount, "should be >= 0");
-			if (initialDelay < TimeSpan.Zero)
-				throw new ArgumentOutOfRangeException(nameof(initialDelay), initialDelay, "should be >= 0ms");
-
 			return new RetryPolicySettings(
-				new SleepDurationProvider(retryCount, Backoff.ExponentialBackoff(initialDelay, retryCount)));
+				SleepDurationProvider.Exponential(retryCount, initialDelay));
 		}
 
-		public static IRetryPolicySettings Jitter()
+		public static RetryPolicySettings Jitter()
 		{
 			return Jitter(Defaults.Retry.RetryCount,
 				TimeSpan.FromMilliseconds(Defaults.Retry.MedianFirstRetryDelayInMilliseconds));
 		}
 
-		public static IRetryPolicySettings Jitter(int retryCount)
+		public static RetryPolicySettings Jitter(int retryCount)
 		{
 			return Jitter(retryCount,
 				TimeSpan.FromMilliseconds(Defaults.Retry.MedianFirstRetryDelayInMilliseconds));
 		}
 
-		public static IRetryPolicySettings Jitter(int retryCount, TimeSpan medianFirstRetryDelay)
+		public static RetryPolicySettings Jitter(int retryCount, TimeSpan medianFirstRetryDelay)
 		{
-			if (retryCount < 0) throw new ArgumentOutOfRangeException(nameof(retryCount), retryCount, "should be >= 0");
-			if (medianFirstRetryDelay < TimeSpan.Zero)
-				throw new ArgumentOutOfRangeException(nameof(medianFirstRetryDelay), medianFirstRetryDelay,
-					"should be >= 0ms");
-
 			return new RetryPolicySettings(
-				new SleepDurationProvider(retryCount, Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay, retryCount)));
+				SleepDurationProvider.Jitter(retryCount, medianFirstRetryDelay));
 		}
 
 		private static readonly Action<DelegateResult<HttpResponseMessage>, TimeSpan> DoNothingOnRetry = (_, __) => { };

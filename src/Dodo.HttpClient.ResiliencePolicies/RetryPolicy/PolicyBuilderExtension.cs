@@ -8,7 +8,7 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 	{
 		public static IAsyncPolicy<HttpResponseMessage> WaitAndRetryAsync(
 			this PolicyBuilder<HttpResponseMessage> policyBuilder,
-			IRetryPolicySettings settings)
+			RetryPolicySettings settings)
 		{
 			var handler = new RetryPolicyHandler(settings);
 			return policyBuilder
@@ -20,7 +20,7 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 
 		public static IAsyncPolicy<HttpResponseMessage> AdvancedCircuitBreakerAsync(
 			this PolicyBuilder<HttpResponseMessage> policyBuilder,
-			ICircuitBreakerPolicySettings settings)
+			CircuitBreakerPolicySettings settings)
 		{
 			return policyBuilder
 				.AdvancedCircuitBreakerAsync(
