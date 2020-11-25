@@ -26,6 +26,8 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 		{
 		}
 
+		private static readonly Action<DelegateResult<HttpResponseMessage>, TimeSpan> DoNothingOnRetry = (_, __) => { };
+
 		public static RetryPolicySettings Constant(int retryCount)
 		{
 			return Constant(retryCount,
@@ -79,7 +81,5 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 			return new RetryPolicySettings(
 				SleepDurationProvider.Jitter(retryCount, medianFirstRetryDelay));
 		}
-
-		private static readonly Action<DelegateResult<HttpResponseMessage>, TimeSpan> DoNothingOnRetry = (_, __) => { };
 	}
 }
