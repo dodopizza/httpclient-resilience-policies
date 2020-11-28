@@ -12,7 +12,7 @@ namespace Dodo.HttpClientResiliencePolicies
 		private CircuitBreakerPolicySettings _circuitBreakerPolicySettings = new CircuitBreakerPolicySettings();
 
 		public TimeSpan OverallTimeout { get; set; } = TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutOverallInMilliseconds);
-		public TimeSpan TimeoutPerTry { get; set; }= TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutPerTryInMilliseconds);
+		public TimeSpan TimeoutPerTry { get; set; } = TimeSpan.FromMilliseconds(Defaults.Timeout.TimeoutPerTryInMilliseconds);
 
 		public RetryPolicySettings RetryPolicySettings
 		{
