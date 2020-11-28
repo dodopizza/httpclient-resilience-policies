@@ -27,7 +27,7 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 		public Task OnRetry(DelegateResult<HttpResponseMessage> response, TimeSpan span, int retryCount, Context context)
 		{
 			_retryPolicySettings.OnRetry?.Invoke(response, span);
-			//todo bulanova: не нравится что асихронный метод в синхронный превращается
+			// TODO: Async method turned into sync one here
 			return Task.CompletedTask;
 		}
 

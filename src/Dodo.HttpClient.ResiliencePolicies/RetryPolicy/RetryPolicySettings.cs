@@ -13,9 +13,7 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 		public RetryPolicySettings(
 			ISleepDurationProvider provider)
 		{
-			if (provider == null) throw new ArgumentNullException(nameof(provider));
-
-			SleepProvider = provider;
+			SleepProvider = provider ?? throw new ArgumentNullException(nameof(provider));
 			OnRetry = DoNothingOnRetry;
 		}
 

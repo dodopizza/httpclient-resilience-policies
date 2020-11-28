@@ -11,11 +11,10 @@ namespace Dodo.HttpClientResiliencePolicies.RetryPolicy
 
 		public SleepDurationProvider(int retryCount, IEnumerable<TimeSpan> durations)
 		{
-			if (durations == null) throw new ArgumentNullException(nameof(durations));
 			if (retryCount < 0) throw new ArgumentOutOfRangeException(nameof(retryCount), retryCount, "should be >= 0");
 
+			Durations = durations ?? throw new ArgumentNullException(nameof(durations));
 			RetryCount = retryCount;
-			Durations = durations;
 		}
 
 		public static SleepDurationProvider Constant(int retryCount, TimeSpan initialDelay)
