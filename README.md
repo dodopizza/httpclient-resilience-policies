@@ -3,128 +3,110 @@
 [![nuget](https://img.shields.io/nuget/v/Dodo.HttpClient.ResiliencePolicies?label=NuGet)](https://www.nuget.org/packages/Dodo.HttpClient.ResiliencePolicies)
 ![master](https://github.com/dodopizza/httpclient-resilience-policies/workflows/master/badge.svg)
 
-The main goal of this library is to provide unified http request retrying policies for the HttpClient that just works.
+Dodo.HttpClient.ResiliencePolicies library extends [IHttpClientBuilder](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.dependencyinjection.ihttpclientbuilder) with easy to use resilience policies for the HttpClient.
 
-Actually this library wraps awesome [Polly](https://github.com/App-vNext/Polly) library with the predefined settings to allow developers to use it as is without a deep dive to Polly.
+In the world of microservices it is quite important to pay attention to resilience of communications between services. You have to think about things like retries, timeouts, circuit breakers, etc.
+We already have a great library for this class of problems called [Polly](https://github.com/App-vNext/Polly). It is really powerful. Polly is like a Swiss knife gives you a lot of functionality, but you should know how and when to use it. It could be a complicated task.
 
-The `DefaultPolicy` provided by this library combines `RetryPolicy`, `CircuitBreakerPolicy` and `TimeoutPolicy` under the hood. See the corresponding sections of the README.
+Main goal of our library is to hide this complexity from the end-users. It uses Polly under the hood and provides some pre-defined functionality with reasonable defaults and minimal settings to setup resilience policies atop of HttpClient.
+You can just plug the with single line of code and your HttpClient will become much more robust than before.
+
 
 ## Functionality provided by the library
 
-Library provides few methods which returns the IHttpClientBuilder and you may chain it with other HttpMessageHandler.
+Library provides few methods which returns `IHttpClientBuilder` and you may chain it with other `HttpMessageHandler`.
 
 There are list of public methods to use:
 
 ```csharp
-// Default policies for a single host environment using all defaults
-IHttpClientBuilder AddDefaultPolicies(this IHttpClientBuilder clientBuilder);
+// Pre-defined policies with defaults settings
+IHttpClientBuilder AddResiliencePolicies(this IHttpClientBuilder clientBuilder);
 
-// Default policies for a single host environment with custom settings
-IHttpClientBuilder AddDefaultPolicies(this IHttpClientBuilder clientBuilder, HttpClientSettings settings);
-
-// Default policies for a multi host environments using all defaults
-IHttpClientBuilder AddDefaultHostSpecificPolicies(this IHttpClientBuilder clientBuilder);
-
-// Default policies for a multi host environments with custom settings
-IHttpClientBuilder AddDefaultHostSpecificPolicies(this IHttpClientBuilder clientBuilder, HttpClientSettings settings);
-
-// Default JsonClient includes DefaultPolicies with custom settings
-IHttpClientBuilder AddJsonClient<TClientInterface, TClientImplementation>(
-    this IServiceCollection sc,
-    Uri baseAddress,
-    HttpClientSettings settings,
-    string clientName = null)
-        where TClientInterface : class
-        where TClientImplementation : class, TClientInterface
+// Pre-defined policies with custom settings
+IHttpClientBuilder AddResiliencePolicies(this IHttpClientBuilder clientBuilder, ResiliencePoliciesSettings settings)
 ```
 
-There are also available `HttpClientSettings`, `IRetrySettings` and `ICircuitBreakerSettings` to tune-in the default policies. See the corresponding sections of the README.
+`AddResiliencePolicies` wraps HttpClient with four policies:
 
-## HttpClient configuration
+- Overall Timeout policy – timeout for entire request, after this time we are not interested in the result anymore.
+- Retry policy – defines how much and how often we will attempt to send request again on failures.
+- Circuit Breaker policy – defines when we should take a break in our retries if the upstream service doesn't respond.
+- Timeout Per Try policy - timeout for each try (defined in Retry policy), after this time attempt considered as failure.
 
-You have two options how to add HttpClient in your code.
+Library also provides pre-configured HttpClient:
 
-1. Just use default client provided by the library and add it to the `ServiceCollection` in the Startup like this:
+```csharp
+// Pre-defined HttpClientFactory which is configured to work with `application/json` MIME media type and uses default ResiliencePolicies
+IHttpClientBuilder AddJsonClient<TClientInterface, TClientImplementation>(
+			this IServiceCollection sc,
+			Uri baseAddress,
+			string clientName = null)
+
+// Pre-defined HttpClientFactory which is configured to work with `application/json` MIME media type and uses ResiliencePolicies with custom settings
+IHttpClientBuilder AddJsonClient<TClientInterface, TClientImplementation>(
+			this IServiceCollection sc,
+			Uri baseAddress,
+			ResiliencePoliciesSettings settings,
+			string clientName = null)
+```
+
+Custom settings can be provided via `ResiliencePoliciesSettings` (see examples below).  
+Also you may check the [defaults](src/Dodo.HttpClient.ResiliencePolicies/Defaults.cs) provided by the library (all of this can be overriden in custom settings).
+
+## Usage examples
+
+1. Using default client provided by the library and add it to the `ServiceCollection` in the Startup like this:
 
     ```csharp
-    service                     // IServiceCollection
-        .AddJsonClient(...)     // Default client with policies
+    using Dodo.HttpClientResiliencePolicies;
+    ...
+
+    service                         // IServiceCollection
+        .AddJsonClient(...)         // HttpClientFactory to build JsonClient provided by the library with all defaults
     ```
 
-2. You may add your own HttpClient and then add default policies. In this case it is important to configure Timeout property in the client:
+2. Add resilience policy with default settings to existing HttpClient
 
     ```csharp
-    service                     // IServiceCollection
-        .AddHttpClient("named-client",
-            client =>
-            {
-                client.Timeout = TimeSpan.FromMilliseconds(Defaults.Timeout.HttpClientTimeoutInMilliseconds); // Constant provided by the library
-            })
-        .AddDefaultPolicies()   // Default policies provided by the library
+    using Dodo.HttpClientResiliencePolicies;
+    ...
+   
+    service                         // IServiceCollection
+        .AddHttpClient(...)         // Existing HttpClientFactory
+        .AddResiliencePolicies()    // Pre-defined resilience policies with all defaults
+   ```
+
+3. Define custom settings for resilience policies:
+
+    ```csharp
+    using Dodo.HttpClientResiliencePolicies;
+    ...
+    
+    var settings = new ResiliencePoliciesSettings
+    {
+        OverallTimeout = TimeSpan.FromSeconds(50),
+        TimeoutPerTry = TimeSpan.FromSeconds(2),
+        RetryPolicySettings = RetryPolicySettings.Jitter(2, TimeSpan.FromMilliseconds(50)),
+        CircuitBreakerPolicySettings = new CircuitBreakerPolicySettings(
+            failureThreshold: 0.5,
+            minimumThroughput: 10,
+            durationOfBreak: TimeSpan.FromSeconds(5),
+            samplingDuration: TimeSpan.FromSeconds(30)
+        ),
+        OnRetry = (response, time) => { ... },      // Handle retry event. For example you may add logging here
+        OnBreak = (response, time) => { ... },      // Handle CircuitBreaker break event. For example you may add logging here
+        OnReset = () => {...},                      // Handle CircuitBreaker reset event. For example you may add logging here
+        OnHalfOpen = () => {...},                   // Handle CircuitBreaker reset event. For example you may add logging here
+    }
     ```
 
-Or if you use custom HttpClientSettings you may get client timeout value from the `HttpClientSettings.HttpClientTimeout` property instead of constant.
+    You may provide only properties which you want to customize, the defaults will be used for the rest.  
+    You may choose different retry strategies. RetryPolicySettings provide static methods to choose Constant, Linear, Exponential or Jitter (exponential with jitter backoff) strategies. Jitter is used as default strategy.
+    
+    You may provide settings as a parameter to `.AddJsonClient(...)` or `.AddResiliencePolicies()` to override default settings.
+    
+## References
 
-Configure `HttpClient.Timeout` is important because HttpClient will use default value of 100 seconds without this configuration. `AddJsonClient` provided by the library is already pre-configured.
-
-More details about TimeoutPolicy in the corresponding section of the README.
-
-## Single host versus multi host environments
-
-You may notice that there are two group of methods:
-`DefaultPolicy` for single host environment and `DefaultHostSpecificPolicy` for multi host environments.
-
-The single host environment means that our HttpClient send requests to a single host (the uri of host is never changed). It also means that if the CircuitBreaker will be opened, **all** requests to this host will be stopped for the duration of break.
-
-In the other hand in multi host environment we suppose that we use single client against multiple hosts. For example in the "country agnostic service" scenario when we use a single HttpClient to send requests against the several host for different countries with the same URL pattern like: `ru-host`, `us-host`, `ng-host`, etc. We can't use `DefaultPolicy` as with single host environment scenario. If the CircuitBreaker will be opened on the one host, ex. `ru-host`, all requests to all other hosts will be stopped too, because of the single HttpClient. `DefaultHostSpecificPolicy` handles this situation by "memorizing" the distinct hosts and policies will match requests to the specific hosts to avoid such situations.
-
-## Retry policy
-
-The retry policy handles the situation when the http request fails because of transient error and retries the attempt to complete the request.
-
-The library provides interface `IRetrySettings` to setup retry policy. There are two predefined implementations provided:
-
-- `SimpleRetrySettings` which by default using [Exponential backoff](https://github.com/App-vNext/Polly/wiki/Retry#exponential-backoff) exponentially increase retry times for each attempt.
-- `JitterRetrySettings` _(used by default)_ which is exponential too but used [JitterBackoff](https://github.com/App-vNext/Polly/wiki/Retry-with-jitter) to slightly modify retry times to prevent the situation when all of the requests will be attempt in the same time.
-
-The most important parameter in the retry policy is `RetryCount` which means each request may have at most `RetryCount + 1` attempts: initial request and all the retries in case of fail.
-
-You also may implement your own policy settings by implement the `IRetrySettings`. Also you may check the default values in the `Defaults` class.
-
-## CircuitBreaker Policy
-
-Circuit breaker's goal is to prevent requests to the server if it doesn't answer for a while to mostly of the requests. In practice the reason to have a circuit breaker is to prevent requests when server is down or overloaded.
-
-CircuitBreaker has several important parameters:
-
-- `FailureThreshold` means what percentage of failed requests should be for the CircuitBreaker to open.
-- `MinimumThroughput` the minimum amount of the requests should be for the CircuitBreaker to open.
-- `DurationOfBreak` amount of time when the CircuitBreaker prevents all the requests to the host.
-- `SamplingDuration` during this amount of time CircuitBreaker will count success/failed requests and check two parameters above to make a decision should it opens or not.
-
-[More information about Circuit Breakers in the Polly documentation](https://github.com/App-vNext/Polly/wiki/Advanced-Circuit-Breaker).
-
-The library provides interface `ICircuitBreakerSettings` to setup circuit breaker policy and default implementation `CircuitBreakerSettings` which has a several constructors to tune-in parameters above.
-
-You also may implement your own policy settings by implement the `ICircuitBreakerSettings`. Also you may check the default values in the `Defaults` class.
-
-## Timeout policy
-
-The timeout policy cancels requests in case of long responses (server doesn't response for a long time).
-
-There are only two settings to configure the timeouts:
-
-- `HttpClientTimeout` which set the timeout to the whole HttpClient.
-- `TimeoutPerTry` which set the timeout for a single request attempt.
-
-Understanding of the difference between this two parameters is very important to create robust policies.
-
-`HttpClientTimeout` is set to the whole HttpClient. Actually it set `HttpClient.Timeout` property. When this timeout exceeded the HttpClient throws `TaskCancelledException` which prevent all requests in the current session. Such a timeout will not be retried even if not all retry attempts have been made.
-
-`TimeoutPerTry` just setup the timeout for a single request. If this timeout exceeded request will be cancelled and retried even if the server worked correctly and finally response with 200 status code.
-
-Notice that the `HttpClientTimeout` should be **greater** than `TimeoutPerRetry` otherwise you requests will never be retried.
-
-One more important thing is the order of the policies. `TimeoutPolicy` should always be **after** the RetryPolicy otherwise the `TimeoutPerRetry` parameter will play the same role as a `HttpClientTimeout`. [Clarification from the Polly documentation](https://github.com/App-vNext/Polly/wiki/Polly-and-HttpClientFactory#use-case-applying-timeouts).
-
-You may setup your own timeout parameters by providing it to the `HttpClientSettings` constructor. Also you may check the default values in the `Defaults` class.
+    - Check Polly [documentation](https://github.com/App-vNext/Polly/wiki) to learn more about each policy.
+    - [Use IHttpClientFactory to implement resilient HTTP requests](https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests).
+    - [Cloud design patterns](https://docs.microsoft.com/en-us/azure/architecture/patterns/retry).
