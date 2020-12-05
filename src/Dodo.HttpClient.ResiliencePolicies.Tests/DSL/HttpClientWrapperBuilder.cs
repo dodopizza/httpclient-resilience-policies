@@ -2,22 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using Dodo.HttpClient.ResiliencePolicies.CircuitBreakerSettings;
-using Dodo.HttpClient.ResiliencePolicies.RetrySettings;
-using Dodo.HttpClient.ResiliencePolicies.Tests.Fakes;
+using Dodo.HttpClientResiliencePolicies.Tests.Fakes;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dodo.HttpClient.ResiliencePolicies.Tests.DSL
+namespace Dodo.HttpClientResiliencePolicies.Tests.DSL
 {
 	public sealed class HttpClientWrapperBuilder
 	{
 		private const string ClientName = "TestClient";
-		private readonly Dictionary<string, HttpStatusCode> _hostsResponseCodes = new Dictionary<string, HttpStatusCode>();
-		private IRetrySettings _retrySettings;
-		private ICircuitBreakerSettings _circuitBreakerSettings;
-		private TimeSpan _httpClientTimeout = TimeSpan.FromDays(1);
-		private TimeSpan _timeoutPerTry = TimeSpan.FromDays(1);
+		private readonly Uri _uri = new Uri("http://localhost");
+
+		private readonly Dictionary<string, HttpStatusCode> _hostsResponseCodes =
+			new Dictionary<string, HttpStatusCode>();
+
+		private ResiliencePoliciesSettings _resiliencePoliciesSettings;
 		private TimeSpan _responseLatency = TimeSpan.Zero;
+		private TimeSpan? _retryAfterSpan;
+		private DateTime? _retryAfterDate;
 
 		public HttpClientWrapperBuilder WithStatusCode(HttpStatusCode statusCode)
 		{
@@ -31,27 +32,9 @@ namespace Dodo.HttpClient.ResiliencePolicies.Tests.DSL
 			return this;
 		}
 
-		public HttpClientWrapperBuilder WithHttpClientTimeout(TimeSpan httpClientTimeout)
+		public HttpClientWrapperBuilder WithResiliencePolicySettings(ResiliencePoliciesSettings resiliencePoliciesSettings)
 		{
-			_httpClientTimeout = httpClientTimeout;
-			return this;
-		}
-
-		public HttpClientWrapperBuilder WithTimeoutPerTry(TimeSpan timeoutPerTry)
-		{
-			_timeoutPerTry = timeoutPerTry;
-			return this;
-		}
-
-		public HttpClientWrapperBuilder WithRetrySettings(IRetrySettings retrySettings)
-		{
-			_retrySettings = retrySettings;
-			return this;
-		}
-
-		public HttpClientWrapperBuilder WithCircuitBreakerSettings(ICircuitBreakerSettings circuitBreakerSettings)
-		{
-			_circuitBreakerSettings = circuitBreakerSettings;
+			_resiliencePoliciesSettings = resiliencePoliciesSettings;
 			return this;
 		}
 
@@ -61,50 +44,43 @@ namespace Dodo.HttpClient.ResiliencePolicies.Tests.DSL
 			return this;
 		}
 
+		public HttpClientWrapperBuilder WithRetryAfterHeader(TimeSpan delay)
+		{
+			_retryAfterSpan = delay;
+			return this;
+		}
+
+		public HttpClientWrapperBuilder WithRetryAfterHeader(DateTime date)
+		{
+			_retryAfterDate = date;
+			return this;
+		}
+
 		public HttpClientWrapper Please()
 		{
 			var handler = new MockHttpMessageHandler(_hostsResponseCodes, _responseLatency);
+
+			if (_retryAfterDate.HasValue)
+			{
+				handler.SetRetryAfterResponseHeader(_retryAfterDate.Value);
+			}
+
+			if (_retryAfterSpan.HasValue)
+			{
+				handler.SetRetryAfterResponseHeader(_retryAfterSpan.Value);
+			}
+
+			var settings = _resiliencePoliciesSettings ?? new ResiliencePoliciesSettings();
 			var services = new ServiceCollection();
 			services
-				.AddHttpClient(ClientName, c => { c.Timeout = _httpClientTimeout; })
-				.AddDefaultPolicies(BuildClientSettings())
+				.AddJsonClient<IMockJsonClient, MockJsonClient>(_uri, settings, ClientName)
 				.ConfigurePrimaryHttpMessageHandler(() => handler);
 
 			var serviceProvider = services.BuildServiceProvider();
 			var factory = serviceProvider.GetService<IHttpClientFactory>();
-			var client = factory.CreateClient(ClientName);
+			var client = factory?.CreateClient(ClientName) ??
+			             throw new NullReferenceException($"\"{nameof(factory)}\" was not created properly");
 			return new HttpClientWrapper(client, handler);
-		}
-
-		public HttpClientWrapper PleaseHostSpecific()
-		{
-			var handler = new MockHttpMessageHandler(_hostsResponseCodes, _responseLatency);
-			var services = new ServiceCollection();
-			services
-				.AddHttpClient(ClientName, c => { c.Timeout = _httpClientTimeout; })
-				.AddDefaultHostSpecificPolicies(BuildClientSettings())
-				.ConfigurePrimaryHttpMessageHandler(() => handler);
-
-			var serviceProvider = services.BuildServiceProvider();
-			var factory = serviceProvider.GetService<IHttpClientFactory>();
-			var client = factory.CreateClient(ClientName);
-			return new HttpClientWrapper(client, handler);
-		}
-
-		private HttpClientSettings BuildClientSettings()
-		{
-			var defaultCircuitBreakerSettings = _circuitBreakerSettings ?? new CircuitBreakerSettings.CircuitBreakerSettings(
-				failureThreshold: 0.5,
-				minimumThroughput: int.MaxValue,
-				durationOfBreak: TimeSpan.FromMilliseconds(1),
-				samplingDuration: TimeSpan.FromMilliseconds(20)
-				);
-
-			return new HttpClientSettings(
-				_httpClientTimeout,
-				_timeoutPerTry,
-				_retrySettings ?? JitterRetrySettings.Default(),
-				defaultCircuitBreakerSettings);
 		}
 	}
 }

@@ -1,10 +1,8 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Dodo.HttpClient.ResiliencePolicies.Tests
+namespace Dodo.HttpClientResiliencePolicies.Tests
 {
-	using HttpClient = System.Net.Http.HttpClient;
-
 	public static class Helper
 	{
 		public static async Task InvokeMultipleHttpRequests(HttpClient client, int taskCount, string uri = "http://localhost")

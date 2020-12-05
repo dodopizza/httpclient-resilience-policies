@@ -1,13 +1,13 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
-using Dodo.HttpClient.ResiliencePolicies.CircuitBreakerSettings;
-using Dodo.HttpClient.ResiliencePolicies.RetrySettings;
-using Dodo.HttpClient.ResiliencePolicies.Tests.DSL;
+using Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy;
+using Dodo.HttpClientResiliencePolicies.RetryPolicy;
+using Dodo.HttpClientResiliencePolicies.Tests.DSL;
 using NUnit.Framework;
 using Polly.CircuitBreaker;
 
-namespace Dodo.HttpClient.ResiliencePolicies.Tests
+namespace Dodo.HttpClientResiliencePolicies.Tests
 {
 	[TestFixture]
 	public class CircuitBreakerTests
@@ -15,38 +15,42 @@ namespace Dodo.HttpClient.ResiliencePolicies.Tests
 		[Test]
 		public void Should_break_after_4_concurrent_calls()
 		{
+			const int retryCount = 5;
 			const int minimumThroughput = 2;
-			var retrySettings = new SimpleRetrySettings(
-				retryCount: 5,
-				sleepDurationProvider: i => TimeSpan.FromMilliseconds(50));
+			var settings = new ResiliencePoliciesSettings
+			{
+				OverallTimeout = TimeSpan.FromSeconds(5),
+				RetryPolicySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(100)),
+				CircuitBreakerPolicySettings = BuildCircuitBreakerSettings(minimumThroughput),
+			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.ServiceUnavailable)
-				.WithHttpClientTimeout(TimeSpan.FromSeconds(5))
-				.WithCircuitBreakerSettings(BuildCircuitBreakerSettings(minimumThroughput))
-				.WithRetrySettings(retrySettings)
+				.WithResiliencePolicySettings(settings)
 				.Please();
 
 			const int taskCount = 4;
 			Assert.CatchAsync<BrokenCircuitException>(async () =>
 				await Helper.InvokeMultipleHttpRequests(wrapper.Client, taskCount));
 
-			Assert.AreEqual(minimumThroughput, wrapper.NumberOfCalls);
+			Assert.LessOrEqual(wrapper.NumberOfCalls, taskCount);
 		}
 
 		[Test]
 		public async Task Should_Open_Circuit_Breaker_for_RU_and_do_not_affect_EE()
 		{
+			const int retryCount = 5;
 			const int minimumThroughput = 2;
-			var retrySettings = new SimpleRetrySettings(
-				retryCount: 5,
-				sleepDurationProvider: i => TimeSpan.FromMilliseconds(50));
+			var settings = new ResiliencePoliciesSettings
+			{
+				OverallTimeout = TimeSpan.FromSeconds(5),
+				RetryPolicySettings =RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(50)),
+				CircuitBreakerPolicySettings = BuildCircuitBreakerSettings(minimumThroughput),
+			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithHostAndStatusCode("ru-prod.com", HttpStatusCode.ServiceUnavailable)
 				.WithHostAndStatusCode("ee-prod.com", HttpStatusCode.OK)
-				.WithHttpClientTimeout(TimeSpan.FromSeconds(5))
-				.WithCircuitBreakerSettings(BuildCircuitBreakerSettings(minimumThroughput))
-				.WithRetrySettings(retrySettings)
-				.PleaseHostSpecific();
+				.WithResiliencePolicySettings(settings)
+				.Please();
 
 			const int taskCount = 4;
 			Assert.CatchAsync<BrokenCircuitException>(async () =>
@@ -59,13 +63,14 @@ namespace Dodo.HttpClient.ResiliencePolicies.Tests
 			Assert.AreEqual(minimumThroughput + taskCount, wrapper.NumberOfCalls);
 		}
 
-		private static ICircuitBreakerSettings BuildCircuitBreakerSettings(int throughput)
+		private static CircuitBreakerPolicySettings BuildCircuitBreakerSettings(int throughput)
 		{
-			return new CircuitBreakerSettings.CircuitBreakerSettings(
+			return new CircuitBreakerPolicySettings(
 				failureThreshold: 0.5,
 				minimumThroughput: throughput,
 				durationOfBreak: TimeSpan.FromMinutes(1),
-				samplingDuration: TimeSpan.FromMilliseconds(20));
+				samplingDuration: TimeSpan.FromMilliseconds(20)
+			);
 		}
 	}
 }
