@@ -71,7 +71,7 @@ jobs:
           dotnet pack --no-restore --no-build --configuration Release --version-suffix "${{ steps.extract-version-suffix.outputs.version_suffix }}" --output out/ ./src/Dodo.HttpClient.ResiliencePolicies/Dodo.HttpClient.ResiliencePolicies.csproj
           dotnet nuget push out/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
 
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@v2
         with:
           name: NuGet package
           path: out/
@@ -84,7 +84,7 @@ jobs:
     needs: build-and-publish
 
     steps:
-      - uses: actions/download-artifact@master
+      - uses: actions/download-artifact@v2
         with:
           name: NuGet package
           path: out
