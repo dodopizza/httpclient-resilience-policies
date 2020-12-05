@@ -101,12 +101,12 @@ Also you may check the [defaults](src/Dodo.HttpClient.ResiliencePolicies/Default
     ```
 
     You may provide only properties which you want to customize, the defaults will be used for the rest.  
-    You may choose different retry strategies. RetryPolicySettings provide static methods to choose Constant, Linear, Exponential or Jitter (exponential with jitter backoff) strategies. Jitter is used as default strategy.
+    You may choose different retry strategies. RetryPolicySettings provides static methods to choose Constant, Linear, Exponential or Jitter (exponential with jitter backoff) strategies. Jitter is used as default strategy.
     
     You may provide settings as a parameter to `.AddJsonClient(...)` or `.AddResiliencePolicies()` to override default settings.
     
 ## References
 
-    - Check Polly [documentation](https://github.com/App-vNext/Polly/wiki) to learn more about each policy.
-    - [Use IHttpClientFactory to implement resilient HTTP requests](https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests).
-    - [Cloud design patterns](https://docs.microsoft.com/en-us/azure/architecture/patterns/retry).
+- Check Polly [documentation](https://github.com/App-vNext/Polly/wiki) to learn more about each policy.
+- [Use IHttpClientFactory to implement resilient HTTP requests](https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests).
+- [Cloud design patterns](https://docs.microsoft.com/en-us/azure/architecture/patterns/retry).
