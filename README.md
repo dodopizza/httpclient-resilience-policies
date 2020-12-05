@@ -65,7 +65,7 @@ Also you may check the [defaults](src/Dodo.HttpClient.ResiliencePolicies/Default
         .AddJsonClient(...)         // HttpClientFactory to build JsonClient provided by the library with all defaults
     ```
 
-2. Add resilience policy with default settings to existing HttpClient
+2. Add resilience policies with default settings to existing HttpClient
 
     ```csharp
     using Dodo.HttpClientResiliencePolicies;
