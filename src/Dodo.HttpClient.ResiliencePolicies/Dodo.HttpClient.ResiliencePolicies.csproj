@@ -49,6 +49,7 @@
       <Link>README.md</Link>
     </None>
   </ItemGroup>
+  
   <PropertyGroup Label="nuspec">
     <PackageId>Dodo.HttpClient.ResiliencePolicies</PackageId>
     <AssemblyTitle>Dodo.HttpClient.ResiliencePolicies</AssemblyTitle>
