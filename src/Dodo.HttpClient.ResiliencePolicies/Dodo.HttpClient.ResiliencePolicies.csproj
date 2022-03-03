@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <!-- The tricky part is that only latest sdk can respect properly each TargetFrameworks entry. It means if you plan to release new package version you have to use latest sdk version. -->
     <TargetFrameworks Condition="'$(Framework)' != 'net5.0' and '$(Framework)' != 'netcoreapp3.1'">netstandard2.0;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
     <TargetFramework Condition="'$(Framework)' == 'net5.0'">net5.0</TargetFramework>
     <TargetFramework Condition="'$(Framework)' == 'netcoreapp3.1'">netcoreapp3.1</TargetFramework>
