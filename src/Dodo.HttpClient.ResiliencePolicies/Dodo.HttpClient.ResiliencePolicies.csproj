@@ -24,6 +24,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="[3.1.0,)" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="[3.1.0,)" />
     <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="[3.1.0,)" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
