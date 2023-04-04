@@ -97,6 +97,7 @@ Also you may check the [defaults](src/Dodo.HttpClient.ResiliencePolicies/Default
         OnBreak = (response, time) => { ... },      // Handle CircuitBreaker break event. For example you may add logging here
         OnReset = () => {...},                      // Handle CircuitBreaker reset event. For example you may add logging here
         OnHalfOpen = () => {...},                   // Handle CircuitBreaker reset event. For example you may add logging here
+        AdditionalFailureResultFilter = r => false  // Additional condition for CircuitBreaker to open (opens on TooManyRequests by default)
     }
     ```
 
