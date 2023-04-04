@@ -6,7 +6,7 @@
     <TargetFramework Condition="'$(Framework)' == 'net5.0'">net5.0</TargetFramework>
     <TargetFramework Condition="'$(Framework)' == 'netcoreapp3.1'">netcoreapp3.1</TargetFramework>
     <LangVersion>8.0</LangVersion>
-    <VersionPrefix>2.0.2</VersionPrefix>
+    <VersionPrefix>2.0.3</VersionPrefix>
     <Title>Dodo.HttpClient.ResiliencePolicies</Title>
     <RootNamespace>Dodo.HttpClientResiliencePolicies</RootNamespace>
     <WarningsAsErrors>true</WarningsAsErrors>
