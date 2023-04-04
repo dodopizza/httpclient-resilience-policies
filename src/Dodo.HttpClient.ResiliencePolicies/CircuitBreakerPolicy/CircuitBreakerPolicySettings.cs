@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Net.Http;
 using Polly;
 
@@ -14,6 +15,7 @@ namespace Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy
 		internal Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnBreak { get; set; }
 		internal Action OnReset { get; set; }
 		internal Action OnHalfOpen { get; set; }
+		internal Func<HttpResponseMessage, bool> AdditionalFailureResultFilter { get; set; }
 
 		public CircuitBreakerPolicySettings()
 			: this(
@@ -38,10 +40,13 @@ namespace Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy
 			OnBreak = DoNothingOnBreak;
 			OnReset = DoNothingOnReset;
 			OnHalfOpen = DoNothingOnHalfOpen;
+			AdditionalFailureResultFilter = HandleTooManyRequests;
 		}
 
 		private static readonly Action<DelegateResult<HttpResponseMessage>, TimeSpan> DoNothingOnBreak = (_, __) => { };
 		private static readonly Action DoNothingOnReset = () => { };
 		private static readonly Action DoNothingOnHalfOpen = () => { };
+		private static readonly Func<HttpResponseMessage, bool> HandleTooManyRequests = response =>
+			response.StatusCode == (HttpStatusCode)429; // Too Many Requests
 	}
 }

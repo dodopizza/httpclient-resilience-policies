@@ -63,6 +63,30 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 			Assert.AreEqual(minimumThroughput + taskCount, wrapper.NumberOfCalls);
 		}
 
+		[Test]
+		public void Should_not_break_on_429()
+		{
+			const int retryCount = 5;
+			const int minimumThroughput = 2;
+			var settings = new ResiliencePoliciesSettings
+			{
+				OverallTimeout = TimeSpan.FromSeconds(5),
+				RetryPolicySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(100)),
+				CircuitBreakerPolicySettings = BuildCircuitBreakerSettings(minimumThroughput),
+				AdditionalFailureResultFilter = _ => false, // no additional filter (default is true for 429)
+			};
+			var wrapper = Create.HttpClientWrapperWrapperBuilder
+				.WithStatusCode(HttpStatusCode.TooManyRequests)
+				.WithResiliencePolicySettings(settings)
+				.Please();
+
+			const int taskCount = 4;
+			Assert.DoesNotThrowAsync(async () =>
+				await Helper.InvokeMultipleHttpRequests(wrapper.Client, taskCount));
+
+			Assert.AreEqual(wrapper.NumberOfCalls, taskCount);
+		}
+
 		private static CircuitBreakerPolicySettings BuildCircuitBreakerSettings(int throughput)
 		{
 			return new CircuitBreakerPolicySettings(

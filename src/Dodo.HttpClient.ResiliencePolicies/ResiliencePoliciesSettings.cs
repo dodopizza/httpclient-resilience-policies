@@ -44,11 +44,13 @@ namespace Dodo.HttpClientResiliencePolicies
 				var onBreakHandler = OnBreak;
 				var onResetHandler = OnReset;
 				var onHalfOpenHandler = OnHalfOpen;
+				var additionalFailureResultFilter = AdditionalFailureResultFilter;
 
 				_circuitBreakerPolicySettings = value;
 				_circuitBreakerPolicySettings.OnBreak = onBreakHandler;
 				_circuitBreakerPolicySettings.OnReset = onResetHandler;
 				_circuitBreakerPolicySettings.OnHalfOpen = onHalfOpenHandler;
+				_circuitBreakerPolicySettings.AdditionalFailureResultFilter = additionalFailureResultFilter;
 			}
 		}
 
@@ -74,6 +76,12 @@ namespace Dodo.HttpClientResiliencePolicies
 		{
 			get => CircuitBreakerPolicySettings.OnHalfOpen;
 			set => CircuitBreakerPolicySettings.OnHalfOpen = value;
+		}
+
+		public Func<HttpResponseMessage, bool> AdditionalFailureResultFilter
+		{
+			get => CircuitBreakerPolicySettings.AdditionalFailureResultFilter;
+			set => CircuitBreakerPolicySettings.AdditionalFailureResultFilter = value;
 		}
 	}
 }
