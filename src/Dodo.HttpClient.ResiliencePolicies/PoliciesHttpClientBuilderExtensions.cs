@@ -1,5 +1,4 @@
 using System;
-using System.Net;
 using System.Net.Http;
 using Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy;
 using Dodo.HttpClientResiliencePolicies.RetryPolicy;
