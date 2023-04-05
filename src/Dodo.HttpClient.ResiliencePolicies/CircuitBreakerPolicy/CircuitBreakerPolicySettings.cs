@@ -14,6 +14,7 @@ namespace Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy
 		internal Action<DelegateResult<HttpResponseMessage>, TimeSpan> OnBreak { get; set; }
 		internal Action OnReset { get; set; }
 		internal Action OnHalfOpen { get; set; }
+		internal Func<HttpResponseMessage, bool> ExtraBreakCondition { get; set; }
 
 		public CircuitBreakerPolicySettings()
 			: this(
@@ -38,6 +39,7 @@ namespace Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy
 			OnBreak = DoNothingOnBreak;
 			OnReset = DoNothingOnReset;
 			OnHalfOpen = DoNothingOnHalfOpen;
+			ExtraBreakCondition = BreakConditions.OnTooManyRequests;
 		}
 
 		private static readonly Action<DelegateResult<HttpResponseMessage>, TimeSpan> DoNothingOnBreak = (_, __) => { };

@@ -93,10 +93,11 @@ Also you may check the [defaults](src/Dodo.HttpClient.ResiliencePolicies/Default
             durationOfBreak: TimeSpan.FromSeconds(5),
             samplingDuration: TimeSpan.FromSeconds(30)
         ),
-        OnRetry = (response, time) => { ... },      // Handle retry event. For example you may add logging here
-        OnBreak = (response, time) => { ... },      // Handle CircuitBreaker break event. For example you may add logging here
-        OnReset = () => {...},                      // Handle CircuitBreaker reset event. For example you may add logging here
-        OnHalfOpen = () => {...},                   // Handle CircuitBreaker reset event. For example you may add logging here
+        OnRetry = (response, time) => { ... },                  // Handle retry event. For example you may add logging here
+        OnBreak = (response, time) => { ... },                  // Handle CircuitBreaker break event. For example you may add logging here
+        OnReset = () => {...},                                  // Handle CircuitBreaker reset event. For example you may add logging here
+        OnHalfOpen = () => {...},                               // Handle CircuitBreaker reset event. For example you may add logging here
+        ExtraBreakCondition = BreakConditions.OnTooManyRequests // Extra condition for CircuitBreaker to open (opens on TooManyRequests by default)
     }
     ```
 

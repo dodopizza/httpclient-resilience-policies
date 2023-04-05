@@ -1,5 +1,4 @@
 using System;
-using System.Net;
 using System.Net.Http;
 using Dodo.HttpClientResiliencePolicies.CircuitBreakerPolicy;
 using Dodo.HttpClientResiliencePolicies.RetryPolicy;
@@ -80,7 +79,7 @@ namespace Dodo.HttpClientResiliencePolicies
 			return HttpPolicyExtensions
 				.HandleTransientHttpError()
 				.Or<TimeoutRejectedException>()
-				.OrResult(r => r.StatusCode == (HttpStatusCode) 429) // Too Many Requests
+				.OrResult(settings.ExtraBreakCondition)
 				.AdvancedCircuitBreakerAsync(settings);
 		}
 
