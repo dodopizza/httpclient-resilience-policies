@@ -80,7 +80,7 @@ namespace Dodo.HttpClientResiliencePolicies
 			return HttpPolicyExtensions
 				.HandleTransientHttpError()
 				.Or<TimeoutRejectedException>()
-				.OrResult(settings.AdditionalFailureResultFilter)
+				.OrResult(settings.ExtraBreakCondition)
 				.AdvancedCircuitBreakerAsync(settings);
 		}
 

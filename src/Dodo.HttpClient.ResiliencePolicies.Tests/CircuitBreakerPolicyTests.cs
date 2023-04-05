@@ -73,7 +73,7 @@ namespace Dodo.HttpClientResiliencePolicies.Tests
 				OverallTimeout = TimeSpan.FromSeconds(5),
 				RetryPolicySettings = RetryPolicySettings.Constant(retryCount, TimeSpan.FromMilliseconds(100)),
 				CircuitBreakerPolicySettings = BuildCircuitBreakerSettings(minimumThroughput),
-				AdditionalFailureResultFilter = _ => false, // no additional filter (default is true for 429)
+				ExtraBreakCondition = BreakConditions.None
 			};
 			var wrapper = Create.HttpClientWrapperWrapperBuilder
 				.WithStatusCode(HttpStatusCode.TooManyRequests)
