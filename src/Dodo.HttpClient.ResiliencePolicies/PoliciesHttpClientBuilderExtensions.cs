@@ -44,6 +44,17 @@ namespace Dodo.HttpClientResiliencePolicies
 				.AddTimeoutPolicy(settings.TimeoutPerTry);
 		}
 
+		public static IHttpClientBuilder AddResiliencePolicies(
+			this IHttpClientBuilder clientBuilder,
+			Func<IServiceProvider, ResiliencePoliciesSettings> configure)
+		{
+			return clientBuilder
+				.AddTimeoutPolicy(sp => configure(sp).OverallTimeout)
+				.AddRetryPolicy(sp => configure(sp).RetryPolicySettings)
+				.AddCircuitBreakerPolicy(sp => configure(sp).CircuitBreakerPolicySettings)
+				.AddTimeoutPolicy(sp => configure(sp).TimeoutPerTry);
+		}
+
 		private static IHttpClientBuilder AddRetryPolicy(
 			this IHttpClientBuilder clientBuilder,
 			RetryPolicySettings settings)
@@ -53,6 +64,17 @@ namespace Dodo.HttpClientResiliencePolicies
 					.HandleTransientHttpError()
 					.Or<TimeoutRejectedException>()
 					.WaitAndRetryAsync(settings));
+		}
+
+		private static IHttpClientBuilder AddRetryPolicy(
+			this IHttpClientBuilder clientBuilder,
+			Func<IServiceProvider, RetryPolicySettings> configure)
+		{
+			return clientBuilder
+				.AddPolicyHandler((sp, _) => HttpPolicyExtensions
+					.HandleTransientHttpError()
+					.Or<TimeoutRejectedException>()
+					.WaitAndRetryAsync(configure(sp)));
 		}
 
 		private static IHttpClientBuilder AddCircuitBreakerPolicy(
@@ -73,6 +95,24 @@ namespace Dodo.HttpClientResiliencePolicies
 			});
 		}
 
+		private static IHttpClientBuilder AddCircuitBreakerPolicy(
+			this IHttpClientBuilder clientBuilder,
+			Func<IServiceProvider, CircuitBreakerPolicySettings> configure)
+		{
+			// This implementation takes into consideration situations
+			// when you use the only HttpClient against different hosts.
+			// In this case we want to have separate CircuitBreaker metrics for each host.
+			// It allows us avoid situations when all requests to all hosts
+			// will be stopped by CircuitBreaker due to single host is not available.
+			var registry = new PolicyRegistry();
+			return clientBuilder.AddPolicyHandler((sp, message) =>
+			{
+				var policyKey = message.RequestUri.Host;
+				var policy = registry.GetOrAdd(policyKey, BuildCircuitBreakerPolicy(configure(sp)));
+				return policy;
+			});
+		}
+
 		private static IAsyncPolicy<HttpResponseMessage> BuildCircuitBreakerPolicy(
 			CircuitBreakerPolicySettings settings)
 		{
@@ -88,6 +128,13 @@ namespace Dodo.HttpClientResiliencePolicies
 			TimeSpan timeout)
 		{
 			return httpClientBuilder.AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(timeout));
+		}
+
+		private static IHttpClientBuilder AddTimeoutPolicy(
+			this IHttpClientBuilder httpClientBuilder,
+			Func<IServiceProvider, TimeSpan> configure)
+		{
+			return httpClientBuilder.AddPolicyHandler((sp, _) => Policy.TimeoutAsync<HttpResponseMessage>(configure(sp)));
 		}
 	}
 }
